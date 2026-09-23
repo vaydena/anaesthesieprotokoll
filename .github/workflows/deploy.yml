@@ -1,0 +1,87 @@
+name: Deploy zu Hostinger
+
+# Loest bei jedem Push auf main automatisch ein Deploy aus.
+# Laedt die statischen Seiten + PWA-Dateien (Manifest, Service Worker, Icons,
+# GiroCode-Bibliothek) per FTPS (curl) nach /anaesthesieprotokoll/ hoch.
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:        # erlaubt manuelles Ausloesen ueber den Actions-Tab
+
+concurrency:
+  group: deploy-hostinger-aprot
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Repo auschecken
+        uses: actions/checkout@v4
+
+      # Solange das Passwort-Secret fehlt, wird NICHT deployt (Lauf bleibt gruen).
+      - name: Secret pruefen
+        id: guard
+        env:
+          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+        run: |
+          if [ -z "$FTP_PASSWORD" ]; then
+            echo "::notice::FTP_PASSWORD fehlt noch - Deploy uebersprungen."
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      # FTPS via curl (auf dem Runner immer vorhanden):
+      #   --ssl-reqd        erzwingt AUTH TLS (verschluesselt)
+      #   -k                ignoriert Hostingers *.hstgr.io-Zertifikat (Namensfehler)
+      #   --ftp-create-dirs legt icons/ und assets/ auf dem Server an
+      #   --user            Passwort als EIN Argument -> Sonderzeichen unkritisch
+      #   --fail            Job wird rot, wenn Login/Upload scheitert (z.B. 530)
+      # Die Ziel-URL enthaelt den vollen relativen Pfad (NICHT mit "/" enden),
+      # damit Unterordner-Dateien nicht in den Wurzelordner flach fallen.
+      - name: Deploy via FTPS (curl)
+        if: steps.guard.outputs.ready == 'true'
+        env:
+          FTPHOST: ftp.vaydena.de
+          FTPUSER: u424339903.deploy
+          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+        run: |
+          set -e
+          # Hostingers FTP ist vom Runner aus sporadisch nicht erreichbar
+          # (curl 28 / Connect-Timeout). Darum je Datei mehrere Anlaeufe mit
+          # Pause, plus curls eigenen Retry innerhalb eines Anlaufs.
+          upload() {
+            f="$1"; attempt=1; max=5
+            while [ "$attempt" -le "$max" ]; do
+              echo "Lade $f hoch (Versuch $attempt/$max)..."
+              if curl --ssl-reqd -k --ftp-create-dirs \
+                   --connect-timeout 60 --max-time 300 \
+                   --retry 3 --retry-delay 5 --retry-all-errors \
+                   --fail --show-error --silent \
+                   --user "$FTPUSER:$FTP_PASSWORD" \
+                   -T "$f" "ftp://$FTPHOST/anaesthesieprotokoll/$f"; then
+                echo "  OK: $f"; return 0
+              fi
+              echo "  Fehlversuch $attempt fuer $f"
+              attempt=$((attempt+1)); sleep 15
+            done
+            echo "Aufgeben nach $max Versuchen: $f"; return 1
+          }
+          for f in \
+            index.html \
+            anmelden.html \
+            app.html \
+            betreiber.html \
+            manifest.webmanifest \
+            sw.js \
+            .htaccess \
+            icons/icon-192.png \
+            icons/icon-512.png \
+            icons/icon-192-maskable.png \
+            icons/icon-512-maskable.png \
+            assets/qrcode-generator.js \
+            deploy-version.txt; do
+            upload "$f"
+          done
+          echo "Alle Dateien hochgeladen."

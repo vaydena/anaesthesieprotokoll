@@ -1,0 +1,21 @@
+{
+  "name": "Anästhesieprotokoll",
+  "short_name": "Anästhesie",
+  "description": "Digitales Narkoseprotokoll – offline auf dem Tablet, reine Dokumentation.",
+  "lang": "de",
+  "dir": "ltr",
+  "id": "/app.html",
+  "start_url": "/app.html",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#f3f7f9",
+  "theme_color": "#0e7c86",
+  "categories": ["medical", "productivity", "health"],
+  "icons": [
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-192-maskable.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "/icons/icon-512-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

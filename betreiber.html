@@ -1,0 +1,706 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Betreiber · Anästhesieprotokoll</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2064%2064'%3E%3Crect%20width='64'%20height='64'%20rx='14'%20fill='%230e7c86'/%3E%3Cpath%20d='M8%2034H20L26%2034L30%2016L36%2048L40%2030H56'%20fill='none'%20stroke='%23fff'%20stroke-width='4'%20stroke-linecap='round'%20stroke-linejoin='round'/%3E%3C/svg%3E">
+<style>
+  :root{
+    --bg:#eef4f4; --surface:#ffffff; --surface-2:#f2f8f8; --border:#d6e3e3;
+    --text:#0f2f2e; --muted:#5c7678; --brand:#0e7c86; --brand-strong:#0b6570; --brand-ink:#ffffff;
+    --ok:#1f7a4d; --ok-bg:#e4f4ea; --ok-bd:#bfe3cd;
+    --danger:#b3341f; --danger-bg:#fbe8e4; --danger-bd:#f0c4ba;
+    --shadow:0 1px 2px rgba(9,40,44,.06), 0 6px 20px rgba(9,40,44,.06);
+    --radius:14px;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#0b1f22; --surface:#10292d; --surface-2:#143036; --border:#254649;
+      --text:#e7f1f0; --muted:#93b0b1; --brand:#37b6c2; --brand-strong:#5cc9d3; --brand-ink:#062229;
+      --ok:#49c78c; --ok-bg:#123a2c; --ok-bd:#1e5641;
+      --danger:#ef7d6b; --danger-bg:#3a1a15; --danger-bd:#5e2b23;
+      --shadow:0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.28);
+    }
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{
+    background:var(--bg); color:var(--text); min-height:100vh;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.5; -webkit-font-smoothing:antialiased;
+    padding:24px 16px 64px;
+  }
+  .wrap{max-width:860px;margin:0 auto}
+  .brand{display:flex;align-items:center;gap:12px;margin:8px 2px 22px}
+  .brand .mark{width:40px;height:40px;border-radius:11px;background:var(--brand);color:var(--brand-ink);
+    display:grid;place-items:center;flex:0 0 auto;box-shadow:var(--shadow)}
+  .brand .mark svg{width:22px;height:22px}
+  .brand h1{font-size:1.18rem;margin:0;letter-spacing:-.01em}
+  .brand p{margin:1px 0 0;color:var(--muted);font-size:.86rem}
+
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+    box-shadow:var(--shadow)}
+  .pad{padding:22px}
+
+  /* ---- Login ---- */
+  #login{max-width:440px;margin:6vh auto 0}
+  #login h2{margin:0 0 4px;font-size:1.05rem}
+  #login p.sub{margin:0 0 18px;color:var(--muted);font-size:.9rem}
+  label.fld{display:block;font-size:.82rem;font-weight:600;color:var(--muted);margin:0 0 6px}
+  .keyrow{display:flex;gap:8px}
+  input[type=password],input[type=text],input.search{
+    width:100%;padding:11px 12px;border:1px solid var(--border);border-radius:10px;
+    background:var(--surface-2);color:var(--text);font-size:.95rem;font-family:inherit}
+  input:focus{outline:2px solid var(--brand);outline-offset:1px;border-color:var(--brand)}
+  .remember{display:flex;align-items:center;gap:8px;margin:14px 0 18px;color:var(--muted);font-size:.86rem}
+  .remember input{width:16px;height:16px;accent-color:var(--brand)}
+
+  .btn{appearance:none;border:1px solid transparent;border-radius:10px;padding:11px 16px;
+    font-size:.92rem;font-weight:600;font-family:inherit;cursor:pointer;transition:transform .06s, filter .15s}
+  .btn:active{transform:scale(.98)}
+  .btn[disabled]{opacity:.55;cursor:not-allowed}
+  .btn-primary{background:var(--brand);color:var(--brand-ink)}
+  .btn-primary:hover{filter:brightness(1.06)}
+  .btn-ghost{background:var(--surface-2);color:var(--text);border-color:var(--border)}
+  .btn-ok{background:var(--ok);color:#fff}
+  .btn-danger{background:transparent;color:var(--danger);border-color:var(--danger-bd)}
+  .btn-danger:hover{background:var(--danger-bg)}
+  .btn-sm{padding:7px 13px;font-size:.85rem}
+
+  /* ---- App ---- */
+  #app{display:none}
+  .toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:0 2px 14px}
+  .toolbar .search{flex:1 1 220px;min-width:0}
+  .toolbar .spacer{flex:1}
+  .summary{display:flex;gap:16px;flex-wrap:wrap;margin:0 2px 16px;color:var(--muted);font-size:.86rem}
+  .summary b{color:var(--text)}
+
+  .tablewrap{overflow-x:auto;border-radius:var(--radius)}
+  table{width:100%;border-collapse:collapse;min-width:560px}
+  thead th{font-size:.74rem;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);
+    text-align:left;font-weight:700;padding:12px 14px;border-bottom:1px solid var(--border)}
+  thead th.num,tbody td.num{text-align:right;font-variant-numeric:tabular-nums}
+  tbody td{padding:13px 14px;border-bottom:1px solid var(--border);vertical-align:middle}
+  tbody tr:last-child td{border-bottom:none}
+  .pname{font-weight:600}
+  .pmeta{color:var(--muted);font-size:.78rem;margin-top:2px}
+  .pill{display:inline-flex;align-items:center;gap:6px;font-size:.78rem;font-weight:700;
+    padding:4px 10px;border-radius:999px;border:1px solid}
+  .pill::before{content:"";width:7px;height:7px;border-radius:50%}
+  .pill.on{color:var(--ok);background:var(--ok-bg);border-color:var(--ok-bd)}
+  .pill.on::before{background:var(--ok)}
+  .pill.off{color:var(--danger);background:var(--danger-bg);border-color:var(--danger-bd)}
+  .pill.off::before{background:var(--danger)}
+  td.act{text-align:right;white-space:nowrap}
+  .badge-open{display:inline-block;min-width:22px;text-align:center;padding:2px 8px;border-radius:999px;
+    background:var(--surface-2);border:1px solid var(--border);font-weight:700;font-size:.82rem}
+  .badge-open.has{color:var(--danger);border-color:var(--danger-bd);background:var(--danger-bg)}
+
+  .empty{padding:40px 20px;text-align:center;color:var(--muted)}
+  .note{margin:18px 2px 0;color:var(--muted);font-size:.8rem}
+
+  /* ---- Toast ---- */
+  #toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);
+    background:var(--text);color:var(--bg);padding:11px 18px;border-radius:10px;font-size:.9rem;font-weight:600;
+    box-shadow:0 8px 30px rgba(0,0,0,.25);opacity:0;pointer-events:none;transition:opacity .2s, transform .2s;max-width:90vw}
+  #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  #toast.ok{background:var(--ok);color:#fff}
+  #toast.err{background:var(--danger);color:#fff}
+  .spin{display:inline-block;width:15px;height:15px;border:2px solid currentColor;border-right-color:transparent;
+    border-radius:50%;animation:sp .7s linear infinite;vertical-align:-2px;margin-right:7px}
+  @keyframes sp{to{transform:rotate(360deg)}}
+  @media (prefers-reduced-motion: reduce){.spin{animation:none}}
+
+  /* ---- Editor-Modal ---- */
+  .warn{color:var(--danger);font-weight:600}
+  .modal-back{position:fixed;inset:0;background:rgba(4,20,22,.55);display:none;align-items:flex-start;
+    justify-content:center;padding:22px 14px;overflow:auto;z-index:60}
+  .modal{max-width:640px;width:100%;margin:18px auto 40px}
+  .modal-h{display:flex;align-items:center;justify-content:space-between;gap:12px;
+    padding:16px 22px;border-bottom:1px solid var(--border)}
+  .modal-h h2{margin:0;font-size:1.02rem;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .modal-h .x{background:none;border:none;color:var(--muted);font-size:1.05rem;cursor:pointer;
+    padding:4px 9px;border-radius:8px;flex:0 0 auto}
+  .modal-h .x:hover{background:var(--surface-2);color:var(--text)}
+  .modal-b{padding:18px 22px}
+  .modal-b label.fld{margin-top:14px}
+  .modal-b > label.fld:first-child{margin-top:0}
+  .modal-b textarea{width:100%;padding:11px 12px;border:1px solid var(--border);border-radius:10px;
+    background:var(--surface-2);color:var(--text);font-family:inherit;font-size:.95rem;line-height:1.45;resize:vertical}
+  .modal-b textarea:focus{outline:2px solid var(--brand);outline-offset:1px;border-color:var(--brand)}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:0 14px}
+  .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:0 14px}
+  @media (max-width:520px){ .grid2,.grid3{grid-template-columns:1fr} }
+  .modal-f{display:flex;justify-content:flex-end;gap:10px;padding:15px 22px;border-top:1px solid var(--border);
+    position:sticky;bottom:0;background:var(--surface);border-radius:0 0 var(--radius) var(--radius)}
+  .linkbtn{background:none;border:none;color:var(--brand);font:inherit;font-size:.78rem;font-weight:600;
+    cursor:pointer;padding:0;margin-left:8px;text-decoration:underline}
+  .linkrow{margin-bottom:8px}
+  .logo-row{display:flex;gap:14px;align-items:center;margin-top:8px}
+  .logo-prev{width:96px;height:60px;flex:0 0 auto;border:1px dashed var(--border);border-radius:10px;
+    display:grid;place-items:center;background:#fff;color:var(--muted);font-size:.74rem;overflow:hidden;text-align:center;padding:4px}
+  .logo-prev img{max-width:100%;max-height:100%;object-fit:contain}
+  .logo-actions{display:flex;flex-direction:column;gap:7px;align-items:flex-start;min-width:0}
+  .logo-hint{color:var(--muted);font-size:.76rem}
+
+  /* ---- Abrechnung (GiroCode) ---- */
+  .bill-sum{background:var(--surface-2);border:1px solid var(--border);border-radius:10px;
+    padding:12px 14px;font-size:.9rem;margin-bottom:16px}
+  .bill-sum b{color:var(--text)}
+  .bill-grid{display:flex;gap:18px;flex-wrap:wrap;align-items:flex-start}
+  .qr-box{flex:0 0 auto;width:180px;height:180px;background:#fff;border:1px solid var(--border);
+    border-radius:12px;padding:8px;display:grid;place-items:center}
+  .qr-box svg{width:100%;height:100%;display:block}
+  .qr-fail{font-size:.76rem;color:var(--danger);text-align:center;padding:8px;line-height:1.4}
+  .bank{flex:1 1 240px;min-width:0}
+  .bank dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:7px 14px;font-size:.9rem}
+  .bank dt{color:var(--muted);font-weight:600}
+  .bank dd{margin:0;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+  .bank dd.amount{font-weight:700;color:var(--text)}
+  .bill-hint{color:var(--muted);font-size:.78rem;margin:16px 0 0;line-height:1.5}
+  @media (max-width:520px){ .qr-box{margin:0 auto} }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="brand">
+    <div class="mark" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M2 12H7L9 6L12 18L14 9L16 13H22"/>
+      </svg>
+    </div>
+    <div>
+      <h1>Betreiber-Verwaltung</h1>
+      <p>Anästhesieprotokoll · Praxen anlegen, Kopf, Logo &amp; Abrechnung</p>
+    </div>
+  </div>
+
+  <!-- ================= LOGIN ================= -->
+  <div id="login" class="card pad">
+    <h2>Anmeldung</h2>
+    <p class="sub">Bitte den Betreiber-Schlüssel eingeben. Er wird nur zur Anmeldung an den Server geschickt und nirgends im Klartext gespeichert.</p>
+    <form id="loginForm" autocomplete="off">
+      <label class="fld" for="keyInput">Betreiber-Schlüssel</label>
+      <div class="keyrow">
+        <input id="keyInput" type="password" placeholder="••••••••••••••••" autocomplete="off" spellcheck="false">
+      </div>
+      <div class="remember">
+        <input id="remember" type="checkbox"><label for="remember" style="margin:0;font-weight:500">Auf diesem Gerät merken</label>
+      </div>
+      <button class="btn btn-primary" id="loginBtn" type="submit" style="width:100%">Anmelden</button>
+      <div id="loginErr" class="note" style="color:var(--danger);display:none"></div>
+    </form>
+  </div>
+
+  <!-- ================= APP ================= -->
+  <div id="app">
+    <div class="toolbar">
+      <input class="search" id="search" type="text" placeholder="Praxis suchen…" autocomplete="off">
+      <div class="spacer"></div>
+      <button class="btn btn-primary btn-sm" id="newBtn" type="button">+ Neue Praxis</button>
+      <button class="btn btn-ghost btn-sm" id="refreshBtn" type="button">Aktualisieren</button>
+      <button class="btn btn-ghost btn-sm" id="logoutBtn" type="button">Abmelden</button>
+    </div>
+
+    <div class="summary" id="summary"></div>
+    <div class="card">
+      <div class="tablewrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Praxis</th>
+              <th>Status</th>
+              <th class="num">Protokolle</th>
+              <th class="num">offen</th>
+              <th style="text-align:right">Aktion</th>
+            </tr>
+          </thead>
+          <tbody id="rows"></tbody>
+        </table>
+      </div>
+      <div class="empty" id="empty" style="display:none">Keine Praxis gefunden.</div>
+    </div>
+    <p class="note">„Offen" = finalisierte Protokolle (je 1,00 €), die noch nicht abgerechnet wurden. Sperren blockiert sofort das Öffnen der App <b>und</b> die Zählung; Freischalten macht denselben Link wieder gültig.</p>
+  </div>
+
+</div>
+
+<!-- ================= EDITOR (Kopf & Logo) ================= -->
+<div id="editorBack" class="modal-back" role="dialog" aria-modal="true" aria-labelledby="edTitle">
+  <div class="modal card">
+    <div class="modal-h">
+      <h2 id="edTitle">Praxis bearbeiten</h2>
+      <button class="x" id="edClose" type="button" aria-label="Schließen">✕</button>
+    </div>
+    <div class="modal-b">
+      <div class="linkrow">
+        <label class="fld">Zugangs-Link dieser Praxis</label>
+        <div class="keyrow">
+          <input id="ed_link" type="text" readonly style="flex:1;min-width:0">
+          <button class="btn btn-ghost btn-sm" id="edCopy" type="button" style="flex:0 0 auto">Kopieren</button>
+        </div>
+      </div>
+
+      <label class="fld" for="ed_header_name">Praxis-/Klinikname (erscheint im Kopf) *</label>
+      <input type="text" id="ed_header_name" placeholder="z. B. Anästhesiepraxis Dr. Müller">
+
+      <label class="fld" for="ed_header_sub">Untertitel</label>
+      <input type="text" id="ed_header_sub" placeholder="z. B. Dr. med. Anna Müller · Rostock">
+
+      <div class="grid2">
+        <div><label class="fld" for="ed_inhaber">Ärztin/Arzt · Inhaber</label><input type="text" id="ed_inhaber" placeholder="Dr. med. Anna Müller"></div>
+        <div><label class="fld" for="ed_email">E-Mail (für Rechnung)</label><input type="text" id="ed_email" placeholder="praxis@example.de"></div>
+      </div>
+
+      <label class="fld" for="ed_adresse">Anschrift</label>
+      <input type="text" id="ed_adresse" placeholder="Musterstraße 1, 12345 Stadt">
+
+      <div class="grid3">
+        <div><label class="fld" for="ed_tel">Telefon</label><input type="text" id="ed_tel"></div>
+        <div><label class="fld" for="ed_fax">Fax</label><input type="text" id="ed_fax"></div>
+        <div><label class="fld" for="ed_notfall">Notfall-Nr.</label><input type="text" id="ed_notfall"></div>
+      </div>
+      <div class="grid2">
+        <div><label class="fld" for="ed_mail">Kontakt-E-Mail (im Kopf)</label><input type="text" id="ed_mail"></div>
+        <div><label class="fld" for="ed_web">Web</label><input type="text" id="ed_web"></div>
+      </div>
+
+      <label class="fld" for="ed_verantwortlich">DSGVO-Verantwortlicher<button type="button" class="linkbtn" id="ed_autoVer">aus Feldern erzeugen</button></label>
+      <textarea id="ed_verantwortlich" rows="2" placeholder="Name, Anschrift und Kontakt der verantwortlichen Stelle"></textarea>
+
+      <label class="fld">Logo (optional)</label>
+      <div class="logo-row">
+        <div class="logo-prev" id="ed_logoPrev">kein Logo</div>
+        <div class="logo-actions">
+          <input type="file" id="ed_logoFile" accept="image/png,image/jpeg,image/webp" hidden>
+          <button class="btn btn-ghost btn-sm" id="ed_logoBtn" type="button">Logo wählen…</button>
+          <button class="btn btn-danger btn-sm" id="ed_logoDel" type="button" style="display:none">Logo entfernen</button>
+          <div class="logo-hint">PNG/JPG · wird automatisch auf max. 320 px verkleinert</div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-f">
+      <button class="btn btn-ghost" id="edCancel" type="button">Abbrechen</button>
+      <button class="btn btn-primary" id="edSave" type="button">Speichern</button>
+    </div>
+  </div>
+</div>
+
+<!-- ================= ABRECHNUNG (GiroCode) ================= -->
+<div id="billBack" class="modal-back" role="dialog" aria-modal="true" aria-labelledby="billTitle">
+  <div class="modal card">
+    <div class="modal-h">
+      <h2 id="billTitle">Abrechnung</h2>
+      <button class="x" id="billClose" type="button" aria-label="Schließen">✕</button>
+    </div>
+    <div class="modal-b">
+      <div class="bill-sum" id="billSum"></div>
+      <div class="bill-grid">
+        <div class="qr-box" id="billQr"></div>
+        <div class="bank">
+          <dl>
+            <dt>Empfänger</dt><dd>Karl-Heinz Bicker</dd>
+            <dt>IBAN</dt><dd>DE95 7005 1003 0000 7853 03</dd>
+            <dt>BIC</dt><dd>BYLADEM1FSI</dd>
+            <dt>Betrag</dt><dd class="amount" id="billAmount">–</dd>
+            <dt>Verwendung</dt><dd id="billRef">–</dd>
+          </dl>
+          <p class="bill-hint">GiroCode mit einer Banking-App scannen oder die Bankdaten manuell übernehmen. „Als abgerechnet markieren" setzt den Offen-Zähler dieser Praxis auf 0 – bitte erst nach Zahlungseingang bestätigen.</p>
+        </div>
+      </div>
+    </div>
+    <div class="modal-f">
+      <button class="btn btn-ghost" id="billCloseBtn" type="button">Schließen</button>
+      <button class="btn btn-ok" id="billMark" type="button">Als abgerechnet markieren</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script src="assets/qrcode-generator.js"></script>
+<script>
+(function(){
+  "use strict";
+  var CFG = {
+    fn: "https://xeuexovdipdiiuzjpzkj.supabase.co/functions/v1",
+    apikey: "sb_publishable_3dLuQ2PfEsjavJyl0fmkaA_DXB8ZS6f"
+  };
+  var KKEY = "aprot_betreiber_key";
+
+  var $ = function(id){ return document.getElementById(id); };
+  var PRACTICES = [];
+  var busy = false;
+  var edId = null, edLogo = null, edVersion = "";
+
+  function getKey(){ try{ return sessionStorage.getItem(KKEY) || localStorage.getItem(KKEY) || ""; }catch(e){ return ""; } }
+  function setKey(v, persist){ try{ sessionStorage.setItem(KKEY, v); if(persist){ localStorage.setItem(KKEY, v); } else { localStorage.removeItem(KKEY); } }catch(e){} }
+  function clearKey(){ try{ sessionStorage.removeItem(KKEY); localStorage.removeItem(KKEY); }catch(e){} }
+
+  var toastT;
+  function toast(msg, kind){
+    var t = $("toast"); t.textContent = msg; t.className = "show" + (kind ? " " + kind : "");
+    clearTimeout(toastT); toastT = setTimeout(function(){ t.className = t.className.replace("show","").trim(); }, 2600);
+  }
+
+  function api(action, extra, fnName){
+    var key = getKey();
+    var body = Object.assign({ action: action }, extra || {});
+    return fetch(CFG.fn + "/" + (fnName || "aprot-admin"), {
+      method: "POST",
+      headers: { "Content-Type":"application/json", "apikey":CFG.apikey, "x-admin-key":key },
+      body: JSON.stringify(body)
+    }).then(function(res){
+      return res.json().catch(function(){ return {}; }).then(function(data){
+        if(res.status === 401){ var e = new Error("unauthorized"); e.code = 401; throw e; }
+        if(!res.ok || (data && data.error)){ var e2 = new Error((data && data.error) || ("http_" + res.status)); e2.code = res.status; throw e2; }
+        return data;
+      });
+    });
+  }
+
+  function fmtDate(s){
+    try{ return new Date(s).toLocaleDateString("de-DE", {year:"numeric",month:"2-digit",day:"2-digit"}); }
+    catch(e){ return ""; }
+  }
+  function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g, function(c){
+    return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]; }); }
+
+  function showLogin(){ $("app").style.display="none"; $("login").style.display=""; setTimeout(function(){ $("keyInput").focus(); },50); }
+  function showApp(){ $("login").style.display="none"; $("app").style.display="block"; }
+
+  function setBusy(b){
+    busy = b;
+    [].forEach.call(document.querySelectorAll("#app button, #app input"), function(el){ el.disabled = b; });
+  }
+
+  function renderRows(){
+    var q = ($("search").value || "").trim().toLowerCase();
+    var list = PRACTICES.filter(function(p){ return !q || String(p.name||"").toLowerCase().indexOf(q) >= 0; });
+    var tb = $("rows"); tb.innerHTML = "";
+    $("empty").style.display = list.length ? "none" : "";
+
+    var nAktiv = 0, nGesperrt = 0, offen = 0;
+    PRACTICES.forEach(function(p){ if(p.active){ nAktiv++; } else { nGesperrt++; } offen += (+p.bogen_offen||0); });
+    $("summary").innerHTML =
+      "<span><b>" + PRACTICES.length + "</b> Praxen</span>" +
+      "<span><b>" + nAktiv + "</b> aktiv</span>" +
+      "<span><b>" + nGesperrt + "</b> gesperrt</span>" +
+      "<span><b>" + offen + "</b> Protokolle offen</span>";
+
+    list.forEach(function(p){
+      var tr = document.createElement("tr");
+      var open = +p.bogen_offen || 0;
+      var meta = 'seit ' + fmtDate(p.created_at);
+      if(!p.configured){ meta += ' · <span class="warn">Kopf fehlt</span>'; }
+      else if(p.has_logo){ meta += ' · mit Logo'; }
+      tr.innerHTML =
+        '<td><div class="pname">' + esc(p.name) + '</div><div class="pmeta">' + meta + '</div></td>' +
+        '<td><span class="pill ' + (p.active?"on":"off") + '">' + (p.active?"Aktiv":"Gesperrt") + '</span></td>' +
+        '<td class="num">' + (+p.bogen_total||0) + '</td>' +
+        '<td class="num"><span class="badge-open ' + (open>0?"has":"") + '">' + open + '</span></td>' +
+        '<td class="act"></td>';
+      var act = tr.querySelector(".act");
+      if(open > 0){
+        var billBtn = document.createElement("button");
+        billBtn.className = "btn btn-ok btn-sm"; billBtn.textContent = "Abrechnen"; billBtn.style.marginRight = "8px";
+        billBtn.onclick = function(){ openBill(p); };
+        act.appendChild(billBtn);
+      }
+      var edBtn = document.createElement("button");
+      edBtn.className = "btn btn-ghost btn-sm"; edBtn.textContent = "Bearbeiten"; edBtn.style.marginRight = "8px";
+      edBtn.onclick = function(){ openEditor(p.id); };
+      var btn = document.createElement("button");
+      if(p.active){ btn.className = "btn btn-danger btn-sm"; btn.textContent = "Sperren"; }
+      else { btn.className = "btn btn-ok btn-sm"; btn.textContent = "Freischalten"; }
+      btn.onclick = function(){ toggle(p); };
+      act.appendChild(edBtn); act.appendChild(btn);
+      tb.appendChild(tr);
+    });
+  }
+
+  function toggle(p){
+    if(busy) return;
+    var toActive = !p.active;
+    if(!toActive){
+      var ok = window.confirm('Praxis „' + p.name + '" wirklich sperren?\n\n' +
+        'Der Zugangslink funktioniert dann nicht mehr und es werden keine Protokolle mehr berechnet.\n' +
+        'Du kannst sie jederzeit wieder freischalten.');
+      if(!ok) return;
+    }
+    setBusy(true);
+    api("set_active", { customer_id: p.id, active: toActive }).then(function(){
+      toast((toActive ? "Freigeschaltet: " : "Gesperrt: ") + p.name, "ok");
+      return load(true);
+    }).catch(handleErr).then(function(){ setBusy(false); });
+  }
+
+  function handleErr(e){
+    if(e && e.code === 401){ clearKey(); toast("Schlüssel ungültig", "err"); showLogin(); return; }
+    var map = { not_found:"Praxis nicht gefunden", server_error:"Serverfehler", bad_customer_id:"Ungültige Praxis-ID",
+      bad_logo:"Logo-Format ungültig – bitte Bilddatei wählen", branding_too_large:"Logo/Daten zu groß – kleineres Bild wählen",
+      bad_name:"Name ist zu kurz", bad_branding:"Angaben ungültig" };
+    toast(map[e && e.message] || "Fehler: " + (e && e.message || "unbekannt"), "err");
+  }
+
+  function load(silent){
+    if(!getKey()){ showLogin(); return Promise.resolve(); }
+    if(!silent) setBusy(true);
+    return api("list").then(function(d){
+      PRACTICES = (d && d.customers) || [];
+      showApp(); renderRows();
+    }).catch(handleErr).then(function(){ if(!silent) setBusy(false); });
+  }
+
+  // ---- Wiring ----
+  $("loginForm").addEventListener("submit", function(ev){
+    ev.preventDefault();
+    var v = ($("keyInput").value || "").trim();
+    $("loginErr").style.display = "none";
+    if(!v){ $("loginErr").textContent = "Bitte Schlüssel eingeben."; $("loginErr").style.display=""; return; }
+    setKey(v, $("remember").checked);
+    $("loginBtn").innerHTML = '<span class="spin"></span>Prüfe…'; $("loginBtn").disabled = true;
+    api("list").then(function(d){
+      PRACTICES = (d && d.customers) || [];
+      $("keyInput").value = "";
+      showApp(); renderRows();
+    }).catch(function(e){
+      if(e && e.code === 401){ clearKey(); $("loginErr").textContent = "Schlüssel ist nicht korrekt."; }
+      else { $("loginErr").textContent = "Verbindungsfehler – bitte erneut versuchen."; }
+      $("loginErr").style.display = "";
+    }).then(function(){ $("loginBtn").innerHTML = "Anmelden"; $("loginBtn").disabled = false; });
+  });
+
+  $("search").addEventListener("input", renderRows);
+  $("refreshBtn").addEventListener("click", function(){ load(); });
+  $("logoutBtn").addEventListener("click", function(){
+    clearKey(); PRACTICES = []; $("search").value="";
+    showLogin();
+  });
+
+  // ---------- Editor (Kopf & Logo) ----------
+  function val(id){ return ($(id).value || ""); }
+
+  function buildLink(token){
+    var base = (location.protocol === "http:" || location.protocol === "https:")
+      ? location.origin : "https://anaesthesieprotokoll.vaydena.de";
+    return base + "/app.html?k=" + (token || "");
+  }
+
+  function showEditor(){ $("editorBack").style.display = "flex"; document.body.style.overflow = "hidden"; }
+  function hideEditor(){ $("editorBack").style.display = "none"; document.body.style.overflow = ""; edId = null; edLogo = null; edVersion = ""; }
+
+  function showLogoPreview(url){
+    var pv = $("ed_logoPrev");
+    if(url){ pv.innerHTML = ""; var im = document.createElement("img"); im.src = url; im.alt = ""; pv.appendChild(im); $("ed_logoDel").style.display = ""; }
+    else { pv.textContent = "kein Logo"; $("ed_logoDel").style.display = "none"; }
+  }
+
+  function fillEditor(p){
+    var b = p.branding || {}, px = b.praxis || {};
+    edId = p.id;
+    edVersion = px.version || "";
+    edLogo = (typeof b.logo === "string" && b.logo) ? b.logo : null;
+    $("ed_header_name").value    = b.header_name || px.name || "";
+    $("ed_header_sub").value     = b.header_sub || "";
+    $("ed_inhaber").value        = px.inhaber || "";
+    $("ed_email").value          = p.contact_email || "";
+    $("ed_adresse").value        = px.adresse || "";
+    $("ed_tel").value            = px.tel || "";
+    $("ed_fax").value            = px.fax || "";
+    $("ed_notfall").value        = px.notfall || "";
+    $("ed_mail").value           = px.mail || "";
+    $("ed_web").value            = px.web || "";
+    $("ed_verantwortlich").value = b.verantwortlich || "";
+    $("ed_link").value           = buildLink(p.token);
+    showLogoPreview(edLogo);
+    $("edTitle").textContent = "Praxis: " + (p.name || "");
+  }
+
+  function openEditor(pid){
+    showEditor();
+    $("edSave").disabled = true;
+    api("get_practice", { customer_id: pid }).then(function(d){
+      fillEditor(d.practice);
+      $("edSave").disabled = false;
+      setTimeout(function(){ try{ $("ed_header_name").focus(); }catch(e){} }, 60);
+    }).catch(function(e){ hideEditor(); handleErr(e); });
+  }
+
+  function autoVerantwortlich(){
+    var parts = [];
+    var n = val("ed_header_name").trim(); if(n) parts.push(n);
+    var a = val("ed_adresse").trim();     if(a) parts.push(a);
+    var t = val("ed_tel").trim();         if(t) parts.push("Tel. " + t);
+    var m = val("ed_mail").trim();        if(m) parts.push(m);
+    $("ed_verantwortlich").value = parts.length ? (parts.join(", ") + ".") : "";
+  }
+
+  function scaleLogo(file, cb){
+    if(file.size > 8 * 1024 * 1024){ toast("Bild ist zu groß (max. 8 MB)", "err"); return; }
+    var reader = new FileReader();
+    reader.onload = function(){
+      var img = new Image();
+      img.onload = function(){
+        var max = 320, w = img.naturalWidth, h = img.naturalHeight;
+        if(!w || !h){ toast("Bild konnte nicht gelesen werden", "err"); return; }
+        if(w > max || h > max){ var r = Math.min(max / w, max / h); w = Math.round(w * r); h = Math.round(h * r); }
+        var c = document.createElement("canvas"); c.width = w; c.height = h;
+        var ctx = c.getContext("2d"); ctx.drawImage(img, 0, 0, w, h);
+        var out;
+        try{ out = c.toDataURL("image/png"); }
+        catch(e){ toast("Bildformat nicht unterstützt", "err"); return; }
+        if(out.length > 140000){ var j = c.toDataURL("image/jpeg", 0.85); if(j.length < out.length) out = j; }
+        cb(out);
+      };
+      img.onerror = function(){ toast("Bild konnte nicht geladen werden", "err"); };
+      img.src = reader.result;
+    };
+    reader.onerror = function(){ toast("Datei konnte nicht gelesen werden", "err"); };
+    reader.readAsDataURL(file);
+  }
+
+  function saveEditor(){
+    if(!edId) return;
+    var hn = val("ed_header_name").trim();
+    if(!hn){ toast("Bitte einen Praxis-/Kliniknamen eingeben", "err"); try{ $("ed_header_name").focus(); }catch(e){} return; }
+    var branding = {
+      header_name: hn,
+      header_sub: val("ed_header_sub").trim(),
+      verantwortlich: val("ed_verantwortlich").trim(),
+      praxis: {
+        name:    hn,
+        inhaber: val("ed_inhaber").trim(),
+        adresse: val("ed_adresse").trim(),
+        tel:     val("ed_tel").trim(),
+        fax:     val("ed_fax").trim(),
+        notfall: val("ed_notfall").trim(),
+        mail:    val("ed_mail").trim(),
+        web:     val("ed_web").trim(),
+        version: edVersion || ""
+      }
+    };
+    if(edLogo) branding.logo = edLogo;
+    var email = val("ed_email").trim();
+    var save = $("edSave");
+    save.innerHTML = '<span class="spin"></span>Speichern…'; save.disabled = true;
+    api("save_practice", { customer_id: edId, contact_email: email, branding: branding }).then(function(){
+      toast("Gespeichert", "ok"); hideEditor(); return load(true);
+    }).catch(handleErr).then(function(){ save.innerHTML = "Speichern"; save.disabled = false; });
+  }
+
+  function copyLink(){
+    var v = $("ed_link").value || "";
+    if(!v) return;
+    function done(){ toast("Link kopiert", "ok"); }
+    function fallback(){ try{ $("ed_link").select(); document.execCommand("copy"); done(); }catch(e){ toast("Kopieren nicht möglich", "err"); } }
+    if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(v).then(done).catch(fallback); }
+    else { fallback(); }
+  }
+
+  function newPractice(){
+    if(busy) return;
+    var name = window.prompt("Interne Bezeichnung der neuen Praxis\n(z. B. „Praxis Dr. Müller, Rostock“):");
+    if(name === null) return;
+    name = (name || "").trim();
+    if(name.length < 2){ toast("Name ist zu kurz", "err"); return; }
+    setBusy(true);
+    api("create_practice", { name: name }).then(function(d){
+      var np = d.customer;
+      toast("Praxis angelegt", "ok");
+      return load(true).then(function(){ setBusy(false); if(np) openEditor(np.id); });
+    }).catch(function(e){ setBusy(false); handleErr(e); });
+  }
+
+  $("newBtn").addEventListener("click", newPractice);
+  $("edClose").addEventListener("click", hideEditor);
+  $("edCancel").addEventListener("click", hideEditor);
+  $("edSave").addEventListener("click", saveEditor);
+  $("edCopy").addEventListener("click", copyLink);
+  $("ed_autoVer").addEventListener("click", autoVerantwortlich);
+  $("ed_logoBtn").addEventListener("click", function(){ $("ed_logoFile").click(); });
+  $("ed_logoDel").addEventListener("click", function(){ edLogo = null; showLogoPreview(null); });
+  $("ed_logoFile").addEventListener("change", function(){
+    var f = this.files && this.files[0]; this.value = "";
+    if(f) scaleLogo(f, function(url){ edLogo = url; showLogoPreview(url); });
+  });
+  $("editorBack").addEventListener("click", function(ev){ if(ev.target === $("editorBack")) hideEditor(); });
+  document.addEventListener("keydown", function(ev){
+    if(ev.key !== "Escape") return;
+    if($("billBack").style.display === "flex"){ hideBill(); return; }
+    if($("editorBack").style.display === "flex") hideEditor();
+  });
+
+  // ---------- Abrechnung (GiroCode) ----------
+  var VAYDENA = { payee:"Karl-Heinz Bicker", iban:"DE95700510030000785303", bic:"BYLADEM1FSI" };
+  var PREIS = 1.00;
+  var billCust = null;
+
+  function asciiFold(s){
+    return String(s==null?"":s)
+      .replace(/ä/g,"ae").replace(/ö/g,"oe").replace(/ü/g,"ue")
+      .replace(/Ä/g,"Ae").replace(/Ö/g,"Oe").replace(/Ü/g,"Ue").replace(/ß/g,"ss")
+      .replace(/[^\x20-\x7E]/g," ").replace(/\s+/g," ").trim();
+  }
+  function fmtEuro(n){ return (Number(n)||0).toFixed(2).replace(".",",") + " €"; }
+
+  function showBill(){ $("billBack").style.display = "flex"; document.body.style.overflow = "hidden"; }
+  function hideBill(){ $("billBack").style.display = "none"; document.body.style.overflow = ""; billCust = null; }
+
+  function renderGiroCode(betrag, ref){
+    var box = $("billQr"); box.innerHTML = "";
+    try{
+      if(typeof qrcode !== "function") throw new Error("qr_lib_missing");
+      var amount = "EUR" + (Number(betrag)||0).toFixed(2);
+      var payload = ["BCD","002","1","SCT", VAYDENA.bic, VAYDENA.payee, VAYDENA.iban, amount, "", "", ref].join("\n");
+      var qr = qrcode(0, "M"); qr.addData(payload); qr.make();
+      box.innerHTML = qr.createSvgTag({ cellSize:4, margin:2, scalable:true, alt:"GiroCode für die SEPA-Überweisung", title:"GiroCode" });
+    }catch(e){
+      box.innerHTML = '<div class="qr-fail">QR-Code konnte nicht erzeugt werden.<br>Bitte die Bankdaten manuell übernehmen.</div>';
+    }
+  }
+
+  function openBill(p){
+    billCust = p;
+    var n = +p.bogen_offen || 0;
+    var betrag = n * PREIS;
+    var ref = asciiFold("Anaesthesieprotokoll " + n + " Protokolle " + (p.name||"")).slice(0,140);
+    $("billTitle").textContent = "Abrechnung · " + (p.name || "");
+    $("billSum").innerHTML = "<b>" + esc(p.name||"") + "</b> · <b>" + n + "</b> offene Protokoll" + (n===1?"":"e") +
+      " · je " + fmtEuro(PREIS) + " = <b>" + fmtEuro(betrag) + "</b>";
+    $("billAmount").textContent = fmtEuro(betrag);
+    $("billRef").textContent = ref;
+    $("billMark").disabled = n <= 0;
+    renderGiroCode(betrag, ref);
+    showBill();
+  }
+
+  function markBilled(){
+    if(!billCust) return;
+    var p = billCust, n = +p.bogen_offen || 0;
+    if(n <= 0) return;
+    var ok = window.confirm('„' + p.name + '": ' + n + ' Protokoll' + (n===1?"":"e") + ' als abgerechnet markieren?\n\n' +
+      'Der Offen-Zähler dieser Praxis wird auf 0 gesetzt. Bitte erst nach Zahlungseingang bestätigen.');
+    if(!ok) return;
+    var b = $("billMark"); b.innerHTML = '<span class="spin"></span>Markiere…'; b.disabled = true;
+    api("mark_billed", { customer_id: p.id }).then(function(d){
+      toast(((d && d.marked) ? d.marked : 0) + " Protokoll(e) als abgerechnet markiert", "ok");
+      hideBill();
+      return load(true);
+    }).catch(handleErr).then(function(){ b.innerHTML = "Als abgerechnet markieren"; b.disabled = false; });
+  }
+
+  $("billClose").addEventListener("click", hideBill);
+  $("billCloseBtn").addEventListener("click", hideBill);
+  $("billMark").addEventListener("click", markBilled);
+  $("billBack").addEventListener("click", function(ev){ if(ev.target === $("billBack")) hideBill(); });
+
+  // Auto-Login, wenn Schlüssel gemerkt wurde
+  if(getKey()){ load(); } else { showLogin(); }
+})();
+</script>
+</body>
+</html>

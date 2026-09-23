@@ -1,0 +1,15 @@
+# Betreiber-/Operator-Schluessel niemals versionieren oder deployen
+OPERATOR-KEY.local.txt
+*.local.txt
+
+# Betriebssystem / Editor
+.DS_Store
+Thumbs.db
+*.swp
+*~
+
+# Supabase-CLI (lokale Temp-/Zugangsdaten), nur Functions/Migrations bleiben
+supabase/.branches/
+supabase/.temp/
+.env
+.env.*

@@ -1,0 +1,45 @@
+# Anästhesieprotokoll – statisches Hosting (Hostinger)
+
+# Manifest korrekt ausliefern
+AddType application/manifest+json .webmanifest
+
+# --- Caching ---------------------------------------------------------------
+# Service Worker & Manifest & HTML: NIE cachen. Sonst erneuern zurückkehrende
+# Clients den SW nie (hCDN cacht sw.js sonst tagelang, multi-node).
+<FilesMatch "^sw\.js$">
+  <IfModule mod_headers.c>
+    Header set Cache-Control "no-cache, no-store, must-revalidate"
+    Header set Pragma "no-cache"
+    Header set Expires "0"
+  </IfModule>
+</FilesMatch>
+
+<FilesMatch "\.webmanifest$">
+  <IfModule mod_headers.c>
+    Header set Cache-Control "no-cache, no-store, must-revalidate"
+  </IfModule>
+</FilesMatch>
+
+<FilesMatch "\.html$">
+  <IfModule mod_headers.c>
+    Header set Cache-Control "no-cache, must-revalidate"
+  </IfModule>
+</FilesMatch>
+
+# Icons/Bilder dürfen lange gecacht werden (unveränderlich, Name = Version).
+<FilesMatch "\.(png|svg|ico|jpg|jpeg|webp)$">
+  <IfModule mod_headers.c>
+    Header set Cache-Control "public, max-age=604800"
+  </IfModule>
+</FilesMatch>
+
+# --- Sicherheit ------------------------------------------------------------
+<IfModule mod_headers.c>
+  Header set X-Content-Type-Options "nosniff"
+  Header set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
+# Betreiber-Schlüssel-Datei niemals ausliefern (falls je hochgeladen)
+<FilesMatch "(OPERATOR-KEY\.local\.txt|\.local\.txt)$">
+  Require all denied
+</FilesMatch>

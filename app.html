@@ -1,0 +1,1468 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#0e7c86">
+<meta name="color-scheme" content="light">
+<title>Anästhesieprotokoll</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="icon" href="icons/icon-192.png">
+<style>
+:root{
+  --bg:#f3f7f9; --bg2:#e8eff3; --card:#ffffff;
+  --ink:#16303f; --muted:#5c7180; --line:#d3dfe7;
+  --primary:#0e7c86; --primary-d:#0a5b63; --primary-l:#e2f2f2;
+  --accent:#e08a1e; --accent-l:#fbeed7;
+  --ok:#2e7d54; --ok-l:#e3f3ea;
+  --deep:#0d3037; --deep-2:#0a262c; --deep-ink:#e7f2f1;
+  --focus:#1a97a4; --radius:18px; --shadow:0 6px 22px rgba(20,48,63,.10);
+  --font:-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  font-family:var(--font); color:var(--ink); background:var(--bg);
+  font-size:16px; line-height:1.45; -webkit-text-size-adjust:100%;
+  padding-bottom:96px;
+}
+h1,h2,h3{margin:0 0 .4em; text-wrap:balance; line-height:1.2}
+a{color:var(--primary-d)}
+.wrap{max-width:1100px; margin:0 auto; padding:0 16px}
+.eyebrow{font-size:.72rem; letter-spacing:.14em; text-transform:uppercase; color:var(--muted); font-weight:700}
+
+/* ---- Kopf / Branding ---- */
+.topbar{position:sticky; top:0; z-index:40; background:var(--deep); color:var(--deep-ink);
+  box-shadow:0 2px 10px rgba(10,38,44,.25)}
+.topbar .wrap{display:flex; align-items:center; gap:14px; min-height:58px; padding-top:8px; padding-bottom:8px; flex-wrap:wrap}
+.brand{display:flex; align-items:center; gap:12px; min-width:0}
+.brand .logo{width:40px; height:40px; border-radius:11px; background:rgba(255,255,255,.12);
+  display:flex; align-items:center; justify-content:center; flex:0 0 auto; overflow:hidden}
+.brand .logo svg{width:24px; height:24px}
+.brand .logo img{width:100%; height:100%; object-fit:contain}
+.brand .logo.has-img{background:transparent; padding:0; border:none; box-shadow:none; border-radius:0; height:40px; width:auto}
+.brand .logo.has-img img{width:auto; height:40px}
+.brand .names{min-width:0}
+#hf-praxis-name{font-weight:800; font-size:1.02rem; line-height:1.15; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:52vw}
+#hf-praxis-sub{font-size:.78rem; color:#b9d4d3; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:52vw}
+.topbar .spacer{flex:1 1 auto}
+.modeswitch{display:inline-flex; background:rgba(255,255,255,.10); border-radius:999px; padding:3px}
+.modeswitch button{border:0; background:transparent; color:#cfe6e5; font:inherit; font-weight:700;
+  padding:8px 14px; border-radius:999px; cursor:pointer; font-size:.86rem}
+.modeswitch button[aria-pressed="true"]{background:var(--card); color:var(--primary-d)}
+.tb-actions{display:flex; gap:8px; flex-wrap:wrap}
+.tb-actions .btn{padding:9px 13px; min-height:auto; font-size:.85rem}
+
+/* ---- Buttons ---- */
+.btn{display:inline-flex; align-items:center; justify-content:center; gap:8px; cursor:pointer;
+  border:1px solid transparent; border-radius:999px; min-height:48px; padding:11px 20px;
+  font:inherit; font-weight:700; font-size:.95rem; background:var(--primary); color:#fff; text-decoration:none;
+  transition:background .15s, box-shadow .15s, transform .05s}
+.btn:hover{background:var(--primary-d)}
+.btn:active{transform:translateY(1px)}
+.btn.sec{background:var(--card); color:var(--primary-d); border-color:var(--line)}
+.btn.sec:hover{background:var(--primary-l)}
+.btn.ghost{background:transparent; color:var(--deep-ink); border-color:rgba(255,255,255,.28)}
+.btn.ghost:hover{background:rgba(255,255,255,.10)}
+.btn.warn{background:var(--accent); color:#3a2405}
+.btn.warn:hover{background:#c9781a}
+.btn.ok{background:var(--ok)}
+.btn.small{min-height:40px; padding:8px 14px; font-size:.85rem}
+.btn:disabled{opacity:.5; cursor:not-allowed}
+button.linky{background:none;border:0;color:var(--primary-d);font:inherit;font-weight:700;cursor:pointer;padding:0;text-decoration:underline}
+
+/* ---- Sektionen ---- */
+main.wrap{padding-top:16px}
+.leadcard{background:var(--card); border:1px solid var(--line); border-radius:var(--radius);
+  box-shadow:var(--shadow); padding:16px 18px; margin:14px 0}
+.leadcard h1{font-size:1.24rem; margin-bottom:4px}
+.leadcard p{margin:.3em 0; color:var(--muted); font-size:.92rem}
+.sect{background:var(--card); border:1px solid var(--line); border-radius:var(--radius);
+  box-shadow:var(--shadow); margin:12px 0; overflow:hidden}
+.sect > summary{list-style:none; cursor:pointer; padding:15px 18px; display:flex; align-items:center; gap:12px;
+  font-weight:800; font-size:1.04rem; color:var(--ink); user-select:none}
+.sect > summary::-webkit-details-marker{display:none}
+.sect > summary .chev{margin-left:auto; transition:transform .18s; color:var(--muted); flex:0 0 auto}
+.sect[open] > summary .chev{transform:rotate(90deg)}
+.sect > summary .badge{font-size:.68rem; font-weight:800; letter-spacing:.04em; padding:3px 9px; border-radius:999px;
+  background:var(--primary-l); color:var(--primary-d)}
+.sect .body{padding:4px 18px 18px}
+.grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px 16px}
+.grid.two{grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+.field{display:flex; flex-direction:column; gap:5px; min-width:0}
+.field.wide{grid-column:1/-1}
+.field label{font-size:.82rem; font-weight:700; color:var(--ink)}
+.field .hint{font-size:.72rem; color:var(--muted); font-weight:500}
+input[type=text],input[type=date],input[type=time],input[type=number],select,textarea{
+  font:inherit; font-size:.95rem; color:var(--ink); background:#fff; border:1px solid var(--line);
+  border-radius:12px; padding:11px 12px; width:100%; min-height:46px}
+textarea{min-height:70px; resize:vertical; line-height:1.4}
+input:focus,select:focus,textarea:focus,button:focus-visible,summary:focus-visible,.tapgrid:focus-visible{
+  outline:3px solid var(--focus); outline-offset:2px}
+.inputunit{display:flex; align-items:stretch}
+.inputunit input{border-top-right-radius:0; border-bottom-right-radius:0; border-right:0}
+.inputunit .u{display:flex; align-items:center; padding:0 12px; background:var(--bg2); border:1px solid var(--line);
+  border-left:0; border-top-right-radius:12px; border-bottom-right-radius:12px; color:var(--muted); font-size:.85rem; font-weight:700; white-space:nowrap}
+.radio-row,.check-row{display:flex; flex-wrap:wrap; gap:8px}
+.chip{display:inline-flex; align-items:center; gap:7px; border:1px solid var(--line); background:#fff;
+  border-radius:999px; padding:8px 14px; cursor:pointer; font-size:.9rem; font-weight:600; user-select:none; min-height:42px}
+.chip input{position:absolute; opacity:0; width:1px; height:1px}
+.chip:has(input:checked){background:var(--primary-l); border-color:var(--primary); color:var(--primary-d); font-weight:800}
+.chip.mk:has(input:checked){background:var(--accent-l); border-color:var(--accent); color:#7a4a06}
+
+/* Score */
+.score{border:1px dashed var(--line); border-radius:14px; padding:12px; background:var(--bg2)}
+.score .comps{display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:10px}
+.score .comp{display:flex; align-items:center; justify-content:space-between; gap:8px; background:#fff;
+  border:1px solid var(--line); border-radius:10px; padding:7px 10px}
+.score .comp label{font-size:.82rem; font-weight:600}
+.score .comp select{width:66px; min-height:40px; padding:6px}
+.score .sumline{margin-top:10px; display:flex; align-items:center; gap:10px; font-weight:800}
+.score .sumval{background:var(--primary); color:#fff; border-radius:999px; padding:4px 14px}
+.score .note{font-size:.72rem; color:var(--muted); font-weight:600; margin-top:6px}
+
+/* Medikamente */
+.rowtable{width:100%; border-collapse:collapse; font-size:.9rem}
+.rowtable th{text-align:left; font-size:.72rem; text-transform:uppercase; letter-spacing:.05em; color:var(--muted);
+  padding:6px 8px; border-bottom:1px solid var(--line); white-space:nowrap}
+.rowtable td{padding:4px 6px; vertical-align:top}
+.rowtable input,.rowtable select{min-height:42px; padding:8px 9px}
+.rowtable .tdel{width:44px; text-align:center}
+.iconbtn{border:1px solid var(--line); background:#fff; border-radius:10px; width:40px; height:40px; cursor:pointer;
+  display:inline-flex; align-items:center; justify-content:center; color:var(--muted); font-size:1.1rem}
+.iconbtn:hover{background:var(--accent-l); color:#7a4a06; border-color:var(--accent)}
+.tablescroll{overflow-x:auto; -webkit-overflow-scrolling:touch; margin:0 -4px}
+.dosesum{margin-top:12px; background:var(--primary-l); border-radius:12px; padding:10px 14px; font-size:.86rem}
+.dosesum b{color:var(--primary-d)}
+.dosesum .row{display:flex; justify-content:space-between; gap:12px; padding:2px 0}
+
+/* Vitalkurve */
+.vittools{display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin-bottom:10px}
+.paramsel{display:inline-flex; flex-wrap:wrap; gap:6px}
+.paramsel button{border:1px solid var(--line); background:#fff; border-radius:999px; padding:7px 13px; cursor:pointer;
+  font:inherit; font-weight:700; font-size:.82rem; min-height:40px}
+.paramsel button[aria-pressed="true"]{background:var(--ink); color:#fff; border-color:var(--ink)}
+.stylesel{display:inline-flex; background:var(--bg2); border-radius:999px; padding:3px}
+.stylesel button{border:0; background:transparent; font:inherit; font-weight:700; font-size:.82rem; padding:7px 13px;
+  border-radius:999px; cursor:pointer; color:var(--muted); min-height:38px}
+.stylesel button[aria-pressed="true"]{background:#fff; color:var(--ink); box-shadow:0 1px 4px rgba(0,0,0,.1)}
+.vitwrap{overflow-x:auto; -webkit-overflow-scrolling:touch; border:1px solid var(--line); border-radius:12px; background:#fff}
+.tapgrid{display:block; touch-action:manipulation}
+.legend{display:flex; flex-wrap:wrap; gap:12px 18px; margin-top:10px; font-size:.8rem; color:var(--ink)}
+.legend span{display:inline-flex; align-items:center; gap:6px}
+.legend .gly{font-weight:800; font-size:1rem; width:16px; text-align:center; color:var(--primary-d)}
+.legend .swatch{width:16px; height:3px; border-radius:2px}
+.vitnote{font-size:.72rem; color:var(--muted); margin-top:6px}
+.numrows{margin-top:12px}
+.numrows table{border-collapse:collapse; font-size:.82rem}
+.numrows th,.numrows td{border:1px solid var(--line); padding:0}
+.numrows th{background:var(--bg2); padding:5px 7px; white-space:nowrap; position:sticky; left:0; z-index:1; font-size:.74rem}
+.numrows thead th{position:static}
+.numrows td input{border:0; border-radius:0; min-height:38px; width:58px; text-align:center; padding:4px}
+.numrows td input:focus{outline-offset:-3px}
+.numrows .colh{background:var(--bg2); font-weight:700; text-align:center; padding:4px 6px; font-size:.72rem; color:var(--muted); white-space:nowrap}
+
+/* Ereignisse */
+.evlist{display:flex; flex-direction:column; gap:8px}
+.evrow{display:flex; gap:8px; align-items:flex-start; background:var(--bg2); border-radius:12px; padding:8px}
+.evrow .evn{font-weight:800; color:var(--primary-d); min-width:26px; text-align:center; padding-top:10px}
+.evrow input[type=time]{max-width:110px}
+.evrow textarea{min-height:44px}
+
+/* Unterschriften */
+.sigbox{display:flex; flex-direction:column; gap:6px}
+.sigpad{border:1.5px dashed var(--line); border-radius:12px; background:#fff; width:100%; height:150px; touch-action:none; display:block}
+.sigpad.signed{border-style:solid; border-color:var(--ok)}
+.sigmeta{display:flex; gap:10px; align-items:center; flex-wrap:wrap}
+
+/* Info-/Rechtshinweise */
+.callout{border-left:4px solid var(--accent); background:var(--accent-l); border-radius:0 12px 12px 0;
+  padding:11px 14px; font-size:.86rem; color:#5c3a05; margin:10px 0}
+.callout.info{border-color:var(--primary); background:var(--primary-l); color:var(--primary-d)}
+.callout b{font-weight:800}
+.mdrbar{font-size:.78rem; color:var(--muted); text-align:center; padding:14px 0 4px}
+
+/* Finalisierung / Footer */
+.footbar{position:fixed; left:0; right:0; bottom:0; z-index:38; background:var(--card);
+  border-top:1px solid var(--line); box-shadow:0 -4px 18px rgba(20,48,63,.08)}
+.footbar .wrap{display:flex; align-items:center; gap:10px; padding-top:10px; padding-bottom:10px; flex-wrap:wrap}
+.footbar .status{font-size:.82rem; color:var(--muted); font-weight:600; margin-right:auto}
+.footbar .status b{color:var(--ink)}
+.pill-final{display:none; align-items:center; gap:8px; background:var(--ok-l); color:var(--ok); font-weight:800;
+  border-radius:999px; padding:6px 14px; font-size:.85rem}
+body.is-final .pill-final{display:inline-flex}
+body.is-final #btnFinal{display:none}
+
+/* Dialog */
+dialog{border:0; border-radius:18px; padding:0; box-shadow:0 20px 60px rgba(10,38,44,.35); max-width:520px; width:92vw}
+dialog::backdrop{background:rgba(10,38,44,.5)}
+.dlg{padding:20px 22px}
+.dlg h3{font-size:1.1rem}
+.dlg p{color:var(--muted); font-size:.92rem}
+.dlg .actions{display:flex; gap:10px; justify-content:flex-end; margin-top:16px; flex-wrap:wrap}
+
+/* Gate */
+body.hf-locked > *:not(#hf-gate){filter:blur(7px); pointer-events:none; user-select:none}
+#hf-gate{position:fixed; inset:0; z-index:1000; background:linear-gradient(160deg,var(--deep),var(--deep-2));
+  color:var(--deep-ink); display:flex; align-items:center; justify-content:center; padding:24px}
+#hf-gate .card{background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.14); border-radius:20px;
+  padding:30px 26px; max-width:440px; text-align:center}
+#hf-gate .lk{width:52px; height:52px; margin:0 auto 14px; border-radius:14px; background:rgba(255,255,255,.10);
+  display:flex; align-items:center; justify-content:center}
+#hf-gate h2{font-size:1.3rem}
+#hf-gate #hf-gate-msg{color:#bcd6d5; font-size:.95rem; margin-top:6px}
+#hf-gate.err .lk{background:rgba(224,138,30,.20)}
+#hf-gate a{color:#ffd79a}
+
+/* Idle-Lock */
+.idlelock{position:fixed; inset:0; z-index:900; background:rgba(13,48,55,.86); color:#fff; display:none;
+  align-items:center; justify-content:center; flex-direction:column; gap:14px; text-align:center; padding:24px}
+.idlelock.on{display:flex}
+.idlelock .lk{width:56px; height:56px; border-radius:16px; background:rgba(255,255,255,.12); display:flex; align-items:center; justify-content:center}
+
+/* Install-Banner */
+.install{display:none; align-items:center; gap:12px; background:var(--primary-l); border:1px solid var(--primary);
+  border-radius:14px; padding:10px 14px; margin:12px 0; font-size:.88rem; color:var(--primary-d)}
+.install.on{display:flex}
+.install .spacer{flex:1}
+
+@media (max-width:760px){
+  #hf-praxis-name{max-width:44vw}
+  #hf-praxis-sub{display:none}
+  .tb-actions .lbl{display:none}
+  .modeswitch button{padding:8px 11px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+
+/* -------- Druck / PDF -------- */
+@media print{
+  @page{size:A4; margin:12mm}
+  body{background:#fff; padding:0; font-size:11px; color:#000}
+  .topbar,.footbar,.install,.idlelock,#hf-gate,.tb-actions,.modeswitch,.chev,.no-print,
+  .iconbtn,.paramsel,.stylesel,.addbtnrow,.vittools .stylesel{display:none!important}
+  .wrap{max-width:none; padding:0}
+  .sect,.leadcard{box-shadow:none; border:1px solid #999; break-inside:avoid; margin:6px 0; border-radius:6px}
+  .sect > summary{padding:6px 10px; font-size:12px; border-bottom:1px solid #ccc}
+  .sect > summary .badge{border:1px solid #999; background:#fff; color:#000}
+  .sect .body{padding:8px 10px}
+  .sect[data-hidden="1"]{display:none!important}
+  input,select,textarea{border:0; border-bottom:1px solid #bbb; border-radius:0; padding:1px 2px; min-height:0;
+    background:#fff; -webkit-appearance:none; appearance:none; color:#000}
+  textarea{border:1px solid #ccc}
+  .inputunit .u{background:#fff; border:0; padding:0 4px}
+  .chip{border:1px solid #999; padding:2px 8px; min-height:0}
+  .chip:has(input:checked){background:#eee}
+  .chip input{position:static; opacity:1; width:auto; height:auto; margin-right:4px}
+  .vitwrap{overflow:visible; border:1px solid #999}
+  .numrows{overflow:visible}
+  .print-only{display:block!important}
+  .reportfoot{display:block!important}
+  .callout{background:#f3f3f3; color:#000; border-color:#999}
+  .score{background:#fff}
+  .idlelock,.footbar{display:none!important}
+}
+.print-only,.reportfoot{display:none}
+.reportfoot{margin-top:14px; padding-top:10px; border-top:1px solid #999; font-size:10px; color:#333}
+.reportfoot .idline{font-family:ui-monospace,Menlo,Consolas,monospace}
+</style>
+</head>
+<body class="hf-locked">
+
+<!-- ================= GATE ================= -->
+<div id="hf-gate">
+  <div class="card">
+    <div class="lk" aria-hidden="true">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#e7f2f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+    </div>
+    <h2 id="hf-gate-title">Zugang wird geprüft…</h2>
+    <p id="hf-gate-msg">Einen Moment bitte.</p>
+  </div>
+</div>
+
+<!-- ================= IDLE-LOCK ================= -->
+<div class="idlelock" id="idlelock" aria-hidden="true">
+  <div class="lk"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
+  <div><b>Bildschirm gesperrt</b><br><span style="opacity:.85;font-size:.9rem">Zum Schutz der Patientendaten. Tippen zum Fortsetzen.</span></div>
+  <button class="btn ghost" id="idleResume">Fortsetzen</button>
+</div>
+
+<!-- ================= KOPF ================= -->
+<header class="topbar">
+  <div class="wrap">
+    <div class="brand">
+      <span class="logo" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#e7f2f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12h4l2 6 4-14 3 9 1.5-3H22"/></svg>
+      </span>
+      <div class="names">
+        <div id="hf-praxis-name">Anästhesieprotokoll</div>
+        <div id="hf-praxis-sub">Digitale Narkosedokumentation</div>
+      </div>
+    </div>
+    <div class="spacer"></div>
+    <div class="modeswitch" role="group" aria-label="Protokollart">
+      <button type="button" id="modeVoll" aria-pressed="true">Vollprotokoll</button>
+      <button type="button" id="modeAmb" aria-pressed="false">Ambulant / Sedierung</button>
+    </div>
+    <div class="tb-actions">
+      <button class="btn ghost small" id="btnNew" type="button" title="Neues Protokoll"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg><span class="lbl">Neu</span></button>
+      <button class="btn ghost small" id="btnArchive" type="button" title="Archiv"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="4" rx="1"/><path d="M5 8v11a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8M9 12h6"/></svg><span class="lbl">Archiv</span></button>
+    </div>
+  </div>
+</header>
+
+<!-- ================= INHALT ================= -->
+<main class="wrap" id="app">
+
+  <div class="install" id="install">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>
+    <span>Als App auf dem Tablet installieren – offline nutzbar, ohne App-Store.</span>
+    <span class="spacer"></span>
+    <button class="btn small" id="installBtn" type="button">Installieren</button>
+    <button class="btn sec small" id="installX" type="button" aria-label="Ausblenden">✕</button>
+  </div>
+
+  <div class="leadcard">
+    <div class="eyebrow">Narkoseprotokoll</div>
+    <h1 id="leadTitle">Neues Anästhesieprotokoll</h1>
+    <p id="leadSub">Alle Eingaben bleiben lokal auf diesem Gerät. Beim Finalisieren entsteht ein unveränderbares PDF; die Langzeit-Archivierung obliegt der Praxis.</p>
+  </div>
+
+  <div id="sections"><!-- gerendert per JS --></div>
+
+  <div class="callout info no-print" style="margin-top:16px">
+    <b>Reine Dokumentation.</b> Diese Anwendung erfasst und stellt dar. Sie berechnet keine Dosierungen,
+    bewertet keine Werte und gibt keine klinischen Empfehlungen oder Warnungen. Kein Medizinprodukt.
+  </div>
+
+  <div class="mdrbar no-print">Anästhesieprotokoll · lokale Dokumentation · Vaydena</div>
+
+  <!-- Nur im Ausdruck sichtbarer Report-Fuß -->
+  <div class="reportfoot" id="reportfoot"></div>
+
+</main>
+
+<!-- ================= FUSSLEISTE ================= -->
+<div class="footbar no-print">
+  <div class="wrap">
+    <div class="status" id="status">Entwurf · nicht finalisiert</div>
+    <span class="pill-final"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg> Finalisiert</span>
+    <button class="btn sec small" id="btnBackup" type="button">Sichern (JSON)</button>
+    <button class="btn sec small" id="btnRestore" type="button">Einlesen</button>
+    <button class="btn sec small" id="btnPrint" type="button">Drucken / PDF</button>
+    <button class="btn warn" id="btnFinal" type="button">Finalisieren</button>
+    <button class="btn ok small" id="btnAddendum" type="button" style="display:none">Nachtrag</button>
+  </div>
+</div>
+
+<input type="file" id="fileIn" accept="application/json" style="display:none">
+
+<!-- ================= DIALOGE ================= -->
+<dialog id="dlg">
+  <div class="dlg">
+    <h3 id="dlgTitle"></h3>
+    <div id="dlgBody"></div>
+    <div class="actions" id="dlgActions"></div>
+  </div>
+</dialog>
+
+<!-- Archiv-Dialog -->
+<dialog id="arch">
+  <div class="dlg">
+    <h3>Archiv (dieses Gerät)</h3>
+    <p>Finalisierte Protokolle werden lokal gespeichert. <b>Langzeit-Archivierung ist Praxispflicht</b> – bitte regelmäßig als PDF/JSON sichern.</p>
+    <div id="archList" style="max-height:50vh; overflow:auto; margin-top:8px"></div>
+    <div class="actions">
+      <button class="btn sec" id="archExportAll" type="button">Alle als JSON</button>
+      <button class="btn" id="archClose" type="button">Schließen</button>
+    </div>
+  </div>
+</dialog>
+
+<!-- ============================================================= -->
+<!-- SCRIPT A — GATE + METERING (verbatim Blaupause + aprot)         -->
+<!-- ============================================================= -->
+<script>
+window.__HF_PRAXIS = { name:"", sub:"", verantwortlich:"" };
+(function(){
+  "use strict";
+  var CFG = {
+    fn: "https://xeuexovdipdiiuzjpzkj.supabase.co/functions/v1",
+    key: "sb_publishable_3dLuQ2PfEsjavJyl0fmkaA_DXB8ZS6f",
+    storeKey: "anaesthesieprotokoll_v1"
+  };
+  document.body.classList.add("hf-locked");
+  var byId = function(id){ return document.getElementById(id); };
+  function gate(title,msg,isErr){
+    if(byId("hf-gate-title")) byId("hf-gate-title").textContent = title;
+    if(byId("hf-gate-msg")) byId("hf-gate-msg").innerHTML = msg;
+    if(isErr && byId("hf-gate")) byId("hf-gate").classList.add("err");
+  }
+  function open(){
+    var g = byId("hf-gate"); if(g && g.parentNode) g.parentNode.removeChild(g);
+    document.body.classList.remove("hf-locked");
+  }
+  var token = "";
+  try{
+    var u = new URL(window.location.href);
+    var k = u.searchParams.get("k");
+    if(k){ token = k.trim(); try{ sessionStorage.setItem("hf_token", token); localStorage.setItem("hf_token", token); }catch(e){}
+           u.searchParams.delete("k"); history.replaceState(null,"",u.pathname+u.search+u.hash); }
+    else { try{ token = (sessionStorage.getItem("hf_token")||localStorage.getItem("hf_token")||"").trim(); }catch(e){} }
+  }catch(e){}
+  function newUuid(){
+    if(window.crypto && crypto.randomUUID) return crypto.randomUUID();
+    var b = crypto.getRandomValues(new Uint8Array(16));
+    b[6]=(b[6]&15)|64; b[8]=(b[8]&63)|128;
+    var h=[]; for(var i=0;i<16;i++) h.push((b[i]+256).toString(16).slice(1));
+    return h[0]+h[1]+h[2]+h[3]+"-"+h[4]+h[5]+"-"+h[6]+h[7]+"-"+h[8]+h[9]+"-"+h[10]+h[11]+h[12]+h[13]+h[14]+h[15];
+  }
+  function visitId(){
+    var hasData=false, vid=null;
+    try{ hasData=!!localStorage.getItem(CFG.storeKey); }catch(e){}
+    try{ vid=localStorage.getItem("hf_visit_id"); }catch(e){}
+    if(!hasData || !vid){ vid=newUuid(); try{ localStorage.setItem("hf_visit_id",vid); }catch(e){} }
+    return vid;
+  }
+  var VISIT = visitId();
+  window.__HF_VISIT = VISIT;
+  function post(path,body){
+    return fetch(CFG.fn+"/"+path,{method:"POST",
+      headers:{"Content-Type":"application/json","apikey":CFG.key,"Authorization":"Bearer "+CFG.key},
+      body:JSON.stringify(body)});
+  }
+  var QKEY = "hf_usage_queue";
+  function qLoad(){ try{ return JSON.parse(localStorage.getItem(QKEY)||"[]")||[]; }catch(e){ return []; } }
+  function qSave(a){ try{ localStorage.setItem(QKEY, JSON.stringify(a)); }catch(e){} }
+  function qAdd(tok,vid){
+    if(!tok||!vid) return;
+    var a=qLoad();
+    for(var i=0;i<a.length;i++){ if(a[i]&&a[i].visit_id===vid) return; }
+    a.push({token:tok,visit_id:vid,ts:Date.now()});
+    if(a.length>1000) a=a.slice(a.length-1000);
+    qSave(a);
+  }
+  function qRemove(vid){
+    var a=qLoad(),out=[];
+    for(var i=0;i<a.length;i++){ if(a[i]&&a[i].visit_id!==vid) out.push(a[i]); }
+    qSave(out);
+  }
+  function sendUsage(tok,vid){
+    return post("aprot-record-usage",{token:tok,visit_id:vid}).then(function(r){
+      if(r.ok) return true;
+      if(r.status===403||r.status===400) return "drop";
+      return false;
+    });
+  }
+  function flushQueue(){
+    var a=qLoad(); if(!a.length) return;
+    a.forEach(function(item){
+      if(!item||!item.token||!item.visit_id){ qRemove(item&&item.visit_id); return; }
+      sendUsage(item.token,item.visit_id).then(function(res){
+        if(res===true||res==="drop") qRemove(item.visit_id);
+      }).catch(function(){});
+    });
+  }
+  var recorded = false;
+  function record(){
+    if(recorded) return; recorded=true;
+    qAdd(token,VISIT);
+    try{ sendUsage(token,VISIT).then(function(res){ if(res===true||res==="drop") qRemove(VISIT); }).catch(function(){}); }catch(e){}
+  }
+  var _p = (typeof window.print==="function") ? window.print.bind(window) : function(){};
+  window.print = function(){ record(); return _p(); };
+  try{ window.addEventListener("online", flushQueue); }catch(e){}
+
+  function applyBranding(b){
+    b = b || {};
+    if(b.header_name && byId("hf-praxis-name")) byId("hf-praxis-name").textContent = b.header_name;
+    if(b.header_sub && byId("hf-praxis-sub")) byId("hf-praxis-sub").textContent = b.header_sub;
+    if(b.verantwortlich && byId("hf-verantwortlich")) byId("hf-verantwortlich").textContent = b.verantwortlich;
+    if(window.__HF_PRAXIS){
+      if(b.header_name) window.__HF_PRAXIS.name = b.header_name;
+      if(b.header_sub) window.__HF_PRAXIS.sub = b.header_sub;
+      if(b.verantwortlich) window.__HF_PRAXIS.verantwortlich = b.verantwortlich;
+    }
+    if(b.praxis && window.__HF_PRAXIS){ for(var kk in b.praxis){ if(b.praxis[kk]) window.__HF_PRAXIS[kk]=b.praxis[kk]; } }
+    if(b.logo){
+      var box=document.querySelector(".brand .logo");
+      if(box){ box.innerHTML=""; var im=document.createElement("img"); im.src=b.logo; im.alt=""; box.appendChild(im); box.classList.add("has-img"); }
+    }
+    if(b.header_name){ try{ document.title = b.header_name + " – Anästhesieprotokoll"; }catch(e){} }
+    try{ if(window.__afterBranding) window.__afterBranding(); }catch(e){}
+  }
+
+  window.__record = record;
+
+  function start(){
+    flushQueue();
+    if(!token){ gate("Kein Zugang","Bitte über den <b>Freischalt-Link Ihres Zugangs</b> öffnen.", true); return; }
+    post("aprot-check-token",{token:token}).then(function(r){return r.json();}).then(function(d){
+      if(d && d.valid){ applyBranding(d.branding); open(); try{ if(window.__onUnlock) window.__onUnlock(); }catch(e){} }
+      else{ try{ sessionStorage.removeItem("hf_token"); }catch(e){}
+            gate("Zugang ungültig","Der Zugangslink ist nicht (mehr) gültig.", true); }
+    }).catch(function(){ gate("Verbindungsproblem","Zugang konnte nicht geprüft werden. Bitte erneut versuchen.", true); });
+  }
+  if(document.readyState==="loading") document.addEventListener("DOMContentLoaded", start);
+  else start();
+})();
+</script>
+
+<!-- ============================================================= -->
+<!-- SCRIPT B — ANWENDUNG                                            -->
+<!-- ============================================================= -->
+<script>
+(function(){
+  "use strict";
+  var STORE_KEY = "anaesthesieprotokoll_v1";
+  var $ = function(s,r){ return (r||document).querySelector(s); };
+  var $$ = function(s,r){ return Array.prototype.slice.call((r||document).querySelectorAll(s)); };
+  function el(tag,attrs,kids){
+    var e=document.createElement(tag);
+    if(attrs) for(var k in attrs){
+      if(k==="class") e.className=attrs[k];
+      else if(k==="html") e.innerHTML=attrs[k];
+      else if(k==="text") e.textContent=attrs[k];
+      else if(k.slice(0,2)==="on" && typeof attrs[k]==="function") e.addEventListener(k.slice(2),attrs[k]);
+      else if(attrs[k]!=null) e.setAttribute(k,attrs[k]);
+    }
+    if(kids) (Array.isArray(kids)?kids:[kids]).forEach(function(c){ if(c==null)return; e.appendChild(typeof c==="string"?document.createTextNode(c):c); });
+    return e;
+  }
+  function esc(s){ return (s==null?"":String(s)).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c];}); }
+  function pad2(n){ return (n<10?"0":"")+n; }
+  function nowISO(){ return new Date().toISOString(); }
+  function fmtDT(iso){ if(!iso)return"—"; var d=new Date(iso); return pad2(d.getDate())+"."+pad2(d.getMonth()+1)+"."+d.getFullYear()+" "+pad2(d.getHours())+":"+pad2(d.getMinutes()); }
+
+  /* ---------------- Medikamenten-Katalog (Namen + Einheiten; keine Dosen) ---------------- */
+  var DRUGS = {
+    "Hypnotika i.v.": [["Propofol","mg"],["Thiopental","mg"],["Etomidat","mg"],["Ketamin","mg"],["Esketamin","mg"],["Midazolam","mg"],["Dexmedetomidin","µg"]],
+    "Opioide": [["Fentanyl","µg"],["Sufentanil","µg"],["Remifentanil","µg"],["Alfentanil","mg"],["Piritramid","mg"],["Morphin","mg"],["Hydromorphon","mg"],["Oxycodon","mg"],["Pethidin","mg"]],
+    "Muskelrelaxanzien": [["Succinylcholin (Suxamethonium)","mg"],["Rocuronium","mg"],["Vecuronium","mg"],["Atracurium","mg"],["Cisatracurium","mg"],["Mivacurium","mg"],["Pancuronium","mg"]],
+    "Volatile Anästhetika": [["Sevofluran","Vol%"],["Desfluran","Vol%"],["Isofluran","Vol%"],["Lachgas (N₂O)","Vol%"],["Xenon","Vol%"]],
+    "Lokalanästhetika": [["Lidocain","mg"],["Prilocain","mg"],["Mepivacain","mg"],["Bupivacain","mg"],["Levobupivacain","mg"],["Ropivacain","mg"],["Articain","mg"],["Chloroprocain","mg"],["Procain","mg"],["Tetracain","mg"]],
+    "Katecholamine / Vasoaktiva": [["Adrenalin","µg"],["Noradrenalin","µg"],["Dobutamin","µg"],["Dopamin","µg"],["Cafedrin/Theodrenalin (Akrinor)","ml"],["Ephedrin","mg"],["Phenylephrin","µg"],["Vasopressin","IE"],["Milrinon","µg"],["Levosimendan","µg"],["Nitroglycerin","µg"],["Urapidil","mg"],["Clonidin","µg"],["Esmolol","mg"],["Metoprolol","mg"],["Nifedipin","mg"],["Amiodaron","mg"],["Adenosin","mg"]],
+    "Antagonisten": [["Naloxon","µg"],["Flumazenil","mg"],["Sugammadex","mg"],["Neostigmin","mg"],["Pyridostigmin","mg"],["Physostigmin","mg"],["Glycopyrronium","mg"]],
+    "Antiemetika": [["Ondansetron","mg"],["Granisetron","mg"],["Tropisetron","mg"],["Palonosetron","mg"],["Dexamethason","mg"],["Dimenhydrinat","mg"],["Droperidol","mg"],["Metoclopramid","mg"],["Aprepitant","mg"],["Haloperidol","mg"]],
+    "Antibiotika": [["Cefazolin","g"],["Cefuroxim","g"],["Cefotaxim","g"],["Ampicillin/Sulbactam","g"],["Amoxicillin/Clavulansäure","g"],["Piperacillin/Tazobactam","g"],["Clindamycin","mg"],["Vancomycin","mg"],["Metronidazol","mg"],["Gentamicin","mg"]],
+    "Sonstige": [["Methylprednisolon","mg"],["Prednisolon","mg"],["Hydrocortison","mg"],["Dimetinden","mg"],["Clemastin","mg"],["Famotidin","mg"],["Atropin","mg"],["Oxytocin","IE"],["Carbetocin","µg"],["Methylergometrin","mg"],["Metamizol","mg"],["Paracetamol","mg"],["Parecoxib","mg"],["Diclofenac","mg"],["Ibuprofen","mg"],["Tranexamsäure","mg"],["Magnesiumsulfat","mmol"],["Heparin","IE"],["Furosemid","mg"],["Natriumhydrogencarbonat","mmol"],["Calciumgluconat","mmol"],["Glukose","ml"],["Dantrolen","mg"]]
+  };
+  var DRUG_UNIT = {};
+  Object.keys(DRUGS).forEach(function(g){ DRUGS[g].forEach(function(d){ if(!(d[0] in DRUG_UNIT)) DRUG_UNIT[d[0]]=d[1]; }); });
+
+  /* ---------------- Sektions-/Feldmodell (F24) ----------------
+     Feldtypen: text,date,time,num,select,radio,checks,check,textarea,score
+     Flags: voll  = nur im Vollprotokoll
+            ambHide= im Ambulant-Modus ausgeblendet
+            ambOnly= nur im Ambulant-Modus
+  */
+  var SECTIONS = [
+    { id:"stamm", title:"Stammdaten", n:"①", fields:[
+      {id:"name",label:"Name",type:"text"},
+      {id:"gebdat",label:"Geburtsdatum",type:"date"},
+      {id:"geschlecht",label:"Geschlecht",type:"select",options:["","weiblich","männlich","divers","unbestimmt"]},
+      {id:"gewicht",label:"Gewicht",type:"num",unit:"kg"},
+      {id:"groesse",label:"Größe",type:"num",unit:"cm"},
+      {id:"fallnr",label:"Fall-/ID-Nr.",type:"text"},
+      {id:"saal",label:"OP-Saal / Station",type:"text"},
+      {id:"datum",label:"Datum",type:"date"},
+      {id:"eingriff",label:"Eingriff",type:"text",wide:true},
+      {id:"operateur",label:"Operateur:in",type:"text"},
+      {id:"anaesthesist",label:"Anästhesist:in",type:"text"},
+      {id:"fachrichtung",label:"Fachrichtung",type:"text",ambHide:true},
+      {id:"dringlichkeit",label:"Dringlichkeit",type:"select",options:["","elektiv","dringlich","Notfall"]}
+    ]},
+    { id:"praemed", title:"Prämedikation & Risiko", n:"②", fields:[
+      {id:"asa",label:"ASA-Klasse",type:"radio",options:["I","II","III","IV","V"]},
+      {id:"asaE",label:"Zusatz „E“ (Notfall)",type:"check"},
+      {id:"mallampati",label:"Mallampati",type:"radio",options:["I","II","III","IV"],ambHide:true},
+      {id:"nuechtern",label:"Nüchternheit",type:"select",options:["","nüchtern","nicht nüchtern","unklar"]},
+      {id:"nuechternZeit",label:"letzte Nahrung/Flüssigkeit",type:"text",ambHide:true},
+      {id:"allergien",label:"Allergien / Unverträglichkeiten",type:"textarea",wide:true},
+      {id:"dauermedikation",label:"Dauermedikation",type:"textarea",wide:true,ambHide:true},
+      {id:"vorerkrankungen",label:"Vorerkrankungen",type:"textarea",wide:true,ambHide:true},
+      {id:"nikotin",label:"Nikotin",type:"text",ambHide:true},
+      {id:"alkohol",label:"Alkohol",type:"text",ambHide:true},
+      {id:"aufklaerung",label:"Aufklärung erfolgt",type:"check"}
+    ]},
+    { id:"art", title:"Anästhesie-Art & Zeiten", n:"③", fields:[
+      {id:"verfahren",label:"Verfahren",type:"checks",options:["ITN","Larynxmaske (LMA)","Maske","Regional","Analgosedierung","Kombination"]},
+      {id:"sedierungsgrad",label:"Sedierungsgrad",type:"select",options:["","minimal","moderat","tief"],ambOnly:true},
+      {id:"beginn",label:"Anästhesiebeginn *",type:"time",req:true},
+      {id:"freigabe",label:"Freigabe",type:"time",ambHide:true},
+      {id:"opBeginn",label:"OP-Beginn",type:"time"},
+      {id:"opEnde",label:"OP-Ende",type:"time"},
+      {id:"ende",label:"Anästhesieende *",type:"time",req:true}
+    ]},
+    { id:"atemweg", title:"Atemwegsmanagement", n:"④", voll:true, fields:[
+      {id:"tubusGroesse",label:"Tubus-Größe (ID)",type:"text"},
+      {id:"tubusTiefe",label:"Tubus-Tiefe",type:"num",unit:"cm"},
+      {id:"lmaGroesse",label:"LMA-Größe",type:"text"},
+      {id:"cormack",label:"Cormack-Lehane",type:"radio",options:["I","II","III","IV"]},
+      {id:"versuche",label:"Intubationsversuche",type:"num"},
+      {id:"hilfsmittel",label:"Hilfsmittel",type:"checks",options:["Führungsstab","Videolaryngoskop","Bougie","Fiberoptik","Wachintubation"]},
+      {id:"schwierig",label:"schwieriger Atemweg",type:"check"},
+      {id:"maskenbeatmung",label:"Maskenbeatmung",type:"select",options:["","möglich","erschwert","nicht möglich"]}
+    ]},
+    { id:"medis", title:"Medikamente & Infusionen", n:"⑤", widget:"drugs" },
+    { id:"beatmung", title:"Beatmung & Monitoring", n:"⑥", voll:true, fields:[
+      {id:"modus",label:"Beatmungsmodus",type:"select",options:["","Spontanatmung","volumenkontrolliert","druckkontrolliert","druckunterstützt (assistiert)","manuell"]},
+      {id:"tidalvol",label:"Tidalvolumen",type:"num",unit:"ml"},
+      {id:"af",label:"Atemfrequenz",type:"num",unit:"/min"},
+      {id:"peep",label:"PEEP",type:"num",unit:"mbar"},
+      {id:"fio2",label:"FiO₂",type:"num",unit:"%"},
+      {id:"spitzendruck",label:"Spitzendruck",type:"num",unit:"mbar"},
+      {id:"monitoring",label:"Monitoring",type:"checks",wide:true,options:["EKG","NIBP","IBP (arteriell)","SpO₂","etCO₂","Temperatur","Relaxometrie","BIS","ZVK","Arterie"]}
+    ]},
+    { id:"verlauf", title:"Intraoperativer Verlauf", n:"⑦", widget:"vitals" },
+    { id:"regional", title:"Regionalanästhesie", n:"⑧", voll:true, fields:[
+      {id:"regVerfahren",label:"Verfahren",type:"select",options:["","Spinalanästhesie","Periduralanästhesie (PDA)","Kombinierte Spinal-Epidural","Plexus axillaris","Plexus interscalenär","Femoralis","Ischiadicus","TAP-Block","Sonstiges"]},
+      {id:"regOrt",label:"Punktionsort / Höhe",type:"text"},
+      {id:"regNadel",label:"Nadel",type:"text"},
+      {id:"regTechnik",label:"Technik",type:"checks",options:["Loss of Resistance","Ultraschall","Nervenstimulator"]},
+      {id:"regKatheter",label:"Katheter angelegt",type:"check"},
+      {id:"regTestdosis",label:"Testdosis",type:"text"},
+      {id:"regAusbreitung",label:"Ausbreitung",type:"text"},
+      {id:"regVersuche",label:"Versuche",type:"num"},
+      {id:"regAspiration",label:"Aspiration",type:"select",options:["","negativ","positiv"]}
+    ]},
+    { id:"ereignis", title:"Ereignisse & Zwischenfälle", n:"⑨", widget:"events" },
+    { id:"lagerung", title:"Lagerung", n:"⑩", voll:true, fields:[
+      {id:"lagerung",label:"Lagerung",type:"select",options:["","Rückenlage","Bauchlage","Seitenlage","Steinschnittlage","Beach-Chair","Sonstige"]},
+      {id:"polsterung",label:"Polsterung kontrolliert",type:"check"},
+      {id:"waerme",label:"Wärmemanagement",type:"check"},
+      {id:"augenschutz",label:"Augenschutz",type:"check"},
+      {id:"zugaenge",label:"Gefäßzugänge",type:"textarea",wide:true}
+    ]},
+    { id:"ausleitung", title:"Ausleitung", n:"⑪", voll:true, fields:[
+      {id:"extubation",label:"Extubation",type:"select",options:["","wach","tief","keine (Nachbeatmung)"]},
+      {id:"antagonisierung",label:"Antagonisierung",type:"text"},
+      {id:"nachbeatmung",label:"Nachbeatmung",type:"check"},
+      {id:"verlegung",label:"Verlegung nach",type:"select",options:["","Aufwachraum","Station","IMC","Intensivstation"]},
+      {id:"zustandAus",label:"Zustand bei Verlegung",type:"textarea",wide:true}
+    ]},
+    { id:"pacu", title:"Aufwachraum / PACU", n:"⑫", fields:[
+      {id:"aldrete",label:"Aldrete-Score",type:"score",comps:[
+        {id:"a_akt",label:"Aktivität"},{id:"a_atm",label:"Atmung"},{id:"a_kreis",label:"Kreislauf"},
+        {id:"a_bew",label:"Bewusstsein"},{id:"a_spo2",label:"SpO₂"}],wide:true},
+      {id:"pacuVital",label:"Vitalzeichen",type:"text"},
+      {id:"nrs",label:"Schmerz (NRS 0–10)",type:"num"},
+      {id:"ponv",label:"PONV aufgetreten",type:"check"},
+      {id:"analgesie",label:"Analgesie / Anordnung",type:"textarea",wide:true},
+      {id:"padss",label:"PADSS (ambulant)",type:"score",comps:[
+        {id:"p_vital",label:"Vitalzeichen"},{id:"p_akt",label:"Aktivität"},{id:"p_ponv",label:"Übelkeit/Erbrechen"},
+        {id:"p_schmerz",label:"Schmerz"},{id:"p_blut",label:"Blutung"}],wide:true},
+      {id:"verlegungszeit",label:"Verlegungs-/Entlasszeit",type:"time"}
+    ]},
+    { id:"unterschrift", title:"Übergabe & Unterschriften", n:"⑬", widget:"signatures", fields:[
+      {id:"komplikationen",label:"Komplikationen / Besonderheiten",type:"textarea",wide:true},
+      {id:"uebergabeAn",label:"Übergabe an",type:"text"}
+    ]}
+  ];
+  var SECBYID = {}; SECTIONS.forEach(function(s){ SECBYID[s.id]=s; });
+
+  /* ---------------- Zustand ---------------- */
+  function blankState(){
+    return {
+      v:1, mode:"voll",
+      created: nowISO(),
+      f:{},              // Feldwerte  fieldId -> value / array
+      drugs:[],          // {t,name,dose,unit,route}
+      infus:[],          // {name,vol,unit}
+      blut:"",
+      balance:{ urin:"", verlust:"", einfuhr:"" },
+      vitals:{ style:"classic", start:"", cols:18, data:{} }, // data: colIndex -> {hf,rrsys,rrdia,map,spo2,etco2,af,temp}
+      events:[],         // {time,text}
+      markers:[],        // globale Markerliste
+      sigs:{},           // role -> dataURL
+      final:false, finalAt:null,
+      ver:1, addenda:[], audit:[]
+    };
+  }
+  var state = load() || blankState();
+
+  function load(){ try{ var s=localStorage.getItem(STORE_KEY); return s?JSON.parse(s):null; }catch(e){ return null; } }
+  var saveT=null;
+  function save(){ if(saveT) clearTimeout(saveT); saveT=setTimeout(function(){ try{ localStorage.setItem(STORE_KEY, JSON.stringify(state)); }catch(e){} },250); }
+  function saveNow(){ try{ localStorage.setItem(STORE_KEY, JSON.stringify(state)); }catch(e){} }
+  function audit(action,detail){ state.audit.push({ts:nowISO(),action:action,detail:detail||""}); }
+
+  /* ---------------- Feld-Sichtbarkeit ---------------- */
+  function fieldVisible(f){
+    if(state.mode==="ambulant" && f.ambHide) return false;
+    if(state.mode!=="ambulant" && f.ambOnly) return false;
+    return true;
+  }
+  function sectionVisible(s){
+    if(state.mode==="ambulant" && s.voll) return false;
+    return true;
+  }
+
+  /* ---------------- Rendering ---------------- */
+  var MOUNT = $("#sections");
+  function render(){
+    MOUNT.innerHTML="";
+    SECTIONS.forEach(function(s){
+      var det = el("details",{class:"sect","data-id":s.id});
+      if(sectionVisible(s)){ det.open = (openState[s.id]!==false); }
+      else { det.setAttribute("data-hidden","1"); det.style.display="none"; }
+      var badge = state.mode==="ambulant" && s.voll ? null : el("span",{class:"badge",text:s.n});
+      var sum = el("summary",{},[ badge, el("span",{text:s.title}),
+        el("span",{class:"chev",html:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>'}) ]);
+      det.appendChild(sum);
+      var body = el("div",{class:"body"});
+      if(s.widget==="drugs") renderDrugs(body);
+      else if(s.widget==="vitals") renderVitals(body);
+      else if(s.widget==="events") renderEvents(body,s);
+      else if(s.widget==="signatures") renderSignatures(body,s);
+      else renderFields(body,s);
+      det.appendChild(body);
+      det.addEventListener("toggle",function(){ openState[s.id]=det.open; });
+      MOUNT.appendChild(det);
+    });
+    lockUI();
+    updateLead();
+  }
+  var openState={};
+
+  function renderFields(body,s){
+    var grid = el("div",{class:"grid"});
+    s.fields.forEach(function(f){
+      if(!fieldVisible(f)) return;
+      grid.appendChild(renderField(f));
+    });
+    body.appendChild(grid);
+    // Ambulant-Sedierungshinweis
+    if(s.id==="art" && state.mode==="ambulant"){
+      body.appendChild(el("div",{class:"vitnote",text:"* Anästhesiebeginn und -ende sind die einzigen Pflichtangaben des DGAI/BDA-Kerndatensatzes."}));
+    }
+  }
+
+  function renderField(f){
+    var wrap = el("div",{class:"field"+(f.wide?" wide":"")});
+    var lab = el("label",{text:f.label, "for":"f_"+f.id});
+    if(f.req){ lab.appendChild(document.createTextNode(" ")); lab.appendChild(el("span",{style:"color:var(--accent)",text:"•"})); }
+    if(f.type!=="check") wrap.appendChild(lab);
+    var v = state.f[f.id];
+
+    if(f.type==="text"||f.type==="date"||f.type==="time"){
+      wrap.appendChild(el("input",{type:f.type,id:"f_"+f.id,value:v||"", oninput:function(e){ state.f[f.id]=e.target.value; save(); }}));
+    }
+    else if(f.type==="num"){
+      var iu = el("div",{class:"inputunit"});
+      iu.appendChild(el("input",{type:"number",inputmode:"decimal",step:"any",id:"f_"+f.id,value:v||"", oninput:function(e){ state.f[f.id]=e.target.value; save(); }}));
+      if(f.unit) iu.appendChild(el("span",{class:"u",text:f.unit}));
+      wrap.appendChild(iu);
+    }
+    else if(f.type==="select"){
+      var sel = el("select",{id:"f_"+f.id, onchange:function(e){ state.f[f.id]=e.target.value; save(); if(f.id==="verlegung"||f.id==="dringlichkeit"){} }});
+      f.options.forEach(function(o){ var op=el("option",{value:o,text:o||"—"}); if((v||"")===o) op.selected=true; sel.appendChild(op); });
+      wrap.appendChild(sel);
+    }
+    else if(f.type==="textarea"){
+      wrap.appendChild(el("textarea",{id:"f_"+f.id, oninput:function(e){ state.f[f.id]=e.target.value; save(); }},[v||""]));
+    }
+    else if(f.type==="check"){
+      var cl = el("label",{class:"chip"});
+      var cb = el("input",{type:"checkbox",id:"f_"+f.id, onchange:function(e){ state.f[f.id]=e.target.checked; save(); }});
+      if(v===true) cb.checked=true;
+      cl.appendChild(cb); cl.appendChild(document.createTextNode(f.label));
+      wrap.appendChild(cl);
+    }
+    else if(f.type==="radio"){
+      var rr = el("div",{class:"radio-row"});
+      f.options.forEach(function(o){
+        var cl2=el("label",{class:"chip"});
+        var rb=el("input",{type:"radio",name:"f_"+f.id,value:o, onchange:function(){ state.f[f.id]=o; save(); }});
+        if((v||"")===o) rb.checked=true;
+        cl2.appendChild(rb); cl2.appendChild(document.createTextNode(o));
+        rr.appendChild(cl2);
+      });
+      wrap.appendChild(rr);
+    }
+    else if(f.type==="checks"){
+      var cur = Array.isArray(v)?v.slice():[];
+      var cr = el("div",{class:"check-row"});
+      f.options.forEach(function(o){
+        var cl3=el("label",{class:"chip"});
+        var cb3=el("input",{type:"checkbox",value:o, onchange:function(e){
+          var arr = Array.isArray(state.f[f.id])?state.f[f.id]:[];
+          if(e.target.checked){ if(arr.indexOf(o)<0) arr.push(o); }
+          else { arr=arr.filter(function(x){return x!==o;}); }
+          state.f[f.id]=arr; save();
+        }});
+        if(cur.indexOf(o)>=0) cb3.checked=true;
+        cl3.appendChild(cb3); cl3.appendChild(document.createTextNode(o));
+        cr.appendChild(cl3);
+      });
+      wrap.appendChild(cr);
+    }
+    else if(f.type==="score"){
+      wrap.appendChild(renderScore(f, v||{}));
+    }
+    return wrap;
+  }
+
+  function renderScore(f, vals){
+    var box = el("div",{class:"score"});
+    var comps = el("div",{class:"comps"});
+    var sumEl;
+    function recompute(){
+      var sum=0, any=false;
+      f.comps.forEach(function(c){ var x=parseInt((state.f[f.id]||{})[c.id],10); if(!isNaN(x)){ sum+=x; any=true; } });
+      sumEl.textContent = any? String(sum) : "—";
+    }
+    f.comps.forEach(function(c){
+      var comp = el("div",{class:"comp"});
+      comp.appendChild(el("label",{text:c.label}));
+      var sel = el("select",{ onchange:function(e){
+        if(!state.f[f.id]) state.f[f.id]={};
+        state.f[f.id][c.id]= e.target.value===""?"":e.target.value; save(); recompute();
+      }});
+      ["","0","1","2"].forEach(function(o){ var op=el("option",{value:o,text:o===""?"–":o}); if(String((vals||{})[c.id]||"")===o) op.selected=true; sel.appendChild(op); });
+      comp.appendChild(sel);
+      comps.appendChild(comp);
+    });
+    box.appendChild(comps);
+    var sumline = el("div",{class:"sumline"},[ el("span",{text:"Summe:"}), (sumEl=el("span",{class:"sumval",text:"—"})) ]);
+    box.appendChild(sumline);
+    box.appendChild(el("div",{class:"note",text:"Nur Summe der gewählten Komponenten – keine Deutung, kein Grenzwert, keine Empfehlung."}));
+    recompute();
+    return box;
+  }
+
+  /* ---------------- Medikamente ---------------- */
+  function renderDrugs(body){
+    // Datalist mit allen Namen
+    var dl = el("datalist",{id:"druglist"});
+    Object.keys(DRUGS).forEach(function(g){ DRUGS[g].forEach(function(d){ dl.appendChild(el("option",{value:d[0]})); }); });
+    body.appendChild(dl);
+
+    body.appendChild(el("p",{class:"vitnote",text:"Wirkstoffkatalog nach Klasse (Namen & Einheiten). Freitext ist möglich. Die App schlägt keine Dosierungen vor."}));
+
+    var scroll = el("div",{class:"tablescroll"});
+    var t = el("table",{class:"rowtable"});
+    t.appendChild(el("thead",{},el("tr",{},[
+      el("th",{text:"Uhrzeit"}),el("th",{text:"Wirkstoff"}),el("th",{text:"Dosis"}),el("th",{text:"Einheit"}),el("th",{text:"Gabe"}),el("th",{class:"tdel"})
+    ])));
+    var tb = el("tbody");
+    function addRow(row,idx){
+      var tr = el("tr");
+      tr.appendChild(el("td",{},el("input",{type:"time",value:row.t||"",style:"min-width:104px",oninput:function(e){ row.t=e.target.value; save(); }})));
+      tr.appendChild(el("td",{},el("input",{type:"text",list:"druglist",value:row.name||"",placeholder:"Wirkstoff",style:"min-width:170px",oninput:function(e){
+        row.name=e.target.value; var u=DRUG_UNIT[e.target.value]; if(u){ row.unit=u; var ui=tr.querySelector(".unitcell input"); if(ui) ui.value=u; } save(); updateDoseSum();
+      }})));
+      tr.appendChild(el("td",{},el("input",{type:"number",inputmode:"decimal",step:"any",value:row.dose||"",placeholder:"—",style:"min-width:80px",oninput:function(e){ row.dose=e.target.value; save(); updateDoseSum(); }})));
+      tr.appendChild(el("td",{class:"unitcell"},el("input",{type:"text",value:row.unit||"",style:"min-width:64px",oninput:function(e){ row.unit=e.target.value; save(); updateDoseSum(); }})));
+      var rsel = el("select",{style:"min-width:104px",onchange:function(e){ row.route=e.target.value; save(); }});
+      ["","Bolus","Perfusor","Infusion","inhalativ","p.o.","sonstige"].forEach(function(o){ var op=el("option",{value:o,text:o||"—"}); if((row.route||"")===o) op.selected=true; rsel.appendChild(op); });
+      tr.appendChild(el("td",{},rsel));
+      tr.appendChild(el("td",{class:"tdel"},el("button",{class:"iconbtn",type:"button",title:"Zeile löschen",onclick:function(){ state.drugs.splice(state.drugs.indexOf(row),1); save(); tr.remove(); updateDoseSum(); }},"×")));
+      tb.appendChild(tr);
+    }
+    state.drugs.forEach(addRow);
+    t.appendChild(tb);
+    scroll.appendChild(t);
+    body.appendChild(scroll);
+
+    var addRowBtn = el("div",{class:"addbtnrow",style:"margin:10px 0"},el("button",{class:"btn sec small",type:"button",onclick:function(){ var r={t:"",name:"",dose:"",unit:"",route:"Bolus"}; state.drugs.push(r); addRow(r); save(); }},"+ Medikament"));
+    body.appendChild(addRowBtn);
+
+    // Infusionen
+    body.appendChild(el("h3",{style:"font-size:.95rem;margin-top:14px",text:"Infusionen & Volumen"}));
+    var iscroll = el("div",{class:"tablescroll"});
+    var it = el("table",{class:"rowtable"});
+    it.appendChild(el("thead",{},el("tr",{},[el("th",{text:"Lösung / Produkt"}),el("th",{text:"Menge"}),el("th",{text:"Einheit"}),el("th",{class:"tdel"})])));
+    var itb=el("tbody");
+    function addInf(row){
+      var tr=el("tr");
+      tr.appendChild(el("td",{},el("input",{type:"text",value:row.name||"",placeholder:"z. B. Ringer-Acetat / EK",style:"min-width:200px",oninput:function(e){ row.name=e.target.value; save(); }})));
+      tr.appendChild(el("td",{},el("input",{type:"number",inputmode:"decimal",step:"any",value:row.vol||"",style:"min-width:90px",oninput:function(e){ row.vol=e.target.value; save(); updateDoseSum(); }})));
+      var us=el("select",{style:"min-width:80px",onchange:function(e){ row.unit=e.target.value; save(); }});
+      ["ml","IE","Stk"].forEach(function(o){ var op=el("option",{value:o,text:o}); if((row.unit||"ml")===o) op.selected=true; us.appendChild(op); });
+      tr.appendChild(el("td",{},us));
+      tr.appendChild(el("td",{class:"tdel"},el("button",{class:"iconbtn",type:"button",onclick:function(){ state.infus.splice(state.infus.indexOf(row),1); save(); tr.remove(); updateDoseSum(); }},"×")));
+      itb.appendChild(tr);
+    }
+    state.infus.forEach(addInf);
+    it.appendChild(itb); iscroll.appendChild(it); body.appendChild(iscroll);
+    body.appendChild(el("div",{class:"addbtnrow",style:"margin:10px 0"},el("button",{class:"btn sec small",type:"button",onclick:function(){ var r={name:"",vol:"",unit:"ml"}; state.infus.push(r); addInf(r); save(); }},"+ Infusion")));
+
+    // Ein-/Ausfuhr
+    body.appendChild(el("h3",{style:"font-size:.95rem;margin-top:14px",text:"Ein-/Ausfuhr-Bilanz"}));
+    var bg = el("div",{class:"grid"});
+    [["einfuhr","Einfuhr gesamt","ml"],["urin","Urin","ml"],["verlust","Blutverlust","ml"]].forEach(function(b){
+      var w=el("div",{class:"field"});
+      w.appendChild(el("label",{text:b[1]}));
+      var iu=el("div",{class:"inputunit"});
+      iu.appendChild(el("input",{type:"number",inputmode:"decimal",step:"any",value:state.balance[b[0]]||"",oninput:function(e){ state.balance[b[0]]=e.target.value; save(); updateDoseSum(); }}));
+      iu.appendChild(el("span",{class:"u",text:b[2]}));
+      w.appendChild(iu); bg.appendChild(w);
+    });
+    var bw=el("div",{class:"field"});
+    bw.appendChild(el("label",{text:"Blutprodukte / Bemerkung"}));
+    bw.appendChild(el("input",{type:"text",value:state.blut||"",oninput:function(e){ state.blut=e.target.value; save(); }}));
+    bg.appendChild(bw);
+    body.appendChild(bg);
+
+    // Dosis-Summe (reine Addition)
+    var ds = el("div",{class:"dosesum",id:"doseSum"});
+    body.appendChild(ds);
+    updateDoseSum();
+  }
+
+  function updateDoseSum(){
+    var ds = $("#doseSum"); if(!ds) return;
+    var sums={}; // "name||unit" -> total
+    state.drugs.forEach(function(r){
+      if(!r.name) return; var d=parseFloat(String(r.dose).replace(",","."));
+      if(isNaN(d)) return;
+      var key=r.name+" ||"+(r.unit||"");
+      sums[key]=(sums[key]||0)+d;
+    });
+    var infTot=0; state.infus.forEach(function(r){ var v=parseFloat(String(r.vol).replace(",",".")); if(!isNaN(v)&&(r.unit||"ml")==="ml") infTot+=v; });
+    ds.innerHTML="";
+    ds.appendChild(el("div",{style:"font-weight:800;color:var(--primary-d);margin-bottom:4px",text:"Summen (reine Addition)"}));
+    var keys=Object.keys(sums);
+    if(!keys.length && !infTot){ ds.appendChild(el("div",{class:"vitnote",text:"Noch keine numerischen Dosen erfasst."})); }
+    keys.forEach(function(k){
+      var parts=k.split(" ||"); var nm=parts[0], un=parts[1];
+      var val=sums[k]; var out=(Math.round(val*1000)/1000);
+      ds.appendChild(el("div",{class:"row"},[ el("span",{text:nm}), el("b",{text:out+" "+un}) ]));
+    });
+    if(infTot){ ds.appendChild(el("div",{class:"row",style:"border-top:1px solid rgba(0,0,0,.08);margin-top:4px;padding-top:4px"},[ el("span",{text:"Infusionsvolumen (ml)"}), el("b",{text:(Math.round(infTot*10)/10)+" ml"}) ])); }
+    ds.appendChild(el("div",{class:"note",style:"font-size:.72rem;color:var(--muted);margin-top:6px",text:"Nur Zwischensummen. Keine Höchstmengen-Prüfung, keine Warnung, keine Empfehlung."}));
+  }
+
+  /* ---------------- Vitalkurve ---------------- */
+  var VPARAMS=[
+    {id:"rrsys",label:"RR systol.",gly:"∨",color:"#c0392b"},
+    {id:"rrdia",label:"RR diastol.",gly:"∧",color:"#c0392b"},
+    {id:"map",label:"MAP",gly:"–",color:"#8e44ad"},
+    {id:"hf",label:"Herzfrequenz",gly:"•",color:"#0e7c86"}
+  ];
+  var NUMROWS=[
+    {id:"hf",label:"HF /min"},{id:"rrsys",label:"RR sys"},{id:"rrdia",label:"RR dia"},{id:"map",label:"MAP"},
+    {id:"spo2",label:"SpO₂ %"},{id:"etco2",label:"etCO₂"},{id:"af",label:"AF /min"},{id:"temp",label:"Temp °C"}
+  ];
+  var curParam="rrsys";
+
+  function vitData(col){ if(!state.vitals.data[col]) state.vitals.data[col]={}; return state.vitals.data[col]; }
+  function colClock(col){
+    var st=state.vitals.start||state.f.beginn||"";
+    if(!/^\d{1,2}:\d{2}$/.test(st)) return (col*5)+"′";
+    var p=st.split(":"); var mins=parseInt(p[0],10)*60+parseInt(p[1],10)+col*5;
+    mins=((mins%1440)+1440)%1440;
+    return pad2(Math.floor(mins/60))+":"+pad2(mins%60);
+  }
+
+  function renderVitals(body){
+    // Tools
+    var tools = el("div",{class:"vittools"});
+    var startWrap=el("div",{class:"field",style:"max-width:180px"});
+    startWrap.appendChild(el("label",{text:"Startzeit Kurve",style:"font-size:.78rem"}));
+    startWrap.appendChild(el("input",{type:"time",value:state.vitals.start||"", oninput:function(e){ state.vitals.start=e.target.value; save(); paintVitals(); }}));
+    tools.appendChild(startWrap);
+
+    var psel=el("div",{class:"paramsel"});
+    VPARAMS.forEach(function(p){
+      psel.appendChild(el("button",{type:"button","aria-pressed":curParam===p.id?"true":"false",onclick:function(){ curParam=p.id; $$(".paramsel button",tools).forEach(function(b){b.setAttribute("aria-pressed","false");}); this.setAttribute("aria-pressed","true"); }},p.gly+" "+p.label));
+    });
+    var pselWrap=el("div",{class:"field"});
+    pselWrap.appendChild(el("label",{text:"Antippen setzt:",style:"font-size:.78rem"}));
+    pselWrap.appendChild(psel);
+    tools.appendChild(pselWrap);
+
+    var stylesel=el("div",{class:"field"});
+    stylesel.appendChild(el("label",{text:"Darstellung",style:"font-size:.78rem"}));
+    var ss=el("div",{class:"stylesel"});
+    ss.appendChild(el("button",{type:"button","aria-pressed":state.vitals.style==="classic"?"true":"false",onclick:function(){ state.vitals.style="classic"; save(); render(); }},"klassisch"));
+    ss.appendChild(el("button",{type:"button","aria-pressed":state.vitals.style==="modern"?"true":"false",onclick:function(){ state.vitals.style="modern"; save(); render(); }},"modern"));
+    stylesel.appendChild(ss);
+    tools.appendChild(stylesel);
+
+    body.appendChild(tools);
+
+    // SVG-Container
+    var wrap = el("div",{class:"vitwrap"});
+    var svgHost = el("div",{id:"vitHost"});
+    wrap.appendChild(svgHost);
+    body.appendChild(wrap);
+
+    // Legende (eigene, neutrale)
+    var leg = el("div",{class:"legend"});
+    if(state.vitals.style==="classic"){
+      leg.appendChild(el("span",{},[el("span",{class:"gly",text:"∨"})," RR systolisch"]));
+      leg.appendChild(el("span",{},[el("span",{class:"gly",text:"∧"})," RR diastolisch"]));
+      leg.appendChild(el("span",{},[el("span",{class:"gly",text:"–"})," MAP"]));
+      leg.appendChild(el("span",{},[el("span",{class:"gly",text:"•"})," Herzfrequenz"]));
+    } else {
+      VPARAMS.forEach(function(p){ leg.appendChild(el("span",{},[el("span",{class:"swatch",style:"background:"+p.color})," "+p.label])); });
+    }
+    body.appendChild(leg);
+    body.appendChild(el("div",{class:"vitnote",text:"Symbolstil „klassisch“ (hausüblich, nicht genormt). Die App liefert diese eigene Legende; es besteht keine verbindliche Norm für grafische Vitalzeichen-Symbole."}));
+
+    // Erweitern
+    body.appendChild(el("div",{class:"addbtnrow",style:"margin:10px 0"},el("button",{class:"btn sec small",type:"button",onclick:function(){ state.vitals.cols=Math.min(state.vitals.cols+6,120); save(); render(); }},"+ 30 Min")));
+
+    // Numerische Tabelle (Fallback + SpO₂/etCO₂/AF/Temp)
+    renderNumRows(body);
+
+    paintVitals();
+  }
+
+  function paintVitals(){
+    var host=$("#vitHost"); if(!host) return;
+    var cols=state.vitals.cols||18;
+    // Auto-Erweiterung: wenn letzte 2 Spalten belegt
+    var lastFilled=-1;
+    Object.keys(state.vitals.data).forEach(function(c){ var o=state.vitals.data[c]; if(o&&Object.keys(o).some(function(k){return o[k]!==""&&o[k]!=null;})){ if(+c>lastFilled) lastFilled=+c; } });
+    if(lastFilled>=cols-2 && cols<120){ cols=Math.min(cols+6,120); state.vitals.cols=cols; save(); }
+
+    var COLW=34, PADL=44, PADR=12, PADT=12, H=300, YMAX=220;
+    var W=PADL+PADR+cols*COLW;
+    function X(c){ return PADL + c*COLW + COLW/2; }
+    function Y(val){ return PADT + (1 - val/YMAX)*(H-PADT-24); }
+    var svgNS="http://www.w3.org/2000/svg";
+    var svg=document.createElementNS(svgNS,"svg");
+    svg.setAttribute("width",W); svg.setAttribute("height",H); svg.setAttribute("viewBox","0 0 "+W+" "+H);
+    svg.setAttribute("class","tapgrid"); svg.setAttribute("tabindex","0");
+    svg.setAttribute("role","img"); svg.setAttribute("aria-label","Vitalkurve, antippen zum Setzen des gewählten Parameters");
+    function mk(tag,at){ var e=document.createElementNS(svgNS,tag); for(var k in at) e.setAttribute(k,at[k]); return e; }
+
+    // Y-Gitter
+    for(var yv=0; yv<=YMAX; yv+=20){
+      svg.appendChild(mk("line",{x1:PADL,y1:Y(yv),x2:W-PADR,y2:Y(yv),stroke:"#eef3f5",'stroke-width':1}));
+      svg.appendChild(mk("text",{x:6,y:Y(yv)+4,'font-size':10,fill:"#8aa0ab"})).textContent=yv;
+    }
+    // X-Gitter + Zeitlabel
+    for(var c=0;c<cols;c++){
+      var major=(c%2===0);
+      svg.appendChild(mk("line",{x1:PADL+c*COLW,y1:PADT,x2:PADL+c*COLW,y2:H-24,stroke:major?"#e2eaee":"#f2f6f8",'stroke-width':1}));
+      if(major){ var tx=mk("text",{x:PADL+c*COLW+2,y:H-8,'font-size':9,fill:"#8aa0ab"}); tx.textContent=colClock(c); svg.appendChild(tx); }
+    }
+    svg.appendChild(mk("line",{x1:PADL,y1:PADT,x2:PADL,y2:H-24,stroke:"#cdd9df",'stroke-width':1}));
+
+    // Datenreihen
+    function series(pid){ var pts=[]; for(var c=0;c<cols;c++){ var o=state.vitals.data[c]; if(o&&o[pid]!==""&&o[pid]!=null){ var val=parseFloat(o[pid]); if(!isNaN(val)) pts.push([c,val]); } } return pts; }
+
+    if(state.vitals.style==="classic"){
+      // HF verbindungslinie
+      var hf=series("hf");
+      if(hf.length>1){ var d="M"+hf.map(function(p){return X(p[0])+" "+Y(p[1]);}).join(" L"); svg.appendChild(mk("path",{d:d,fill:"none",stroke:"#0e7c86",'stroke-width':1.4})); }
+      hf.forEach(function(p){ svg.appendChild(mk("circle",{cx:X(p[0]),cy:Y(p[1]),r:3.2,fill:"#0e7c86"})); });
+      series("rrsys").forEach(function(p){ var t=mk("text",{x:X(p[0]),y:Y(p[1])+4,'font-size':13,'text-anchor':"middle",fill:"#c0392b",'font-weight':700}); t.textContent="∨"; svg.appendChild(t); });
+      series("rrdia").forEach(function(p){ var t=mk("text",{x:X(p[0]),y:Y(p[1])+5,'font-size':13,'text-anchor':"middle",fill:"#c0392b",'font-weight':700}); t.textContent="∧"; svg.appendChild(t); });
+      series("map").forEach(function(p){ svg.appendChild(mk("line",{x1:X(p[0])-6,y1:Y(p[1]),x2:X(p[0])+6,y2:Y(p[1]),stroke:"#8e44ad",'stroke-width':2})); });
+    } else {
+      VPARAMS.forEach(function(p){
+        var pts=series(p.id);
+        if(pts.length>1){ var d="M"+pts.map(function(q){return X(q[0])+" "+Y(q[1]);}).join(" L"); svg.appendChild(mk("path",{d:d,fill:"none",stroke:p.color,'stroke-width':1.8,'stroke-linejoin':"round"})); }
+        pts.forEach(function(q){ svg.appendChild(mk("circle",{cx:X(q[0]),cy:Y(q[1]),r:2.6,fill:p.color})); });
+      });
+    }
+
+    // Tap-Interaktion
+    function place(evt){
+      if(state.final) return;
+      var rect=svg.getBoundingClientRect();
+      var sx=(evt.touches?evt.touches[0].clientX:evt.clientX)-rect.left;
+      var sy=(evt.touches?evt.touches[0].clientY:evt.clientY)-rect.top;
+      var scaleX=W/rect.width, scaleY=H/rect.height;
+      var px=sx*scaleX, py=sy*scaleY;
+      var c=Math.round((px-PADL-COLW/2)/COLW);
+      if(c<0) c=0; if(c>=cols) c=cols-1;
+      var val=Math.round((1-(py-PADT)/(H-PADT-24))*YMAX);
+      if(val<0)val=0; if(val>YMAX)val=YMAX;
+      vitData(c)[curParam]=val; save();
+      var inp=document.querySelector('input[data-vr="'+curParam+'"][data-vc="'+c+'"]'); if(inp) inp.value=val;
+      paintVitals();
+    }
+    svg.addEventListener("click",place);
+    svg.addEventListener("touchstart",function(e){ e.preventDefault(); place(e); },{passive:false});
+
+    host.innerHTML=""; host.appendChild(svg);
+  }
+
+  function renderNumRows(body){
+    var cols=state.vitals.cols||18;
+    var box=el("div",{class:"numrows"});
+    box.appendChild(el("div",{class:"vitnote",style:"margin-bottom:6px",text:"Numerische Schnelleingabe (Fallback). Werte je 5-Minuten-Spalte:"}));
+    var scroll=el("div",{class:"tablescroll"});
+    var t=el("table");
+    var thead=el("thead"); var htr=el("tr"); htr.appendChild(el("th",{text:""}));
+    for(var c=0;c<cols;c++){ htr.appendChild(el("th",{class:"colh",text:colClock(c)})); }
+    thead.appendChild(htr); t.appendChild(thead);
+    var tb=el("tbody");
+    NUMROWS.forEach(function(row){
+      var tr=el("tr"); tr.appendChild(el("th",{text:row.label}));
+      for(var c=0;c<cols;c++){
+        (function(c){
+          var o=state.vitals.data[c]||{};
+          var td=el("td");
+          td.appendChild(el("input",{type:"number",inputmode:"decimal",step:"any","data-vr":row.id,"data-vc":c,value:(o[row.id]!=null?o[row.id]:""), oninput:function(e){
+            var v=e.target.value; vitData(c)[row.id]= v===""?"":v; save();
+            if(["hf","rrsys","rrdia","map"].indexOf(row.id)>=0) paintVitals();
+          }}));
+          tr.appendChild(td);
+        })(c);
+      }
+      tb.appendChild(tr);
+    });
+    t.appendChild(tb); scroll.appendChild(t); box.appendChild(scroll);
+    body.appendChild(box);
+  }
+
+  /* ---------------- Ereignisse ---------------- */
+  var MARKERLIST=["Laryngospasmus","Bronchospasmus","Hypotonie","Hypertonie","Bradykardie","Tachykardie","Desaturierung","Allergische Reaktion","Aspiration","Blutung","Reanimation"];
+  function renderEvents(body,s){
+    body.appendChild(el("p",{class:"vitnote",text:"Zeitpunkt + Freitext. Marker sind ankreuzbare Kennzeichnungen – reine Dokumentation."}));
+    var list=el("div",{class:"evlist"});
+    function addEv(ev){
+      var idx;
+      var row=el("div",{class:"evrow"});
+      var n=el("div",{class:"evn"});
+      row.appendChild(n);
+      row.appendChild(el("input",{type:"time",value:ev.time||"",oninput:function(e){ ev.time=e.target.value; save(); }}));
+      row.appendChild(el("textarea",{placeholder:"Ereignis / Maßnahme",style:"flex:1",oninput:function(e){ ev.text=e.target.value; save(); }},[ev.text||""]));
+      row.appendChild(el("button",{class:"iconbtn",type:"button",onclick:function(){ state.events.splice(state.events.indexOf(ev),1); save(); row.remove(); renumber(); }},"×"));
+      list.appendChild(row);
+      renumber();
+    }
+    function renumber(){ $$(".evn",list).forEach(function(e,i){ e.textContent="#"+(i+1); }); }
+    state.events.forEach(addEv);
+    body.appendChild(list);
+    body.appendChild(el("div",{class:"addbtnrow",style:"margin:10px 0"},el("button",{class:"btn sec small",type:"button",onclick:function(){ var ev={time:"",text:""}; state.events.push(ev); addEv(ev); save(); }},"+ Ereignis")));
+
+    body.appendChild(el("h3",{style:"font-size:.95rem;margin-top:12px",text:"Marker"}));
+    var cr=el("div",{class:"check-row"});
+    MARKERLIST.forEach(function(m){
+      var cl=el("label",{class:"chip mk"});
+      var cb=el("input",{type:"checkbox",onchange:function(e){
+        var arr=Array.isArray(state.markers)?state.markers:[];
+        if(e.target.checked){ if(arr.indexOf(m)<0) arr.push(m); } else { arr=arr.filter(function(x){return x!==m;}); }
+        state.markers=arr; save();
+      }});
+      if((state.markers||[]).indexOf(m)>=0) cb.checked=true;
+      cl.appendChild(cb); cl.appendChild(document.createTextNode(m));
+      cr.appendChild(cl);
+    });
+    body.appendChild(cr);
+  }
+
+  /* ---------------- Unterschriften ---------------- */
+  function renderSignatures(body,s){
+    // die beiden textfelder zuerst
+    var grid=el("div",{class:"grid"});
+    s.fields.forEach(function(f){ if(fieldVisible(f)) grid.appendChild(renderField(f)); });
+    body.appendChild(grid);
+
+    body.appendChild(el("div",{class:"callout",html:"<b>Finalisieren</b> sperrt das Protokoll und erzeugt ein unveränderbares PDF. Eine spätere Korrektur ist nur als gekennzeichneter <b>Nachtrag (v2)</b> mit Zeitstempel möglich; es findet keine Löschung statt. Eine qualifizierte elektronische Signatur (QES) ist nicht erforderlich."}));
+
+    var wrap=el("div",{class:"grid two"});
+    wrap.appendChild(sigPad("anaesthesist","Anästhesist:in"));
+    wrap.appendChild(sigPad("zweit","Zweitzeichner:in (optional)"));
+    body.appendChild(wrap);
+
+    // Nachträge anzeigen
+    if(state.addenda && state.addenda.length){
+      var ad=el("div",{style:"margin-top:14px"});
+      ad.appendChild(el("h3",{style:"font-size:.95rem",text:"Nachträge"}));
+      state.addenda.forEach(function(a,i){
+        ad.appendChild(el("div",{class:"callout info"},[ el("b",{text:"v"+(i+2)+" · "+fmtDT(a.ts)}), el("div",{text:a.text}) ]));
+      });
+      body.appendChild(ad);
+    }
+  }
+
+  function sigPad(role,label){
+    var box=el("div",{class:"sigbox"});
+    box.appendChild(el("label",{text:label,style:"font-weight:700;font-size:.85rem"}));
+    var cv=el("canvas",{class:"sigpad"+(state.sigs[role]?" signed":""),width:600,height:150});
+    box.appendChild(cv);
+    var meta=el("div",{class:"sigmeta"});
+    meta.appendChild(el("button",{class:"btn sec small no-print",type:"button",onclick:function(){ clearPad(); }},"Löschen"));
+    meta.appendChild(el("span",{class:"vitnote",text:"mit Finger/Stift unterschreiben"}));
+    box.appendChild(meta);
+
+    var ctx=cv.getContext("2d");
+    function fit(){ // Zeichnung ist in 600x150 Koordinaten gespeichert
+      ctx.clearRect(0,0,cv.width,cv.height);
+      ctx.lineWidth=2; ctx.lineCap="round"; ctx.lineJoin="round"; ctx.strokeStyle="#16303f";
+      var img=state.sigs[role];
+      if(img){ var im=new Image(); im.onload=function(){ ctx.drawImage(im,0,0,cv.width,cv.height); }; im.src=img; }
+    }
+    fit();
+    var drawing=false,last=null;
+    function pos(e){ var r=cv.getBoundingClientRect(); var x=((e.touches?e.touches[0].clientX:e.clientX)-r.left)*(cv.width/r.width); var y=((e.touches?e.touches[0].clientY:e.clientY)-r.top)*(cv.height/r.height); return [x,y]; }
+    function down(e){ if(state.final) return; e.preventDefault(); drawing=true; last=pos(e); }
+    function move(e){ if(!drawing) return; e.preventDefault(); var p=pos(e); ctx.beginPath(); ctx.moveTo(last[0],last[1]); ctx.lineTo(p[0],p[1]); ctx.stroke(); last=p; }
+    function up(){ if(!drawing) return; drawing=false; try{ state.sigs[role]=cv.toDataURL("image/png"); cv.classList.add("signed"); save(); }catch(e){} }
+    cv.addEventListener("mousedown",down); cv.addEventListener("mousemove",move); window.addEventListener("mouseup",up);
+    cv.addEventListener("touchstart",down,{passive:false}); cv.addEventListener("touchmove",move,{passive:false}); cv.addEventListener("touchend",up);
+    function clearPad(){ if(state.final) return; ctx.clearRect(0,0,cv.width,cv.height); delete state.sigs[role]; cv.classList.remove("signed"); save(); }
+    cv._clear=clearPad;
+    return box;
+  }
+
+  /* ---------------- Kopf / Lead / Modus ---------------- */
+  function updateLead(){
+    var t=$("#leadTitle"), sub=$("#leadSub");
+    var nm=state.f.name?("Protokoll · "+state.f.name):"Neues Anästhesieprotokoll";
+    if(state.final) nm="Finalisiert · "+(state.f.name||"Protokoll");
+    t.textContent=nm;
+    $("#status").innerHTML = state.final ? ("Finalisiert am <b>"+fmtDT(state.finalAt)+"</b>"+(state.addenda.length?(" · "+state.addenda.length+" Nachtrag/-träge"):"")) : "Entwurf · nicht finalisiert";
+  }
+  function setMode(m){
+    state.mode=m; save();
+    $("#modeVoll").setAttribute("aria-pressed", m==="voll"?"true":"false");
+    $("#modeAmb").setAttribute("aria-pressed", m==="ambulant"?"true":"false");
+    render();
+  }
+
+  /* ---------------- Sperren nach Finalisierung ---------------- */
+  function lockUI(){
+    var locked=!!state.final;
+    document.body.classList.toggle("is-final",locked);
+    if(locked){
+      $$("#sections input, #sections select, #sections textarea, #sections button.iconbtn, .addbtnrow button, .paramsel button, .stylesel button").forEach(function(e){
+        if(e.closest(".sigmeta")) { e.disabled=true; return; }
+        e.disabled=true;
+      });
+    }
+    $("#btnAddendum").style.display = locked ? "" : "none";
+    $("#btnFinal").disabled = locked;
+    $("#modeVoll").disabled=locked; $("#modeAmb").disabled=locked;
+  }
+
+  /* ---------------- Finalisieren ---------------- */
+  function validateFinal(){
+    var miss=[];
+    if(!state.f.beginn) miss.push("Anästhesiebeginn");
+    if(!state.f.ende) miss.push("Anästhesieende");
+    return miss;
+  }
+  function doFinalize(){
+    var miss=validateFinal();
+    var body=el("div");
+    if(miss.length){
+      body.appendChild(el("p",{html:"Folgende Pflichtangabe(n) fehlen noch:<br><b>"+miss.map(esc).join(", ")+"</b>"}));
+      body.appendChild(el("p",{class:"vitnote",text:"Es werden ausschließlich Vollständigkeit und Format geprüft – keine inhaltliche/klinische Bewertung."}));
+      dialog("Pflichtangaben fehlen", body, [ {t:"Zurück",cls:"sec",fn:closeDlg} ]);
+      return;
+    }
+    body.appendChild(el("p",{text:"Nach dem Finalisieren ist das Protokoll gesperrt. Korrekturen sind nur noch als gekennzeichneter Nachtrag möglich."}));
+    body.appendChild(el("p",{class:"vitnote",text:"Es wird ein anonymes Zähl-Ereignis für die Abrechnung erfasst (kein Personenbezug)."}));
+    dialog("Protokoll finalisieren?", body, [
+      {t:"Abbrechen",cls:"sec",fn:closeDlg},
+      {t:"Finalisieren",cls:"warn",fn:function(){ closeDlg(); finalizeNow(); }}
+    ]);
+  }
+  function finalizeNow(){
+    state.final=true; state.finalAt=nowISO(); state.ver=1;
+    audit("finalize","Protokoll finalisiert");
+    saveNow();
+    archiveSave();
+    try{ if(window.__record) window.__record(); }catch(e){}
+    render();
+    buildReportFoot();
+    // sanftes Feedback + Druckangebot
+    var b=el("div"); b.appendChild(el("p",{text:"Das Protokoll ist finalisiert und lokal archiviert. Möchten Sie jetzt das PDF erzeugen?"}));
+    dialog("Finalisiert ✓", b, [ {t:"Später",cls:"sec",fn:closeDlg}, {t:"Drucken / PDF",cls:"primary",fn:function(){ closeDlg(); window.print(); }} ]);
+  }
+  function addAddendum(){
+    var ta=el("textarea",{placeholder:"Nachtrag / Korrektur (wird als eigene Version mit Zeitstempel angehängt)…",style:"width:100%;min-height:90px"});
+    var b=el("div"); b.appendChild(el("p",{text:"Der Nachtrag ergänzt das Protokoll als neue Version. Bestehende Angaben bleiben unverändert erhalten."})); b.appendChild(ta);
+    dialog("Nachtrag hinzufügen", b, [
+      {t:"Abbrechen",cls:"sec",fn:closeDlg},
+      {t:"Anhängen",cls:"ok",fn:function(){ var txt=ta.value.trim(); if(!txt){ closeDlg(); return; } state.addenda.push({ts:nowISO(),text:txt}); state.ver=state.addenda.length+1; audit("addendum","v"+state.ver); saveNow(); archiveSave(); closeDlg(); render(); buildReportFoot(); }}
+    ]);
+  }
+
+  /* ---------------- Report-Fuß (nur Druck) ---------------- */
+  function buildReportFoot(){
+    var rf=$("#reportfoot"); if(!rf) return;
+    var p=window.__HF_PRAXIS||{};
+    var idline = "Protokoll-ID: "+(window.__HF_VISIT||"—")+" · Version v"+(state.ver||1);
+    rf.innerHTML="";
+    rf.appendChild(el("div",{style:"font-weight:700",text:(p.name||"Anästhesieprotokoll")+(p.sub?(" · "+p.sub):"")}));
+    if(state.final) rf.appendChild(el("div",{text:"Finalisiert: "+fmtDT(state.finalAt)}));
+    (state.addenda||[]).forEach(function(a,i){ rf.appendChild(el("div",{text:"Nachtrag v"+(i+2)+": "+fmtDT(a.ts)+" – "+a.text})); });
+    rf.appendChild(el("div",{class:"idline",style:"margin-top:4px;color:#666",text:idline}));
+    rf.appendChild(el("div",{style:"margin-top:6px;color:#666",html:"Reine Dokumentation, kein Medizinprodukt. Langzeit-Archivierung obliegt der Praxis (§ 630f BGB)."}));
+    if(p.verantwortlich){ rf.appendChild(el("div",{id:"hf-verantwortlich",style:"margin-top:4px",text:p.verantwortlich})); }
+  }
+
+  /* ---------------- Archiv (IndexedDB) ---------------- */
+  var DB=null;
+  function idb(cb){
+    if(DB){ cb(DB); return; }
+    try{
+      var rq=indexedDB.open("aprot_archive",1);
+      rq.onupgradeneeded=function(){ var db=rq.result; if(!db.objectStoreNames.contains("cases")) db.createObjectStore("cases",{keyPath:"id"}); };
+      rq.onsuccess=function(){ DB=rq.result; cb(DB); };
+      rq.onerror=function(){ cb(null); };
+    }catch(e){ cb(null); }
+  }
+  function archiveSave(){
+    var id=window.__HF_VISIT||("case-"+Date.now());
+    var rec={ id:id, at:nowISO(), name:state.f.name||"", datum:state.f.datum||state.f.beginn||"", ver:state.ver||1, data:JSON.parse(JSON.stringify(state)) };
+    idb(function(db){ if(!db) return; try{ var tx=db.transaction("cases","readwrite"); tx.objectStore("cases").put(rec); }catch(e){} });
+  }
+  function archiveList(cb){
+    idb(function(db){ if(!db){ cb([]); return; } try{ var tx=db.transaction("cases","readonly"); var rq=tx.objectStore("cases").getAll(); rq.onsuccess=function(){ cb((rq.result||[]).sort(function(a,b){ return (b.at||"").localeCompare(a.at||""); })); }; rq.onerror=function(){ cb([]); }; }catch(e){ cb([]); } });
+  }
+  function openArchive(){
+    var host=$("#archList"); host.innerHTML="Lade…";
+    archiveList(function(list){
+      host.innerHTML="";
+      if(!list.length){ host.appendChild(el("p",{class:"vitnote",text:"Noch keine archivierten Protokolle auf diesem Gerät."})); }
+      list.forEach(function(rec){
+        var row=el("div",{style:"display:flex;gap:10px;align-items:center;border:1px solid var(--line);border-radius:12px;padding:9px 12px;margin:6px 0"});
+        row.appendChild(el("div",{style:"flex:1;min-width:0"},[
+          el("div",{style:"font-weight:700",text:(rec.name||"(ohne Namen)")+" · v"+(rec.ver||1)}),
+          el("div",{class:"vitnote",text:fmtDT(rec.at)})
+        ]));
+        row.appendChild(el("button",{class:"btn sec small",type:"button",onclick:function(){ exportJSON([rec.data], "protokoll_"+(rec.name||rec.id)); }},"JSON"));
+        row.appendChild(el("button",{class:"btn small",type:"button",onclick:function(){ viewArchived(rec.data); }},"Ansehen"));
+        host.appendChild(row);
+      });
+    });
+    $("#arch").showModal();
+  }
+  function viewArchived(data){
+    // schreibgeschützt anzeigen: aktuellen Zustand ersetzen (im Speicher), aber nicht überschreiben
+    var backup=JSON.parse(JSON.stringify(state));
+    state=JSON.parse(JSON.stringify(data)); state.final=true;
+    $("#arch").close();
+    render(); buildReportFoot();
+    dialog("Archiviertes Protokoll", el("p",{text:"Schreibgeschützte Ansicht. Sie können drucken. „Zurück“ kehrt zu Ihrem aktuellen Protokoll zurück."}), [
+      {t:"Drucken / PDF",cls:"sec",fn:function(){ window.print(); }},
+      {t:"Zurück",cls:"primary",fn:function(){ state=backup; saveNow(); closeDlg(); render(); buildReportFoot(); }}
+    ]);
+  }
+
+  /* ---------------- Backup / Restore (JSON) ---------------- */
+  function exportJSON(arr,name){
+    try{
+      var blob=new Blob([JSON.stringify(arr.length===1?arr[0]:arr,null,2)],{type:"application/json"});
+      var a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download=(name||"anaesthesieprotokoll")+".json"; a.click();
+      setTimeout(function(){ URL.revokeObjectURL(a.href); },1500);
+    }catch(e){ alert("Export nicht möglich."); }
+  }
+  function restoreJSON(file){
+    var rd=new FileReader();
+    rd.onload=function(){
+      try{
+        var obj=JSON.parse(rd.result);
+        if(Array.isArray(obj)){ // Sammel-Backup -> ins Archiv
+          idb(function(db){ if(!db) return; var tx=db.transaction("cases","readwrite"); obj.forEach(function(d){ tx.objectStore("cases").put({id:(d && d.created)||("case-"+Math.random()),at:nowISO(),name:(d.f&&d.f.name)||"",ver:d.ver||1,data:d}); }); });
+          dialog("Eingelesen", el("p",{text:obj.length+" Protokoll(e) ins Archiv übernommen."}), [{t:"OK",cls:"primary",fn:closeDlg}]);
+          return;
+        }
+        if(obj && obj.f){ state=obj; saveNow(); render(); buildReportFoot(); dialog("Eingelesen", el("p",{text:"Protokoll geladen."}), [{t:"OK",cls:"primary",fn:closeDlg}]); }
+        else dialog("Ungültig", el("p",{text:"Keine gültige Protokolldatei."}), [{t:"OK",cls:"primary",fn:closeDlg}]);
+      }catch(e){ dialog("Fehler", el("p",{text:"Datei konnte nicht gelesen werden."}), [{t:"OK",cls:"primary",fn:closeDlg}]); }
+    };
+    rd.readAsText(file);
+  }
+
+  /* ---------------- Neues Protokoll ---------------- */
+  function newProtocol(){
+    var b=el("div");
+    if(!state.final && (state.f.name||state.drugs.length||Object.keys(state.vitals.data).length)){
+      b.appendChild(el("p",{html:"Das aktuelle Protokoll ist <b>noch nicht finalisiert</b>. Ein neues Protokoll zu starten verwirft die aktuellen, ungesicherten Eingaben (auf diesem Gerät)."}));
+      b.appendChild(el("p",{class:"vitnote",text:"Tipp: vorher „Sichern (JSON)“ oder finalisieren."}));
+    } else {
+      b.appendChild(el("p",{text:"Ein neues, leeres Protokoll starten? Das aktuelle bleibt im Archiv erhalten."}));
+    }
+    dialog("Neues Protokoll", b, [
+      {t:"Abbrechen",cls:"sec",fn:closeDlg},
+      {t:"Neu starten",cls:"warn",fn:function(){ closeDlg(); resetProtocol(); }}
+    ]);
+  }
+  function resetProtocol(){
+    try{ localStorage.removeItem(STORE_KEY); localStorage.removeItem("hf_visit_id"); }catch(e){}
+    location.reload();
+  }
+
+  /* ---------------- Dialog-Helfer ---------------- */
+  var dlg=$("#dlg");
+  function dialog(title,bodyNode,actions){
+    $("#dlgTitle").textContent=title;
+    var db=$("#dlgBody"); db.innerHTML=""; db.appendChild(bodyNode);
+    var ac=$("#dlgActions"); ac.innerHTML="";
+    (actions||[]).forEach(function(a){
+      var cls="btn"+(a.cls==="sec"?" sec":a.cls==="warn"?" warn":a.cls==="ok"?" ok":"");
+      ac.appendChild(el("button",{class:cls,type:"button",onclick:a.fn},a.t));
+    });
+    if(!dlg.open) dlg.showModal();
+  }
+  function closeDlg(){ if(dlg.open) dlg.close(); }
+  dlg.addEventListener("cancel",function(e){ /* ESC erlaubt */ });
+
+  /* ---------------- Idle-Lock ---------------- */
+  var IDLE_MS=10*60*1000, idleT=null;
+  function armIdle(){ if(idleT) clearTimeout(idleT); idleT=setTimeout(function(){ $("#idlelock").classList.add("on"); },IDLE_MS); }
+  ["click","keydown","touchstart","input"].forEach(function(ev){ window.addEventListener(ev,function(){ armIdle(); },{passive:true}); });
+  $("#idleResume").addEventListener("click",function(){ $("#idlelock").classList.remove("on"); armIdle(); });
+  $("#idlelock").addEventListener("click",function(){ $("#idlelock").classList.remove("on"); armIdle(); });
+
+  /* ---------------- Druck-Vorbereitung ---------------- */
+  window.addEventListener("beforeprint",function(){
+    buildReportFoot();
+    $$(".sect").forEach(function(d){ if(d.getAttribute("data-hidden")!=="1"){ d.open=true; } });
+    // Vitalkurve sicher gezeichnet
+    paintVitals();
+  });
+
+  /* ---------------- Verdrahtung ---------------- */
+  function wire(){
+    $("#modeVoll").addEventListener("click",function(){ if(!state.final) setMode("voll"); });
+    $("#modeAmb").addEventListener("click",function(){ if(!state.final) setMode("ambulant"); });
+    $("#btnFinal").addEventListener("click",doFinalize);
+    $("#btnAddendum").addEventListener("click",addAddendum);
+    $("#btnPrint").addEventListener("click",function(){ window.print(); });
+    $("#btnBackup").addEventListener("click",function(){ exportJSON([state], "protokoll_"+(state.f.name||"entwurf")); });
+    $("#btnRestore").addEventListener("click",function(){ $("#fileIn").click(); });
+    $("#fileIn").addEventListener("change",function(e){ if(e.target.files[0]) restoreJSON(e.target.files[0]); e.target.value=""; });
+    $("#btnNew").addEventListener("click",newProtocol);
+    $("#btnArchive").addEventListener("click",openArchive);
+    $("#archClose").addEventListener("click",function(){ $("#arch").close(); });
+    $("#archExportAll").addEventListener("click",function(){ archiveList(function(list){ if(!list.length){ alert("Archiv ist leer."); return; } exportJSON(list.map(function(r){return r.data;}), "archiv_anaesthesieprotokolle"); }); });
+    // Modus initial
+    $("#modeVoll").setAttribute("aria-pressed", state.mode==="voll"?"true":"false");
+    $("#modeAmb").setAttribute("aria-pressed", state.mode==="ambulant"?"true":"false");
+  }
+
+  /* ---------------- Start (nach Freischaltung) ---------------- */
+  window.__afterBranding=function(){ buildReportFoot(); };
+  function boot(){
+    wire();
+    render();
+    buildReportFoot();
+    armIdle();
+  }
+  window.__onUnlock=boot;
+  // Falls der Gate-Block schon entsperrt hat (z. B. kein hf-gate), trotzdem booten
+  if(!document.getElementById("hf-gate")){ boot(); }
+
+  /* ---------------- PWA: Service Worker + Install ---------------- */
+  if("serviceWorker" in navigator){
+    window.addEventListener("load",function(){ navigator.serviceWorker.register("sw.js").catch(function(){}); });
+  }
+  var deferredPrompt=null;
+  window.addEventListener("beforeinstallprompt",function(e){ e.preventDefault(); deferredPrompt=e; $("#install").classList.add("on"); });
+  $("#installBtn").addEventListener("click",function(){
+    if(deferredPrompt){ deferredPrompt.prompt(); deferredPrompt.userChoice.finally(function(){ deferredPrompt=null; $("#install").classList.remove("on"); }); }
+    else { dialog("App installieren", el("div",{html:"<p>Über das Browser-Menü:</p><p><b>Safari (iPad):</b> Teilen-Symbol → „Zum Home-Bildschirm“.</p><p><b>Chrome/Edge:</b> Menü ⋮ → „App installieren“ / „Zum Startbildschirm“.</p>"}), [{t:"OK",cls:"primary",fn:closeDlg}]); }
+  });
+  $("#installX").addEventListener("click",function(){ $("#install").classList.remove("on"); }); // Dismissal NICHT persistieren
+  // manuelle Install-Affordanz auch ohne beforeinstallprompt (iPad) nach kurzer Zeit
+  setTimeout(function(){ if(!deferredPrompt && !window.matchMedia("(display-mode: standalone)").matches){ $("#install").classList.add("on"); } }, 1500);
+
+})();
+</script>
+</body>
+</html>
