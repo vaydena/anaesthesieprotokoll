@@ -1,3 +1,3 @@
 Anaesthesieprotokoll - Deploy-Marker
-aprot-v1-4dde6a
+aprot-v2-vitfix
 Stand: 2026-09-23

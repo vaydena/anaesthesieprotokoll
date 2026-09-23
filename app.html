@@ -721,6 +721,7 @@ window.__HF_PRAXIS = { name:"", sub:"", verantwortlich:"" };
       det.addEventListener("toggle",function(){ openState[s.id]=det.open; });
       MOUNT.appendChild(det);
     });
+    paintVitals();
     lockUI();
     updateLead();
   }
@@ -1008,8 +1009,7 @@ window.__HF_PRAXIS = { name:"", sub:"", verantwortlich:"" };
 
     // Numerische Tabelle (Fallback + SpO₂/etCO₂/AF/Temp)
     renderNumRows(body);
-
-    paintVitals();
+    // paintVitals() erst in render(), wenn #vitHost im DOM hängt
   }
 
   function paintVitals(){
