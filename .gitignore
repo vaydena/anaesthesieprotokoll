@@ -2,6 +2,9 @@
 OPERATOR-KEY.local.txt
 *.local.txt
 
+# Lokaler Deploy-Lauf: Log mit Server-Dialog (Passwort maskiert), nie versionieren
+deploy-local.log
+
 # Betriebssystem / Editor
 .DS_Store
 Thumbs.db
