@@ -1479,19 +1479,19 @@ window.__HF_PRAXIS = { name:"", sub:"", verantwortlich:"" };
     spinal:"Spinalanästhesie",armplexus:"Armplexus",bein:"Nervenblockade Bein",ax:"axillär",supra:"supraklavikulär",inter:"interskalenär",
     femoral:"Femoralisblock",ischiadikus:"Ischiadikusblock",obturator:"Obturatoriusblock",tap:"TAP-Block",
     sedierung:"Sedierung",sed_schlaf:"Sedierung (Schlaf)",sed_anx:"Anxiolyse"};
-  var AB_Q={q1_ausweis:"Anästhesie-Ausweis vorhanden",q1_kompl:"Komplikationen bei früheren Narkosen",q2:"Narkosezwischenfälle bei Blutsverwandten",
+  var AB_Q={q1_ausweis:"Anästhesie-Ausweis vorhanden",q1_kompl:"Komplikationen bei früheren Narkosen",q1_ponv:"Übelkeit/Erbrechen nach früherer Narkose (PONV)",q1_atemweg:"schwieriger Atemweg / schwierige Intubation bekannt",q2:"Narkosezwischenfälle bei Blutsverwandten",
     q3:"aktuell in ärztlicher Behandlung",q4:"Infekt in den letzten 4 Wochen",q5:"Infektionskrankheit (Hepatitis/TBC/HIV)",
     q8:"Maligne Hyperthermie (Veranlagung, auch familiär)",q9:"Neigung zu (Reise-)Übelkeit / PONV",q10:"Gerinnungsstörung (auch familiär)",
     q10b:"Nasen-/Zahnfleischbluten, Hämatome, Petechien",q10c:"Gelenk-/Weichteilblutungen",q10d:"verlängerte Blutung bei Schnittwunden",
-    q10e:"Nachblutung nach Operationen",q10f:"Nachblutung nach Zahnentfernung",q11:"Gefäßerkrankung",q12:"Thrombose/Embolie",
+    q10e:"Nachblutung nach Operationen",q10f:"Nachblutung nach Zahnentfernung",q10g:"lehnt Blut/Blutprodukte ab",q11:"Gefäßerkrankung",q12:"Thrombose/Embolie",
     q13:"Herz-Kreislauf-Erkrankung",q14:"Beschwerden bei 2 Stockwerken",q15:"Belastungsdyspnoe",q16:"Atemwegs-/Lungenerkrankung",
     q16b:"Heimsauerstoff / Heimbeatmung",q17:"starkes Schnarchen",q17b:"Schlafapnoe / CPAP",q18:"Erkrankung des Verdauungstrakts",
     q18b:"Reflux / Sodbrennen / Hiatushernie",q19:"Leber-/Gallenerkrankung",q20:"Nieren-/Harnwegserkrankung",q20b:"Dialyse",
     q21:"Stoffwechselerkrankung / Diabetes",q22:"Schilddrüsenerkrankung",q23:"Muskel-/Skeletterkrankung",q24:"neurologische Erkrankung",
-    q24b:"psychische Erkrankung",q25:"Augenerkrankung",q26:"Besonderheiten Zahnstatus",q27:"Implantate (z. B. Schrittmacher, Prothese)",
+    q24b:"psychische Erkrankung",q25:"Augenerkrankung",q26:"Besonderheiten Zahnstatus",q26b:"eingeschränkte Mundöffnung / HWS-Beweglichkeit",q27:"Implantate (z. B. Schrittmacher, Prothese)",
     q28c:"Drogenkonsum",q29:"mögliche Schwangerschaft",q29b:"stillt",q30:"MRE-Nachweis (MRSA/VRE)",q30b:"stationär im Ausland (letztes Jahr)",
     q30c:"Arbeit in Tiermast-Betrieb",q30d:"Arbeit in Pflegeeinrichtung",q33n:"Klinik/Notfallpraxis nicht sicher in 30 min erreichbar"};
-  var AB_WARN={q1_kompl:1,q2:1,q4:1,q8:1,q10:1,q16b:1,q17b:1,q18b:1,q27:1,q29:1,q30:1};
+  var AB_WARN={q1_kompl:1,q1_atemweg:1,q10g:1,q26b:1,q2:1,q4:1,q8:1,q10:1,q16b:1,q17b:1,q18b:1,q27:1,q29:1,q30:1};
 
   function parseHandover(txt){
     var o=null; try{ o=JSON.parse(String(txt||"").trim()); }catch(e){ return null; }
@@ -1517,6 +1517,9 @@ window.__HF_PRAXIS = { name:"", sub:"", verantwortlich:"" };
       if(k==="q7"){ add.allergien.push(t||"Allergie/Unverträglichkeit angegeben (ohne Details)"); hinweise.push("Allergie"+(t?": "+t:"")); }
       else if(k==="q6"){ add.dauermedikation.push(t||"Medikamente angegeben (ohne Details)"); }
       else if(k==="q10a"){ add.dauermedikation.push("⚠ Gerinnungshemmer/Schmerz-/Rheumamittel"+(t?": "+t:"")); hinweise.push("⚠ Gerinnungshemmer"+(t?": "+t:"")); }
+      else if(k==="q6b"){ var l6b="⚠ GLP-1-Präparat (Nüchternheit/Aspiration)"+(t?": "+t:""); add.dauermedikation.push(l6b); hinweise.push(l6b); }
+      else if(k==="q6c"){ var l6c="⚠ SGLT-2-Hemmer (Ketoazidose-Risiko)"+(t?": "+t:""); add.dauermedikation.push(l6c); hinweise.push(l6c); }
+      else if(k==="q6d"){ add.dauermedikation.push("Kortison-Dauertherapie"+(t?": "+t:"")); }
       else if(k==="q28"){ line.nikotin="ja"+(t?", "+t:""); }
       else if(k==="q28b"){ line.alkohol="ja"+(t?", "+t:""); }
       else if(k==="q1"||k==="q14b"){ /* keine Vorerkrankung */ }

@@ -42,7 +42,7 @@ das Version 22; gedruckt werden 50 × 50 mm.
 |---|---|---|
 | `p.n`, `p.g`, `p.s`, `p.kg`, `p.cm`, `e` | name, gebdat, geschlecht, gewicht, groesse, eingriff | wird überschrieben (Vorschau zeigt es vorher) |
 | `j.q7` | allergien | Zeile wird angehängt |
-| `j.q6`, `j.q10a` | dauermedikation | Zeile wird angehängt |
+| `j.q6`, `j.q10a`, `j.q6b` (GLP-1, ⚠), `j.q6c` (SGLT-2, ⚠), `j.q6d` (Kortison) | dauermedikation | Zeile wird angehängt; ⚠-Zeilen auch in den Hinweisen |
 | übrige `j.*` | vorerkrankungen | Zeile wird angehängt, relevante mit „⚠“ |
 | `j.q28` / `j.q28b` | nikotin / alkohol | nur, wenn das Feld leer ist |
 | – | aufklaerung | wird auf „ja“ gesetzt |
@@ -51,6 +51,13 @@ das Version 22; gedruckt werden 50 × 50 mm.
 Das tatsächliche Anästhesieverfahren wird **nicht** vorbelegt; die eingewilligten Verfahren
 stehen nur als Information in der Infobox. Doppelte Zeilen werden nicht erneut angehängt.
 Jede Übernahme wird im Audit-Log als `aufklaerung_import` festgehalten.
+
+Seit 2026-09-24 schickt der Aufklärungsbogen zusätzlich diese Schlüssel mit, die das
+Protokoll beschriftet übernimmt: `q1_ponv` (PONV nach früherer Narkose), `q1_atemweg`
+(schwieriger Atemweg, ⚠), `q10g` (lehnt Blut/Blutprodukte ab, ⚠), `q26b` (eingeschränkte
+Mundöffnung/HWS, ⚠). Fragen, die der Bogen ausblendet (z. B. Schwangerschaft/Stillen bei
+Geschlecht „männlich“), sind nicht im Payload. Ältere Protokoll-Versionen übernehmen
+unbekannte Schlüssel nicht; das Format bleibt `AB1`.
 
 ## Fall-ID und Abrechnung
 
