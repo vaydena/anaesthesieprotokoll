@@ -60,6 +60,9 @@ $rels = @(
   'icons/icon-192-maskable.png',
   'icons/icon-512-maskable.png',
   'assets/qrcode-generator.js',
+  'assets/screenshots/protokoll-verlauf-tablet.webp',
+  'assets/screenshots/protokoll-medikamente.webp',
+  'assets/screenshots/protokoll-uebersicht.webp',
   'deploy-version.txt'
 )
 
