@@ -551,6 +551,20 @@ window.__HF_PRAXIS = { name:"", sub:"", verantwortlich:"" };
   var DRUG_UNIT = {};
   Object.keys(DRUGS).forEach(function(g){ DRUGS[g].forEach(function(d){ if(!(d[0] in DRUG_UNIT)) DRUG_UNIT[d[0]]=d[1]; }); });
 
+  /* Eigene Wirkstoffe (vom Arzt ergänzt; geräteweit, bleibt über neue Protokolle erhalten) */
+  var CUSTOM_DRUG_KEY = "anaesthesieprotokoll_eigene_wirkstoffe";
+  var CUSTOM_UNITS = ["mg","µg","g","ng","mmol","IE","ml","Vol%","mg/h","µg/kg/min","Stk"];
+  function loadCustomDrugs(){ try{ var a=JSON.parse(localStorage.getItem(CUSTOM_DRUG_KEY)||"[]"); return Array.isArray(a)?a.filter(function(d){ return d && d[0]; }):[]; }catch(e){ return []; } }
+  function saveCustomDrugs(){ try{ localStorage.setItem(CUSTOM_DRUG_KEY, JSON.stringify(customDrugs)); }catch(e){} }
+  var customDrugs = loadCustomDrugs(); // [[name,unit], ...]
+  function drugUnit(name){ for(var i=0;i<customDrugs.length;i++){ if(customDrugs[i][0]===name) return customDrugs[i][1]; } return DRUG_UNIT[name]; }
+  function findDrug(name){
+    var n=String(name).trim().toLowerCase(), hit=null;
+    customDrugs.forEach(function(d){ if(d[0].toLowerCase()===n) hit={name:d[0],custom:true}; });
+    if(!hit) Object.keys(DRUG_UNIT).forEach(function(k){ if(k.toLowerCase()===n) hit={name:k,custom:false}; });
+    return hit;
+  }
+
   /* ---------------- Sektions-/Feldmodell (F24) ----------------
      Feldtypen: text,date,time,num,select,radio,checks,check,textarea,score
      Flags: voll  = nur im Vollprotokoll
@@ -837,10 +851,10 @@ window.__HF_PRAXIS = { name:"", sub:"", verantwortlich:"" };
   function renderDrugs(body){
     // Datalist mit allen Namen
     var dl = el("datalist",{id:"druglist"});
-    Object.keys(DRUGS).forEach(function(g){ DRUGS[g].forEach(function(d){ dl.appendChild(el("option",{value:d[0]})); }); });
+    fillDrugList(dl);
     body.appendChild(dl);
 
-    body.appendChild(el("p",{class:"vitnote",text:"Wirkstoffkatalog nach Klasse (Namen & Einheiten). Freitext ist möglich. Die App schlägt keine Dosierungen vor."}));
+    body.appendChild(el("p",{class:"vitnote",text:"Wirkstoffkatalog nach Klasse (Namen & Einheiten). Freitext ist möglich; fehlende Wirkstoffe lassen sich über „Eigene Wirkstoffe“ dauerhaft ergänzen. Die App schlägt keine Dosierungen vor."}));
 
     var scroll = el("div",{class:"tablescroll"});
     var t = el("table",{class:"rowtable"});
@@ -852,7 +866,7 @@ window.__HF_PRAXIS = { name:"", sub:"", verantwortlich:"" };
       var tr = el("tr");
       tr.appendChild(el("td",{},el("input",{type:"time",value:row.t||"",style:"min-width:104px",oninput:function(e){ row.t=e.target.value; save(); }})));
       tr.appendChild(el("td",{},el("input",{type:"text",list:"druglist",value:row.name||"",placeholder:"Wirkstoff",style:"min-width:170px",oninput:function(e){
-        row.name=e.target.value; var u=DRUG_UNIT[e.target.value]; if(u){ row.unit=u; var ui=tr.querySelector(".unitcell input"); if(ui) ui.value=u; } save(); updateDoseSum();
+        row.name=e.target.value; var u=drugUnit(e.target.value); if(u){ row.unit=u; var ui=tr.querySelector(".unitcell input"); if(ui) ui.value=u; } save(); updateDoseSum();
       }})));
       tr.appendChild(el("td",{},el("input",{type:"number",inputmode:"decimal",step:"any",value:row.dose||"",placeholder:"—",style:"min-width:80px",oninput:function(e){ row.dose=e.target.value; save(); updateDoseSum(); }})));
       tr.appendChild(el("td",{class:"unitcell"},el("input",{type:"text",value:row.unit||"",style:"min-width:64px",oninput:function(e){ row.unit=e.target.value; save(); updateDoseSum(); }})));
@@ -867,7 +881,8 @@ window.__HF_PRAXIS = { name:"", sub:"", verantwortlich:"" };
     scroll.appendChild(t);
     body.appendChild(scroll);
 
-    var addRowBtn = el("div",{class:"addbtnrow",style:"margin:10px 0"},el("button",{class:"btn sec small",type:"button",onclick:function(){ var r={t:"",name:"",dose:"",unit:"",route:"Bolus"}; state.drugs.push(r); addRow(r); save(); }},"+ Medikament"));
+    var addRowBtn = el("div",{class:"addbtnrow",style:"margin:10px 0"},[el("button",{class:"btn sec small",type:"button",onclick:function(){ var r={t:"",name:"",dose:"",unit:"",route:"Bolus"}; state.drugs.push(r); addRow(r); save(); }},"+ Medikament"),
+      el("button",{class:"btn sec small",type:"button",style:"margin-left:8px",onclick:function(){ customDrugDialog(); }},"Eigene Wirkstoffe …")]);
     body.appendChild(addRowBtn);
 
     // Infusionen
@@ -911,6 +926,63 @@ window.__HF_PRAXIS = { name:"", sub:"", verantwortlich:"" };
     var ds = el("div",{class:"dosesum",id:"doseSum"});
     body.appendChild(ds);
     updateDoseSum();
+  }
+
+  function fillDrugList(dl){
+    dl = dl || $("#druglist"); if(!dl) return;
+    dl.innerHTML="";
+    customDrugs.forEach(function(d){ dl.appendChild(el("option",{value:d[0],label:"Eigener Wirkstoff · "+(d[1]||"")})); });
+    Object.keys(DRUGS).forEach(function(g){ DRUGS[g].forEach(function(d){ dl.appendChild(el("option",{value:d[0]})); }); });
+  }
+
+  /* Dialog: eigenen, noch nicht definierten Wirkstoff anlegen / verwalten */
+  function customDrugDialog(){
+    var b=el("div");
+    b.appendChild(el("p",{class:"vitnote",style:"margin-top:0",text:"Eigene Wirkstoffe erscheinen in der Wirkstoff-Auswahl und setzen die Einheit automatisch. Sie werden nur auf diesem Gerät gespeichert und bleiben für alle künftigen Protokolle erhalten. Es werden keine Dosierungen hinterlegt."}));
+    var g=el("div",{class:"grid"});
+    var wn=el("div",{class:"field"}); wn.appendChild(el("label",{text:"Wirkstoff"}));
+    var inName=el("input",{type:"text",maxlength:"80",placeholder:"z. B. Remimazolam"}); wn.appendChild(inName);
+    var wu=el("div",{class:"field"}); wu.appendChild(el("label",{text:"Einheit"}));
+    var inUnit=el("input",{type:"text",list:"customunits",maxlength:"20",value:"mg"}); wu.appendChild(inUnit);
+    var ul=el("datalist",{id:"customunits"}); CUSTOM_UNITS.forEach(function(u){ ul.appendChild(el("option",{value:u})); }); wu.appendChild(ul);
+    g.appendChild(wn); g.appendChild(wu); b.appendChild(g);
+    var msg=el("div",{class:"vitnote",role:"status"}); b.appendChild(msg);
+    var list=el("div",{style:"margin-top:12px"}); b.appendChild(list);
+
+    function renderList(){
+      list.innerHTML="";
+      list.appendChild(el("div",{style:"font-weight:800;font-size:.85rem;margin-bottom:4px",text:"Eigene Wirkstoffe ("+customDrugs.length+")"}));
+      if(!customDrugs.length){ list.appendChild(el("div",{class:"vitnote",text:"Noch keine eigenen Wirkstoffe angelegt."})); return; }
+      customDrugs.forEach(function(d){
+        list.appendChild(el("div",{style:"display:flex;align-items:center;gap:10px;padding:4px 0;border-bottom:1px solid var(--line)"},[
+          el("span",{style:"flex:1",text:d[0]}), el("b",{text:d[1]||"—"}),
+          el("button",{class:"iconbtn",type:"button",title:"Aus Katalog entfernen","aria-label":d[0]+" entfernen",onclick:function(){
+            customDrugs.splice(customDrugs.indexOf(d),1); saveCustomDrugs(); fillDrugList(); renderList();
+            msg.textContent="„"+d[0]+"“ entfernt (bereits dokumentierte Gaben bleiben unverändert).";
+          }},"×")
+        ]));
+      });
+    }
+    function add(){
+      var name=inName.value.replace(/\s+/g," ").trim(), unit=inUnit.value.trim();
+      if(!name){ msg.textContent="Bitte einen Wirkstoffnamen eingeben."; inName.focus(); return; }
+      if(!unit){ msg.textContent="Bitte eine Einheit angeben."; inUnit.focus(); return; }
+      var hit=findDrug(name);
+      if(hit){ msg.textContent="„"+hit.name+"“ ist bereits "+(hit.custom?"als eigener Wirkstoff angelegt.":"im Katalog enthalten."); return; }
+      customDrugs.push([name,unit]);
+      customDrugs.sort(function(a,b){ return a[0].localeCompare(b[0],"de"); });
+      saveCustomDrugs(); fillDrugList(); renderList();
+      msg.textContent="„"+name+"“ ("+unit+") hinzugefügt.";
+      inName.value=""; inName.focus();
+    }
+    inName.addEventListener("keydown",function(e){ if(e.key==="Enter"){ e.preventDefault(); add(); } });
+    inUnit.addEventListener("keydown",function(e){ if(e.key==="Enter"){ e.preventDefault(); add(); } });
+    renderList();
+    dialog("Eigene Wirkstoffe", b, [
+      {t:"Schließen",cls:"sec",fn:closeDlg},
+      {t:"Hinzufügen",cls:"ok",fn:add}
+    ]);
+    setTimeout(function(){ inName.focus(); },50);
   }
 
   function updateDoseSum(){
