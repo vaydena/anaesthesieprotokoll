@@ -56,7 +56,15 @@ Jede Übernahme wird im Audit-Log als `aufklaerung_import` festgehalten.
 
 Das Protokoll übernimmt die `id` aus dem QR als eigene `visit_id`, **solange es noch nicht
 gezählt wurde**. Damit tragen Aufklärung und Protokoll desselben Patienten dieselbe Fall-ID.
-Darauf baut Schritt 3 auf: Die Abrechnung prüft, ob die Fall-ID bereits in der anderen App
-gezählt wurde, und berechnet dann nichts mehr (1 € pro Fall).
+Abgerechnet wird deshalb **1 € pro Fall**:
 
-Bis Schritt 3 umgesetzt ist, werden beide Apps weiterhin getrennt gezählt.
+- Beide Apps akzeptieren denselben Praxis-Token (`anaesthesie.practices`).
+  `aprot-check-token` prüft zuerst die Praxis (inkl. Testzeitraum/Sperre) und fällt
+  sonst auf die alten Protokoll-Zugänge (`aprot.customers`) zurück.
+- `aprot-record-usage` schreibt bei einem Praxis-Token in `anaesthesie.visits`
+  (`insert … on conflict (id) do nothing`). Ist die Fall-ID schon durch die Aufklärung
+  gezählt, entsteht kein zweiter Eintrag.
+- Die Rechnung erstellt weiterhin `anaesthesie-invoice` aus `anaesthesie.visits` –
+  eine Rechnung pro Praxis.
+- Ein Protokoll ohne vorherige Aufklärung zählt als eigener Fall. Alte Protokoll-Zugänge
+  (`aprot.customers`) werden unverändert über `aprot.usage` gezählt.

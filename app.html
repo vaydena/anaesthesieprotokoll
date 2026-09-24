@@ -524,7 +524,9 @@ window.__HF_PRAXIS = { name:"", sub:"", verantwortlich:"" };
     post("aprot-check-token",{token:token}).then(function(r){return r.json();}).then(function(d){
       if(d && d.valid){ applyBranding(d.branding); open(); try{ if(window.__onUnlock) window.__onUnlock(); }catch(e){} }
       else{ try{ sessionStorage.removeItem("hf_token"); }catch(e){}
-            gate("Zugang ungültig","Der Zugangslink ist nicht (mehr) gültig.", true); }
+            if(d && d.reason==="trial_expired") gate("Testzeitraum abgelaufen","Der kostenlose Testzeitraum Ihres Praxis-Zugangs ist beendet.", true);
+            else if(d && d.reason==="locked") gate("Zugang gesperrt","Ihr Praxis-Zugang ist derzeit gesperrt. Bitte wenden Sie sich an den Betreiber.", true);
+            else gate("Zugang ungültig","Der Zugangslink ist nicht (mehr) gültig.", true); }
     }).catch(function(){ gate("Verbindungsproblem","Zugang konnte nicht geprüft werden. Bitte erneut versuchen.", true); });
   }
   if(document.readyState==="loading") document.addEventListener("DOMContentLoaded", start);
