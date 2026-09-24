@@ -198,6 +198,18 @@ body.is-final #btnFinal{display:none}
 /* Dialog */
 dialog{border:0; border-radius:18px; padding:0; box-shadow:0 20px 60px rgba(10,38,44,.35); max-width:520px; width:92vw}
 dialog::backdrop{background:rgba(10,38,44,.5)}
+.aufkl-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:0 0 12px}
+.aufkl-row .vitnote{margin:0}
+.scanbox{position:relative;background:#0b1b20;border-radius:12px;overflow:hidden;aspect-ratio:1/1;max-height:60vh;margin:0 auto}
+.scanbox video{width:100%;height:100%;object-fit:cover;display:block}
+.scanbox .frame{position:absolute;inset:14%;border:3px solid rgba(255,255,255,.85);border-radius:14px;pointer-events:none}
+.scanmsg{margin:10px 0 0;font-size:.9rem}
+.aufkl-box ul{margin:6px 0 0 18px;padding:0}
+.aufkl-box li{margin:2px 0}
+.aufkl-prev{max-height:46vh;overflow:auto}
+.aufkl-prev table{width:100%;border-collapse:collapse;font-size:.9rem}
+.aufkl-prev td{border-bottom:1px solid var(--line,#e3e8ea);padding:4px 6px;vertical-align:top}
+.aufkl-prev td:first-child{color:#51646f;white-space:nowrap}
 .dlg{padding:20px 22px}
 .dlg h3{font-size:1.1rem}
 .dlg p{color:var(--muted); font-size:.92rem}
@@ -494,6 +506,17 @@ window.__HF_PRAXIS = { name:"", sub:"", verantwortlich:"" };
   }
 
   window.__record = record;
+  // QR-Uebergabe aus dem Aufklaerungsbogen: dessen Fall-ID (visit_id) wird zur Protokoll-ID.
+  // Nur solange dieses Protokoll noch nicht gezaehlt wurde (sonst bleibt die bisherige ID).
+  window.__HF_ADOPT_VISIT = function(vid){
+    vid=String(vid||"").toLowerCase();
+    if(!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/.test(vid)) return false;
+    if(vid===VISIT) return true;
+    if(recorded) return false;
+    VISIT=vid; window.__HF_VISIT=vid;
+    try{ localStorage.setItem("hf_visit_id",vid); }catch(e){}
+    return true;
+  };
 
   function start(){
     flushQueue();
@@ -742,6 +765,13 @@ window.__HF_PRAXIS = { name:"", sub:"", verantwortlich:"" };
   var openState={};
 
   function renderFields(body,s){
+    if(s.id==="stamm" && !state.final){
+      body.appendChild(el("div",{class:"aufkl-row no-print"},[
+        el("button",{class:"btn sec small",type:"button",onclick:openScan},"Aufklärung übernehmen (QR scannen)"),
+        el("span",{class:"vitnote",text: state.aufkl ? "Übernommen am "+fmtDT(state.aufkl.at)+" · Fall-ID "+state.aufkl.id : "QR-Code vom Aufklärungsbogen (Praxis-Ausdruck oder Bildschirm) scannen."})
+      ]));
+    }
+    if(s.id==="praemed" && state.aufkl) body.appendChild(renderAufklBox());
     var grid = el("div",{class:"grid"});
     s.fields.forEach(function(f){
       if(!fieldVisible(f)) return;
@@ -1439,6 +1469,224 @@ window.__HF_PRAXIS = { name:"", sub:"", verantwortlich:"" };
     };
     rd.readAsText(file);
   }
+
+  /* ---------------- Uebergabe aus dem Aufklaerungsbogen (QR, Format AB1) ----------------
+     Spezifikation: docs/UEBERGABE-AUFKLAERUNG.md. Rein lokal: der QR-Code wird im Browser
+     gelesen, es wird nichts an einen Server gesendet. */
+  var AB_VERF={allgemein:"Allgemeinanästhesie",maske:"Maske",larynx:"Larynxmaske",tubus:"Tubus",regional:"Regionalanästhesie",
+    spinal:"Spinalanästhesie",armplexus:"Armplexus",bein:"Nervenblockade Bein",ax:"axillär",supra:"supraklavikulär",inter:"interskalenär",
+    femoral:"Femoralisblock",ischiadikus:"Ischiadikusblock",obturator:"Obturatoriusblock",tap:"TAP-Block",
+    sedierung:"Sedierung",sed_schlaf:"Sedierung (Schlaf)",sed_anx:"Anxiolyse"};
+  var AB_Q={q1_ausweis:"Anästhesie-Ausweis vorhanden",q1_kompl:"Komplikationen bei früheren Narkosen",q2:"Narkosezwischenfälle bei Blutsverwandten",
+    q3:"aktuell in ärztlicher Behandlung",q4:"Infekt in den letzten 4 Wochen",q5:"Infektionskrankheit (Hepatitis/TBC/HIV)",
+    q8:"Maligne Hyperthermie (Veranlagung, auch familiär)",q9:"Neigung zu (Reise-)Übelkeit / PONV",q10:"Gerinnungsstörung (auch familiär)",
+    q10b:"Nasen-/Zahnfleischbluten, Hämatome, Petechien",q10c:"Gelenk-/Weichteilblutungen",q10d:"verlängerte Blutung bei Schnittwunden",
+    q10e:"Nachblutung nach Operationen",q10f:"Nachblutung nach Zahnentfernung",q11:"Gefäßerkrankung",q12:"Thrombose/Embolie",
+    q13:"Herz-Kreislauf-Erkrankung",q14:"Beschwerden bei 2 Stockwerken",q15:"Belastungsdyspnoe",q16:"Atemwegs-/Lungenerkrankung",
+    q16b:"Heimsauerstoff / Heimbeatmung",q17:"starkes Schnarchen",q17b:"Schlafapnoe / CPAP",q18:"Erkrankung des Verdauungstrakts",
+    q18b:"Reflux / Sodbrennen / Hiatushernie",q19:"Leber-/Gallenerkrankung",q20:"Nieren-/Harnwegserkrankung",q20b:"Dialyse",
+    q21:"Stoffwechselerkrankung / Diabetes",q22:"Schilddrüsenerkrankung",q23:"Muskel-/Skeletterkrankung",q24:"neurologische Erkrankung",
+    q24b:"psychische Erkrankung",q25:"Augenerkrankung",q26:"Besonderheiten Zahnstatus",q27:"Implantate (z. B. Schrittmacher, Prothese)",
+    q28c:"Drogenkonsum",q29:"mögliche Schwangerschaft",q29b:"stillt",q30:"MRE-Nachweis (MRSA/VRE)",q30b:"stationär im Ausland (letztes Jahr)",
+    q30c:"Arbeit in Tiermast-Betrieb",q30d:"Arbeit in Pflegeeinrichtung",q33n:"Klinik/Notfallpraxis nicht sicher in 30 min erreichbar"};
+  var AB_WARN={q1_kompl:1,q2:1,q4:1,q8:1,q10:1,q16b:1,q17b:1,q18b:1,q27:1,q29:1,q30:1};
+
+  function parseHandover(txt){
+    var o=null; try{ o=JSON.parse(String(txt||"").trim()); }catch(e){ return null; }
+    if(!o || o.t!=="AB1" || typeof o!=="object") return null;
+    o.p=(o.p&&typeof o.p==="object")?o.p:{}; o.j=(o.j&&typeof o.j==="object")?o.j:{}; o.v=Array.isArray(o.v)?o.v:[];
+    return o;
+  }
+  function abNum(v){ var m=String(v==null?"":v).replace(",",".").match(/\d+(\.\d+)?/); return m?m[0]:""; }
+  function abTxt(v){ return (v===1||v===true||v==null)?"":String(v); }
+  // Aus dem Payload die geplanten Aenderungen berechnen (ohne sie anzuwenden)
+  function planHandover(o){
+    var set={}, add={allergien:[],dauermedikation:[],vorerkrankungen:[]}, line={}, hinweise=[];
+    var p=o.p;
+    if(p.n) set.name=String(p.n);
+    if(p.g && /^\d{4}-\d{2}-\d{2}$/.test(p.g)) set.gebdat=p.g;
+    if(p.s && ["weiblich","männlich","divers","unbestimmt"].indexOf(p.s)>=0) set.geschlecht=p.s;
+    if(abNum(p.kg)) set.gewicht=abNum(p.kg);
+    if(abNum(p.cm)) set.groesse=abNum(p.cm);
+    if(o.e) set.eingriff=String(o.e);
+    var j=o.j;
+    Object.keys(j).forEach(function(k){
+      var t=abTxt(j[k]);
+      if(k==="q7"){ add.allergien.push(t||"Allergie/Unverträglichkeit angegeben (ohne Details)"); hinweise.push("Allergie"+(t?": "+t:"")); }
+      else if(k==="q6"){ add.dauermedikation.push(t||"Medikamente angegeben (ohne Details)"); }
+      else if(k==="q10a"){ add.dauermedikation.push("⚠ Gerinnungshemmer/Schmerz-/Rheumamittel"+(t?": "+t:"")); hinweise.push("⚠ Gerinnungshemmer"+(t?": "+t:"")); }
+      else if(k==="q28"){ line.nikotin="ja"+(t?", "+t:""); }
+      else if(k==="q28b"){ line.alkohol="ja"+(t?", "+t:""); }
+      else if(k==="q1"||k==="q14b"){ /* keine Vorerkrankung */ }
+      else if(AB_Q[k]){
+        var l=(AB_WARN[k]?"⚠ ":"")+AB_Q[k]+(t?": "+t:"");
+        add.vorerkrankungen.push(l);
+        if(AB_WARN[k]) hinweise.push(l);
+      }
+    });
+    var verf=o.v.map(function(k){ return AB_VERF[k]||k; });
+    return {set:set, add:add, line:line, aufkl:{
+      id:String(o.id||""), d:String(o.d||""), at:nowISO(), a:o.a?String(o.a):"", verfahren:verf,
+      h:p.h?String(p.h):"", b:o.b?String(o.b):"", r:o.r?String(o.r):"", hinweise:hinweise }};
+  }
+  function applyPlan(pl){
+    var changed=[];
+    Object.keys(pl.set).forEach(function(k){ if(state.f[k]!==pl.set[k]){ state.f[k]=pl.set[k]; changed.push(k); } });
+    Object.keys(pl.add).forEach(function(k){
+      var cur=String(state.f[k]||""), lines=cur?cur.split("\n"):[];
+      pl.add[k].forEach(function(l){ if(lines.indexOf(l)<0) lines.push(l); });
+      var nv=lines.join("\n"); if(nv!==cur){ state.f[k]=nv; changed.push(k); }
+    });
+    Object.keys(pl.line).forEach(function(k){ if(!state.f[k]){ state.f[k]=pl.line[k]; changed.push(k); } });
+    state.f.aufklaerung=true;
+    var adopted = window.__HF_ADOPT_VISIT ? window.__HF_ADOPT_VISIT(pl.aufkl.id) : false;
+    pl.aufkl.fallIdUebernommen = !!adopted;
+    state.aufkl=pl.aufkl;
+    audit("aufklaerung_import","Aus Aufklärungsbogen übernommen (Fall-ID "+(pl.aufkl.id||"—")+(adopted?"":", Protokoll-ID unverändert")+"). Felder: "+(changed.join(", ")||"—"));
+    saveNow(); render(); buildReportFoot();
+    return adopted;
+  }
+  function showHandoverPreview(o){
+    var pl=planHandover(o);
+    var b=el("div",{class:"aufkl-prev"});
+    var curName=String(state.f.name||"").trim().toLowerCase(), newName=String(pl.set.name||"").trim().toLowerCase();
+    if(curName && newName && curName!==newName){
+      b.appendChild(el("div",{class:"callout",html:"<b>Achtung – anderer Name:</b> Im Protokoll steht „"+esc(state.f.name)+"“, der Code gehört zu „"+esc(pl.set.name)+"“. Bitte Patientenidentität prüfen."}));
+    }
+    if(state.aufkl && state.aufkl.id && state.aufkl.id!==pl.aufkl.id){
+      b.appendChild(el("div",{class:"callout",text:"In dieses Protokoll wurde bereits eine andere Aufklärung übernommen (Fall-ID "+state.aufkl.id+")."}));
+    }
+    var LBL={name:"Name",gebdat:"Geburtsdatum",geschlecht:"Geschlecht",gewicht:"Gewicht (kg)",groesse:"Größe (cm)",eingriff:"Eingriff"};
+    var tb=el("table");
+    function row(k,v){ if(v) tb.appendChild(el("tr",{},[el("td",{text:k}),el("td",{text:v})])); }
+    Object.keys(LBL).forEach(function(k){ row(LBL[k], pl.set[k]); });
+    row("Allergien", pl.add.allergien.join("; "));
+    row("Medikation", pl.add.dauermedikation.join("; "));
+    row("Anamnese", pl.add.vorerkrankungen.join("; "));
+    row("Nikotin", pl.line.nikotin); row("Alkohol", pl.line.alkohol);
+    row("Eingewilligt", pl.aufkl.verfahren.join(", "));
+    row("Aufklärung", [fmtAB(pl.aufkl.d), pl.aufkl.a].filter(Boolean).join(" · "));
+    row("Fall-ID", pl.aufkl.id);
+    b.appendChild(tb);
+    b.appendChild(el("p",{class:"vitnote",text:"Stammdaten werden überschrieben, Anamnese-Angaben ergänzt (nichts wird gelöscht). Das Anästhesieverfahren im Protokoll wird nicht vorbelegt."}));
+    dialog("Aufklärung übernehmen?", b, [
+      {t:"Abbrechen",cls:"sec",fn:closeDlg},
+      {t:"Übernehmen",cls:"primary",fn:function(){
+        var adopted=applyPlan(pl);
+        dialog("Übernommen ✓", el("p",{text: adopted
+          ? "Die Angaben aus der Aufklärung sind eingetragen. Protokoll und Aufklärung laufen unter derselben Fall-ID."
+          : "Die Angaben aus der Aufklärung sind eingetragen. Hinweis: Dieses Protokoll war bereits gezählt; seine Protokoll-ID bleibt unverändert."}),
+          [{t:"OK",cls:"primary",fn:closeDlg}]);
+      }}
+    ]);
+  }
+  function fmtAB(d){ if(!d) return ""; try{ return fmtDT(d.length<=16? d+":00Z" : d); }catch(e){ return d; } }
+  function renderAufklBox(){
+    var a=state.aufkl, box=el("div",{class:"callout info aufkl-box"});
+    box.appendChild(el("b",{text:"Aus dem Aufklärungsbogen übernommen"}));
+    var ul=el("ul");
+    function li(k,v){ if(v) ul.appendChild(el("li",{},[el("b",{text:k+": "}), v])); }
+    li("Aufklärung", [fmtAB(a.d), a.a].filter(Boolean).join(" · "));
+    li("Eingewilligte Verfahren", (a.verfahren||[]).join(", "));
+    li("Wichtige Angaben", (a.hinweise||[]).join("; "));
+    li("Händigkeit", a.h);
+    li("Abholung/Betreuung", a.b);
+    li("Bemerkung Aufklärung", a.r);
+    li("Fall-ID", a.id);
+    box.appendChild(ul);
+    return box;
+  }
+
+  // Scanner: BarcodeDetector (falls vorhanden), sonst jsQR (wird bei Bedarf nachgeladen); Foto als Rückfall
+  var jsQRLoading=null;
+  function loadJsQR(){
+    if(window.jsQR) return Promise.resolve(window.jsQR);
+    if(jsQRLoading) return jsQRLoading;
+    jsQRLoading=new Promise(function(res,rej){
+      var sc=document.createElement("script"); sc.src="assets/jsQR.js";
+      sc.onload=function(){ window.jsQR?res(window.jsQR):rej(new Error("jsQR")); };
+      sc.onerror=function(){ jsQRLoading=null; rej(new Error("jsQR")); };
+      document.head.appendChild(sc);
+    });
+    return jsQRLoading;
+  }
+  var bdet=null;
+  try{ if("BarcodeDetector" in window) bdet=new window.BarcodeDetector({formats:["qr_code"]}); }catch(e){ bdet=null; }
+  function decodeCanvas(cv){
+    var ctx=cv.getContext("2d",{willReadFrequently:true});
+    return loadJsQR().then(function(fn){
+      var img=ctx.getImageData(0,0,cv.width,cv.height);
+      var r=fn(img.data,img.width,img.height,{inversionAttempts:"attemptBoth"});
+      return r?r.data:null;
+    });
+  }
+  function decodeSource(src,w,h){
+    var p = bdet ? bdet.detect(src).then(function(c){ return (c&&c.length)?c[0].rawValue:null; }).catch(function(){ return null; }) : Promise.resolve(null);
+    return p.then(function(v){
+      if(v) return v;
+      var sc=Math.min(1, 1280/Math.max(w,h)), cv=document.createElement("canvas");
+      cv.width=Math.max(1,Math.round(w*sc)); cv.height=Math.max(1,Math.round(h*sc));
+      cv.getContext("2d",{willReadFrequently:true}).drawImage(src,0,0,cv.width,cv.height);
+      return decodeCanvas(cv);
+    });
+  }
+  function openScan(){
+    if(state.final){ dialog("Protokoll finalisiert", el("p",{text:"Ein finalisiertes Protokoll kann nicht mehr befüllt werden. Bitte als Nachtrag dokumentieren."}), [{t:"OK",cls:"primary",fn:closeDlg}]); return; }
+    var stream=null, timer=null, done=false;
+    var video=el("video",{playsinline:"",muted:"",autoplay:""}); video.muted=true;
+    var msg=el("p",{class:"scanmsg vitnote",text:"Kamera wird gestartet …"});
+    var fileIn=el("input",{type:"file",accept:"image/*",capture:"environment",style:"display:none"});
+    var b=el("div",{},[ el("div",{class:"scanbox"},[video, el("div",{class:"frame"})]), msg, fileIn ]);
+    function stop(){ done=true; if(timer){ clearTimeout(timer); timer=null; } if(stream){ stream.getTracks().forEach(function(t){ try{t.stop();}catch(e){} }); stream=null; } }
+    function found(txt){
+      var o=parseHandover(txt);
+      if(!o){ msg.textContent="Dieser QR-Code ist kein Übergabe-Code des Aufklärungsbogens."; return false; }
+      stop(); showHandoverPreview(o); return true;
+    }
+    function tick(){
+      if(done) return;
+      if(video.readyState>=2 && video.videoWidth){
+        decodeSource(video,video.videoWidth,video.videoHeight).then(function(v){
+          if(done) return;
+          if(!(v && found(v))) timer=setTimeout(tick,250);
+        }).catch(function(){ if(!done) timer=setTimeout(tick,400); });
+      } else timer=setTimeout(tick,200);
+    }
+    fileIn.addEventListener("change",function(e){
+      var f=e.target.files&&e.target.files[0]; e.target.value=""; if(!f) return;
+      msg.textContent="Foto wird ausgewertet …";
+      var img=new Image(), url=URL.createObjectURL(f);
+      img.onload=function(){
+        decodeSource(img,img.naturalWidth,img.naturalHeight).then(function(v){
+          URL.revokeObjectURL(url);
+          if(!v){ msg.textContent="Im Foto wurde kein QR-Code erkannt. Bitte näher und gerade fotografieren."; return; }
+          found(v);
+        }).catch(function(){ URL.revokeObjectURL(url); msg.textContent="Foto konnte nicht ausgewertet werden."; });
+      };
+      img.onerror=function(){ URL.revokeObjectURL(url); msg.textContent="Foto konnte nicht geladen werden."; };
+      img.src=url;
+    });
+    dialog("Aufklärung übernehmen", b, [
+      {t:"Abbrechen",cls:"sec",fn:function(){ stop(); closeDlg(); }},
+      {t:"Foto aufnehmen",cls:"sec",fn:function(){ fileIn.click(); }}
+    ]);
+    dlg.addEventListener("close",stop,{once:true});
+    if(!bdet) loadJsQR().catch(function(){});
+    if(navigator.mediaDevices && navigator.mediaDevices.getUserMedia){
+      navigator.mediaDevices.getUserMedia({video:{facingMode:"environment"},audio:false}).then(function(s){
+        if(done){ s.getTracks().forEach(function(t){t.stop();}); return; }
+        stream=s; video.srcObject=s;
+        var pr=video.play(); if(pr&&pr.catch) pr.catch(function(){});
+        msg.textContent="QR-Code des Aufklärungsbogens in den Rahmen halten.";
+        tick();
+      }).catch(function(){
+        msg.textContent="Kamera nicht verfügbar oder nicht erlaubt. Alternativ „Foto aufnehmen“ tippen.";
+      });
+    } else {
+      msg.textContent="Live-Kamera wird von diesem Browser nicht unterstützt. Bitte „Foto aufnehmen“ tippen.";
+    }
+  }
+  window.__aprotHandover={parse:parseHandover, plan:planHandover, apply:applyPlan, preview:showHandoverPreview};
 
   /* ---------------- Neues Protokoll ---------------- */
   function newProtocol(){

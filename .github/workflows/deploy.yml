@@ -80,7 +80,7 @@ jobs:
             icons/icon-512.png \
             icons/icon-192-maskable.png \
             icons/icon-512-maskable.png \
-            assets/qrcode-generator.js \
+            assets/qrcode-generator.js assets/jsQR.js \
             deploy-version.txt; do
             upload "$f"
           done
