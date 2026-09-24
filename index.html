@@ -184,6 +184,17 @@ nav.main a:hover{color:var(--ink);background:var(--primary-l)}
   .mock{min-height:400px;max-width:480px;margin:0 auto;width:100%}
 }
 
+/* ---------- Einblick: echte Screenshots (fiktive Daten) ---------- */
+.shots{display:grid;gap:28px;margin-top:38px;max-width:980px}
+.shots figure{margin:0}
+.shots .frame{background:#10222b;border-radius:22px;padding:10px;box-shadow:0 18px 44px rgba(20,48,63,.22)}
+.shots .frame img{display:block;width:100%;height:auto;border-radius:13px;background:#fff}
+.shots .side{display:grid;grid-template-columns:1fr 1fr;gap:22px;align-items:start}
+.shots .card img{display:block;width:100%;height:auto;border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);background:#fff}
+.shots figcaption{font-size:.86rem;color:var(--muted);margin-top:9px}
+.shots-note{font-size:.8rem;color:var(--muted);margin-top:18px}
+@media (max-width:700px){.shots .side{grid-template-columns:1fr}}
+
 /* ---------- Sektionen ---------- */
 .sect{padding:72px 0}
 .sect.alt{background:var(--card);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
@@ -434,6 +445,32 @@ footer a:hover{color:#fff}
       </div>
       <div class="tag">Reine Dokumentation – kein Medizinprodukt</div>
     </div>
+  </div>
+</section>
+
+<!-- ================= EINBLICK ================= -->
+<section class="sect alt" id="einblick" aria-label="Einblick in die Anwendung">
+  <div class="wrap">
+    <span class="eyebrow">Einblick</span>
+    <h2>So sieht ein ausgefülltes Protokoll aus.</h2>
+    <p class="sub">Vitalkurve im 5-Minuten-Raster, Medikamente mit Uhrzeit und Dosis, Stammdaten auf einen Blick – direkt am Tablet erfasst.</p>
+    <div class="shots">
+      <figure>
+        <div class="frame"><img src="assets/screenshots/protokoll-verlauf-tablet.webp" width="1600" height="1112" loading="lazy" decoding="async" alt="Intraoperativer Verlauf: Vitalkurve mit RR systolisch/diastolisch, MAP und Herzfrequenz sowie numerische Werte je 5-Minuten-Spalte"></div>
+        <figcaption>Intraoperativer Verlauf – Blutdruck, MAP und Herzfrequenz per Antippen oder als Zahl.</figcaption>
+      </figure>
+      <div class="side">
+        <figure class="card">
+          <img src="assets/screenshots/protokoll-medikamente.webp" width="1600" height="1278" loading="lazy" decoding="async" alt="Medikamente und Infusionen mit Uhrzeit, Wirkstoff, Dosis, Einheit und Gabeart">
+          <figcaption>Medikamente &amp; Infusionen mit Ein-/Ausfuhr-Bilanz.</figcaption>
+        </figure>
+        <figure class="card">
+          <img src="assets/screenshots/protokoll-uebersicht.webp" width="1600" height="1112" loading="lazy" decoding="async" alt="Stammdaten eines Protokolls mit Name, Geburtsdatum, Eingriff und Operateur">
+          <figcaption>Stammdaten – optional per QR aus dem Aufklärungsbogen übernommen.</figcaption>
+        </figure>
+      </div>
+    </div>
+    <p class="shots-note">Alle abgebildeten Patienten- und Behandlungsdaten sind frei erfunden.</p>
   </div>
 </section>
 
