@@ -19,6 +19,7 @@ braucht keinen App Store und keinen Server.
 - **Schätze** (🎁) liegen fest an echten Orten. Einsammeln geht nur im Umkreis von ca. 45 m und nach einer richtig beantworteten Frage.
 - **Kleine Funde** (Brezn, Hopfen, Bärenspuren, Silberpfennige, Edelsteine …) tauchen überall rund um den Spieler auf und wechseln alle 15 Minuten.
 - **Kapitel** werden der Reihe nach freigeschaltet. Punkte ergeben Stufen, alles landet im Album.
+- **Kamera-AR**: Beim Einsammeln öffnet sich die Kamera. Der Fund schwebt in der Richtung, in der er wirklich liegt (GPS und Kompass), man dreht sich zu ihm und fängt ihn per Tipp. Seltene Funde bewegen sich flinker. Ohne Kompass (z. B. am PC) schwebt er frei vor der Kamera, ohne Kamera vor einem gemalten Hintergrund. Unter „Info" lässt sich AR abschalten. Das Kamerabild wird nur angezeigt, nie gespeichert.
 - **Testmodus** (unter „Info"): Die Figur lässt sich per Tipp auf die Karte bewegen, zum Ausprobieren von zu Hause.
 
 Standort und Spielstand bleiben auf dem Gerät (localStorage), es werden keine Daten verschickt.
@@ -27,6 +28,7 @@ Standort und Spielstand bleiben auf dem Gerät (localStorage), es werden keine D
 
 - `data.js`: alle Inhalte (Orte, Fragen, Texte, Funde). Neue Orte werden hier ergänzt.
 - `game.js`: Spiellogik
+- `ar.js`: Kamera-AR (Kamerabild, Kompass, Fang-Bildschirm)
 - `index.html`, `style.css`: Oberfläche
 - `sw.js`, `manifest.webmanifest`, `icons/`: PWA (offline-fähig, installierbar)
 - `vendor/leaflet/`: Kartenbibliothek Leaflet 1.9.4 (BSD-2-Lizenz), lokal eingebunden

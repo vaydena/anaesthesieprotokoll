@@ -12,7 +12,7 @@ AddType application/manifest+json .webmanifest
 
 # Service Worker, Manifest, HTML und Spieldaten nie lange cachen,
 # damit Updates sofort ankommen.
-<FilesMatch "(^sw\.js$|\.webmanifest$|\.html$|^(data|game)\.js$|^style\.css$)">
+<FilesMatch "(^sw\.js$|\.webmanifest$|\.html$|^(data|game|ar)\.js$|^style\.css$)">
   <IfModule mod_headers.c>
     Header set Cache-Control "no-cache, must-revalidate"
   </IfModule>

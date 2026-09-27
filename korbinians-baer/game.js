@@ -57,7 +57,7 @@
 
   // ---------- Zustand ----------
   const zustand = Object.assign(
-    { xp: 0, schaetze: {}, funde: {}, eingesammelt: {}, intro: false, test: false, testPos: null },
+    { xp: 0, schaetze: {}, funde: {}, eingesammelt: {}, intro: false, test: false, testPos: null, ar: true },
     ladeJSON(SPEICHER, {})
   );
   const speichern = () => speichereJSON(SPEICHER, zustand);
@@ -234,6 +234,19 @@
       toast(f.typ.icon + " " + f.typ.name + ": noch " + meterText(d) + ". Geh näher ran!");
       return;
     }
+    if (!arAn()) return fundEinsammeln(f);
+    const beweglich = { gewöhnlich: 0, selten: 0.45, episch: 1 }[f.typ.seltenheit] || 0;
+    window.KorbinianAR.fangen({
+      titel: f.typ.name, icon: f.typ.icon, ziel: f, beweglich,
+      klasse: f.typ.seltenheit === "gewöhnlich" ? "" : f.typ.seltenheit === "selten" ? "selten" : "episch",
+      spieler: () => spielerPos, distanz,
+    }).then((ok) => { if (ok && !zustand.eingesammelt[f.id]) fundEinsammeln(f); });
+  }
+
+  // Kamera-AR nur, wenn eingeschaltet und das Gerät eine Kamera-Schnittstelle hat
+  const arAn = () => zustand.ar !== false && !EDITOR && window.KorbinianAR && window.KorbinianAR.moeglich();
+
+  function fundEinsammeln(f) {
     zustand.eingesammelt[f.id] = 1;
     zustand.funde[f.typ.id] = (zustand.funde[f.typ.id] || 0) + 1;
     aktuelleFunde = aktuelleFunde.filter((x) => x.id !== f.id);
@@ -275,7 +288,11 @@
       });
       return;
     }
-    frageStellen(s, false);
+    if (!arAn()) return frageStellen(s, false);
+    window.KorbinianAR.fangen({
+      titel: s.ort, icon: "🎁", ziel: s, klasse: "schatz",
+      spieler: () => spielerPos, distanz,
+    }).then((ok) => { if (ok) frageStellen(s, false); });
   }
 
   function frageStellen(s, schonFalsch) {
@@ -530,6 +547,9 @@
     speichern();
     positionSetzen({ lat: e.latlng.lat, lng: e.latlng.lng, acc: 0 });
   });
+
+  $("opt-ar").checked = zustand.ar !== false;
+  $("opt-ar").addEventListener("change", (e) => { zustand.ar = e.target.checked; speichern(); });
 
   $("opt-test").checked = !!zustand.test;
   $("opt-test").addEventListener("change", (e) => {

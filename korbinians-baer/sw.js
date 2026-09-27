@@ -1,9 +1,9 @@
 /* Service Worker: App-Dateien offline verfügbar machen, Kartenkacheln zwischenspeichern */
-const VERSION = "korbinian-v1";
+const VERSION = "korbinian-v2";
 const KACHELN = "korbinian-kacheln";
 const MAX_KACHELN = 400;
 const DATEIEN = [
-  "./", "index.html", "style.css", "data.js", "game.js", "manifest.webmanifest",
+  "./", "index.html", "style.css", "data.js", "ar.js", "game.js", "manifest.webmanifest",
   "icons/icon.svg", "icons/icon-192.png", "icons/icon-512.png",
   "vendor/leaflet/leaflet.js", "vendor/leaflet/leaflet.css",
 ];
