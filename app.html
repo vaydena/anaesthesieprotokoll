@@ -1652,8 +1652,13 @@ window.__HF_PRAXIS = { name:"", sub:"", verantwortlich:"" };
     q21:"Stoffwechselerkrankung / Diabetes",q22:"Schilddrüsenerkrankung",q23:"Muskel-/Skeletterkrankung",q24:"neurologische Erkrankung",
     q24b:"psychische Erkrankung",q25:"Augenerkrankung",q26:"Besonderheiten Zahnstatus",q27:"Implantate (z. B. Schrittmacher, Prothese)",
     q28c:"Drogenkonsum",q29:"mögliche Schwangerschaft",q29b:"stillt",q30:"MRE-Nachweis (MRSA/VRE)",q30b:"stationär im Ausland (letztes Jahr)",
-    q30c:"Arbeit in Tiermast-Betrieb",q30d:"Arbeit in Pflegeeinrichtung",q33n:"Klinik/Notfallpraxis nicht sicher in 30 min erreichbar"};
-  var AB_WARN={q1_kompl:1,q2:1,q4:1,q8:1,q10:1,q16b:1,q17b:1,q18b:1,q27:1,q29:1,q30:1};
+    q30c:"Arbeit in Tiermast-Betrieb",q30d:"Arbeit in Pflegeeinrichtung",q33n:"Klinik/Notfallpraxis nicht sicher in 30 min erreichbar",
+    q1_ponv:"Übelkeit/Erbrechen nach früherer Narkose (PONV)",q1_atemweg:"Schwierige Beatmung/Intubation bei früherer Narkose",
+    q10g:"Lehnt Blut/Blutprodukte ab",q26b:"Eingeschränkte Mundöffnung/Kopfreklination"};
+  var AB_WARN={q1_kompl:1,q1_atemweg:1,q2:1,q4:1,q8:1,q10:1,q10g:1,q16b:1,q17b:1,q18b:1,q26b:1,q27:1,q29:1,q30:1};
+  // Medikamente mit perioperativer Relevanz -> Dauermedikation + Hinweis
+  var AB_MED={q6b:"GLP-1-Präparat („Abnehmspritze“, Aspirationsrisiko)",q6c:"SGLT-2-Hemmer (Ketoazidose-Risiko, pausieren)",
+    q6d:"Dauerhafte Kortison-Therapie (ggf. Stressdosis)"};
 
   function parseHandover(txt){
     var o=null; try{ o=JSON.parse(String(txt||"").trim()); }catch(e){ return null; }
@@ -1681,11 +1686,17 @@ window.__HF_PRAXIS = { name:"", sub:"", verantwortlich:"" };
       else if(k==="q10a"){ add.dauermedikation.push("⚠ Gerinnungshemmer/Schmerz-/Rheumamittel"+(t?": "+t:"")); hinweise.push("⚠ Gerinnungshemmer"+(t?": "+t:"")); }
       else if(k==="q28"){ line.nikotin="ja"+(t?", "+t:""); }
       else if(k==="q28b"){ line.alkohol="ja"+(t?", "+t:""); }
+      else if(AB_MED[k]){ var ml="⚠ "+AB_MED[k]+(t?": "+t:""); add.dauermedikation.push(ml); hinweise.push(ml); }
       else if(k==="q1"||k==="q14b"){ /* keine Vorerkrankung */ }
       else if(AB_Q[k]){
         var l=(AB_WARN[k]?"⚠ ":"")+AB_Q[k]+(t?": "+t:"");
         add.vorerkrankungen.push(l);
         if(AB_WARN[k]) hinweise.push(l);
+      }
+      else if(/^q/.test(k)){
+        // Unbekannter Schluessel (neuere Bogen-Version): nie stillschweigend verwerfen
+        var ul="⚠ Weitere Angabe aus dem Aufklärungsbogen ("+k+")"+(t?": "+t:"");
+        add.vorerkrankungen.push(ul); hinweise.push(ul);
       }
     });
     var verf=o.v.map(function(k){ return AB_VERF[k]||k; });

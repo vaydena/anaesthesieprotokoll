@@ -43,7 +43,9 @@ das Version 22; gedruckt werden 50 × 50 mm.
 | `p.n`, `p.g`, `p.s`, `p.kg`, `p.cm`, `e` | name, gebdat, geschlecht, gewicht, groesse, eingriff | wird überschrieben (Vorschau zeigt es vorher) |
 | `j.q7` | allergien | Zeile wird angehängt |
 | `j.q6`, `j.q10a` | dauermedikation | Zeile wird angehängt |
-| übrige `j.*` | vorerkrankungen | Zeile wird angehängt, relevante mit „⚠“ |
+| `j.q6b` (GLP-1), `j.q6c` (SGLT-2), `j.q6d` (Kortison) | dauermedikation | Zeile mit „⚠“ wird angehängt, zusätzlich als Hinweis |
+| übrige bekannte `j.*` (u. a. `q1_ponv`, `q1_atemweg`, `q10g`, `q26b`) | vorerkrankungen | Zeile wird angehängt, relevante mit „⚠“ |
+| unbekannte `j.q*` (neuere Bogen-Version) | vorerkrankungen | wird **nie verworfen**: Zeile „⚠ Weitere Angabe aus dem Aufklärungsbogen (Schlüssel): Text“ plus Hinweis |
 | `j.q28` / `j.q28b` | nikotin / alkohol | nur, wenn das Feld leer ist |
 | – | aufklaerung | wird auf „ja“ gesetzt |
 | `v`, `a`, `d`, `p.h`, `b`, `r` | Infobox „Aus dem Aufklärungsbogen übernommen“ (Prämedikation) | nur Anzeige |
