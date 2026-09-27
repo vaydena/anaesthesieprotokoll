@@ -52,8 +52,14 @@ Die Standortbestimmung funktioniert im Browser nur über **HTTPS** (oder `localh
 
 ## Veröffentlichen
 
-Es reicht jedes Hosting für statische Dateien mit HTTPS: den kompletten Ordner hochladen, fertig.
-Das geht zum Beispiel mit GitHub Pages, Netlify oder einem Unterordner auf dem eigenen Webspace.
+Das Spiel wird automatisch auf Hostinger veröffentlicht, sobald Änderungen an diesem Ordner auf
+`main` landen (Workflow `.github/workflows/deploy-korbinians-baer.yml`, nutzt dasselbe
+`FTP_PASSWORD`-Secret wie die übrige Seite). Manuell geht es über den Actions-Tab
+(„Deploy Korbinians Bär zu Hostinger“ → „Run workflow“).
+
+Adresse: **https://anaesthesieprotokoll.vaydena.de/korbinians-baer/**
+
+Alternativ reicht jedes andere Hosting für statische Dateien mit HTTPS: den kompletten Ordner hochladen, fertig.
 
 Die Kartenbilder kommen von den OpenStreetMap-Servern. Für ein kleines Projekt ist das in Ordnung.
 Bei sehr vielen Nutzern sollte ein eigener Kachel-Anbieter eingetragen werden (`game.js`, `L.tileLayer`).
