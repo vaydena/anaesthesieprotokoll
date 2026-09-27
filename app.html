@@ -5,9 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow">
 <meta name="theme-color" content="#0e7c86">
-<meta name="color-scheme" content="light">
+<meta name="color-scheme" content="light dark">
 <title>Anästhesieprotokoll</title>
-<link rel="manifest" href="manifest.webmanifest">
+<link rel="manifest" href="manifest.webmanifest" id="hf-manifest">
+<script>try{var t=localStorage.getItem("aprot_theme");if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t);}catch(e){}</script>
 <link rel="apple-touch-icon" href="icons/icon-192.png">
 <link rel="icon" href="icons/icon-192.png">
 <style>
@@ -19,7 +20,39 @@
   --ok:#2e7d54; --ok-l:#e3f3ea;
   --deep:#0d3037; --deep-2:#0a262c; --deep-ink:#e7f2f1;
   --focus:#1a97a4; --radius:18px; --shadow:0 6px 22px rgba(20,48,63,.10);
+  --field:#ffffff; --accent-ink:#7a4a06; --callout-ink:#5c3a05; --on-ink:#ffffff;
+  --vg-major:#e2eaee; --vg-minor:#f2f6f8; --vg-h:#eef3f5; --vg-axis:#cdd9df; --vg-text:#8aa0ab;
+  --v-rr:#c0392b; --v-map:#8e44ad; --v-hf:#0e7c86;
   --font:-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif;
+  --tbh:58px;
+  color-scheme:light;
+}
+/* Dunkelmodus (nur Bildschirm; Druck bleibt immer hell) */
+@media screen and (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0e191e; --bg2:#1a2a31; --card:#14232a; --field:#0f1d23;
+    --ink:#e2ecf0; --muted:#98adb8; --line:#2b3f48;
+    --primary:#15919c; --primary-d:#7fd6dd; --primary-l:#12363b;
+    --accent:#e39a3e; --accent-l:#3b2a13; --accent-ink:#f3c98a; --callout-ink:#f0d3a6;
+    --ok:#47c088; --ok-l:#143424; --on-ink:#0e191e;
+    --deep:#0a171b; --deep-2:#061013; --focus:#3cc0cc; --shadow:0 6px 22px rgba(0,0,0,.35);
+    --vg-major:#2a3b43; --vg-minor:#1d2c33; --vg-h:#223238; --vg-axis:#3b525c; --vg-text:#8ea5b0;
+    --v-rr:#ff7a6b; --v-map:#c79bff; --v-hf:#4fd1dc;
+    color-scheme:dark;
+  }
+}
+@media screen{
+  :root[data-theme="dark"]{
+    --bg:#0e191e; --bg2:#1a2a31; --card:#14232a; --field:#0f1d23;
+    --ink:#e2ecf0; --muted:#98adb8; --line:#2b3f48;
+    --primary:#15919c; --primary-d:#7fd6dd; --primary-l:#12363b;
+    --accent:#e39a3e; --accent-l:#3b2a13; --accent-ink:#f3c98a; --callout-ink:#f0d3a6;
+    --ok:#47c088; --ok-l:#143424; --on-ink:#0e191e;
+    --deep:#0a171b; --deep-2:#061013; --focus:#3cc0cc; --shadow:0 6px 22px rgba(0,0,0,.35);
+    --vg-major:#2a3b43; --vg-minor:#1d2c33; --vg-h:#223238; --vg-axis:#3b525c; --vg-text:#8ea5b0;
+    --v-rr:#ff7a6b; --v-map:#c79bff; --v-hf:#4fd1dc;
+    color-scheme:dark;
+  }
 }
 *{box-sizing:border-box}
 html,body{margin:0;padding:0}
@@ -54,6 +87,21 @@ a{color:var(--primary-d)}
 .modeswitch button[aria-pressed="true"]{background:var(--card); color:var(--primary-d)}
 .tb-actions{display:flex; gap:8px; flex-wrap:wrap}
 .tb-actions .btn{padding:9px 13px; min-height:auto; font-size:.85rem}
+
+.themebtn{border:1px solid rgba(255,255,255,.28); background:transparent; color:var(--deep-ink); border-radius:999px;
+  font:inherit; font-size:.8rem; font-weight:700; padding:8px 12px; cursor:pointer; display:inline-flex; align-items:center; gap:6px}
+.themebtn:hover{background:rgba(255,255,255,.10)}
+/* ---- Abschnitts-Navigation ---- */
+.secnav{position:sticky; top:var(--tbh); z-index:39; background:var(--bg); border-bottom:1px solid var(--line)}
+.secnav .wrap{display:flex; gap:6px; overflow-x:auto; padding-top:8px; padding-bottom:8px; scrollbar-width:none; -webkit-overflow-scrolling:touch}
+.secnav .wrap::-webkit-scrollbar{display:none}
+.secnav a{flex:0 0 auto; display:inline-flex; align-items:center; gap:5px; text-decoration:none; color:var(--muted); font-size:.8rem; font-weight:700;
+  border:1px solid var(--line); background:var(--card); border-radius:999px; padding:6px 11px; white-space:nowrap}
+.secnav a:hover{color:var(--primary-d); border-color:var(--primary)}
+.secnav a.active{background:var(--primary); border-color:var(--primary); color:#fff}
+.secnav a .dot{width:7px; height:7px; border-radius:50%; background:var(--accent); display:none}
+.secnav a.miss .dot{display:inline-block}
+.sect{scroll-margin-top:calc(var(--tbh) + 60px)}
 
 /* ---- Buttons ---- */
 .btn{display:inline-flex; align-items:center; justify-content:center; gap:8px; cursor:pointer;
@@ -96,9 +144,11 @@ main.wrap{padding-top:16px}
 .field label{font-size:.82rem; font-weight:700; color:var(--ink)}
 .field .hint{font-size:.72rem; color:var(--muted); font-weight:500}
 input[type=text],input[type=date],input[type=time],input[type=number],select,textarea{
-  font:inherit; font-size:.95rem; color:var(--ink); background:#fff; border:1px solid var(--line);
+  font:inherit; font-size:.95rem; color:var(--ink); background:var(--field); border:1px solid var(--line);
   border-radius:12px; padding:11px 12px; width:100%; min-height:46px}
-textarea{min-height:70px; resize:vertical; line-height:1.4}
+input[type=datetime-local]{font:inherit; font-size:.95rem; color:var(--ink); background:var(--field); border:1px solid var(--line);
+  border-radius:12px; padding:11px 12px; width:100%; min-height:46px}
+textarea{min-height:70px; resize:vertical; line-height:1.4; field-sizing:content; max-height:60vh}
 input:focus,select:focus,textarea:focus,button:focus-visible,summary:focus-visible,.tapgrid:focus-visible{
   outline:3px solid var(--focus); outline-offset:2px}
 .inputunit{display:flex; align-items:stretch}
@@ -106,16 +156,26 @@ input:focus,select:focus,textarea:focus,button:focus-visible,summary:focus-visib
 .inputunit .u{display:flex; align-items:center; padding:0 12px; background:var(--bg2); border:1px solid var(--line);
   border-left:0; border-top-right-radius:12px; border-bottom-right-radius:12px; color:var(--muted); font-size:.85rem; font-weight:700; white-space:nowrap}
 .radio-row,.check-row{display:flex; flex-wrap:wrap; gap:8px}
-.chip{display:inline-flex; align-items:center; gap:7px; border:1px solid var(--line); background:#fff;
+.chip{display:inline-flex; align-items:center; gap:7px; border:1px solid var(--line); background:var(--field);
   border-radius:999px; padding:8px 14px; cursor:pointer; font-size:.9rem; font-weight:600; user-select:none; min-height:42px}
 .chip input{position:absolute; opacity:0; width:1px; height:1px}
 .chip:has(input:checked){background:var(--primary-l); border-color:var(--primary); color:var(--primary-d); font-weight:800}
-.chip.mk:has(input:checked){background:var(--accent-l); border-color:var(--accent); color:#7a4a06}
+.chip.mk:has(input:checked){background:var(--accent-l); border-color:var(--accent); color:var(--accent-ink)}
+/* Uhrzeit mit „Jetzt“-Knopf */
+.timeunit{display:flex; gap:6px; align-items:stretch}
+.timeunit input{flex:1 1 auto; min-width:0}
+.nowbtn{border:1px solid var(--line); background:var(--bg2); color:var(--primary-d); border-radius:10px; font:inherit;
+  font-size:.78rem; font-weight:800; padding:0 10px; cursor:pointer; white-space:nowrap; min-height:38px}
+.nowbtn:hover{background:var(--primary-l); border-color:var(--primary)}
+.nowbtn:disabled{opacity:.4; cursor:not-allowed}
+/* berechnete Anzeigen (Alter, BMI) */
+.calcline{display:flex; flex-wrap:wrap; gap:8px 18px; margin-top:12px; font-size:.86rem; color:var(--muted)}
+.calcline b{color:var(--ink)}
 
 /* Score */
 .score{border:1px dashed var(--line); border-radius:14px; padding:12px; background:var(--bg2)}
 .score .comps{display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:10px}
-.score .comp{display:flex; align-items:center; justify-content:space-between; gap:8px; background:#fff;
+.score .comp{display:flex; align-items:center; justify-content:space-between; gap:8px; background:var(--field);
   border:1px solid var(--line); border-radius:10px; padding:7px 10px}
 .score .comp label{font-size:.82rem; font-weight:600}
 .score .comp select{width:66px; min-height:40px; padding:6px}
@@ -130,9 +190,9 @@ input:focus,select:focus,textarea:focus,button:focus-visible,summary:focus-visib
 .rowtable td{padding:4px 6px; vertical-align:top}
 .rowtable input,.rowtable select{min-height:42px; padding:8px 9px}
 .rowtable .tdel{width:44px; text-align:center}
-.iconbtn{border:1px solid var(--line); background:#fff; border-radius:10px; width:40px; height:40px; cursor:pointer;
+.iconbtn{border:1px solid var(--line); background:var(--field); border-radius:10px; width:40px; height:40px; cursor:pointer;
   display:inline-flex; align-items:center; justify-content:center; color:var(--muted); font-size:1.1rem}
-.iconbtn:hover{background:var(--accent-l); color:#7a4a06; border-color:var(--accent)}
+.iconbtn:hover{background:var(--accent-l); color:var(--accent-ink); border-color:var(--accent)}
 .tablescroll{overflow-x:auto; -webkit-overflow-scrolling:touch; margin:0 -4px}
 .dosesum{margin-top:12px; background:var(--primary-l); border-radius:12px; padding:10px 14px; font-size:.86rem}
 .dosesum b{color:var(--primary-d)}
@@ -141,14 +201,15 @@ input:focus,select:focus,textarea:focus,button:focus-visible,summary:focus-visib
 /* Vitalkurve */
 .vittools{display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin-bottom:10px}
 .paramsel{display:inline-flex; flex-wrap:wrap; gap:6px}
-.paramsel button{border:1px solid var(--line); background:#fff; border-radius:999px; padding:7px 13px; cursor:pointer;
+.paramsel button{border:1px solid var(--line); background:var(--field); color:var(--ink); border-radius:999px; padding:7px 13px; cursor:pointer;
   font:inherit; font-weight:700; font-size:.82rem; min-height:40px}
-.paramsel button[aria-pressed="true"]{background:var(--ink); color:#fff; border-color:var(--ink)}
+.paramsel button[aria-pressed="true"]{background:var(--ink); color:var(--card); border-color:var(--ink)}
 .stylesel{display:inline-flex; background:var(--bg2); border-radius:999px; padding:3px}
 .stylesel button{border:0; background:transparent; font:inherit; font-weight:700; font-size:.82rem; padding:7px 13px;
   border-radius:999px; cursor:pointer; color:var(--muted); min-height:38px}
-.stylesel button[aria-pressed="true"]{background:#fff; color:var(--ink); box-shadow:0 1px 4px rgba(0,0,0,.1)}
-.vitwrap{overflow-x:auto; -webkit-overflow-scrolling:touch; border:1px solid var(--line); border-radius:12px; background:#fff}
+.stylesel button[aria-pressed="true"]{background:var(--card); color:var(--ink); box-shadow:0 1px 4px rgba(0,0,0,.1)}
+.vitwrap{overflow-x:auto; -webkit-overflow-scrolling:touch; border:1px solid var(--line); border-radius:12px; background:var(--card)}
+.vitundo{display:inline-flex; align-items:center; gap:6px}
 .tapgrid{display:block; touch-action:manipulation}
 .legend{display:flex; flex-wrap:wrap; gap:12px 18px; margin-top:10px; font-size:.8rem; color:var(--ink)}
 .legend span{display:inline-flex; align-items:center; gap:6px}
@@ -170,16 +231,19 @@ input:focus,select:focus,textarea:focus,button:focus-visible,summary:focus-visib
 .evrow .evn{font-weight:800; color:var(--primary-d); min-width:26px; text-align:center; padding-top:10px}
 .evrow input[type=time]{max-width:110px}
 .evrow textarea{min-height:44px}
+.evrow.flash{animation:evflash 1.4s ease-out}
+@keyframes evflash{from{box-shadow:0 0 0 2px var(--primary)} to{box-shadow:0 0 0 2px transparent}}
 
 /* Unterschriften */
 .sigbox{display:flex; flex-direction:column; gap:6px}
 .sigpad{border:1.5px dashed var(--line); border-radius:12px; background:#fff; width:100%; height:150px; touch-action:none; display:block}
 .sigpad.signed{border-style:solid; border-color:var(--ok)}
 .sigmeta{display:flex; gap:10px; align-items:center; flex-wrap:wrap}
+.sigts{font-size:.78rem; font-weight:700; color:var(--ok)}
 
 /* Info-/Rechtshinweise */
 .callout{border-left:4px solid var(--accent); background:var(--accent-l); border-radius:0 12px 12px 0;
-  padding:11px 14px; font-size:.86rem; color:#5c3a05; margin:10px 0}
+  padding:11px 14px; font-size:.86rem; color:var(--callout-ink); margin:10px 0}
 .callout.info{border-color:var(--primary); background:var(--primary-l); color:var(--primary-d)}
 .callout b{font-weight:800}
 .mdrbar{font-size:.78rem; color:var(--muted); text-align:center; padding:14px 0 4px}
@@ -190,6 +254,13 @@ input:focus,select:focus,textarea:focus,button:focus-visible,summary:focus-visib
 .footbar .wrap{display:flex; align-items:center; gap:10px; padding-top:10px; padding-bottom:10px; flex-wrap:wrap}
 .footbar .status{font-size:.82rem; color:var(--muted); font-weight:600; margin-right:auto}
 .footbar .status b{color:var(--ink)}
+.progress{display:inline-flex; align-items:center; gap:8px; border:1px solid var(--accent); background:var(--accent-l); color:var(--accent-ink);
+  border-radius:999px; padding:6px 12px; font:inherit; font-size:.82rem; font-weight:800; cursor:pointer; min-height:36px}
+.progress .bar{width:54px; height:6px; border-radius:3px; background:rgba(0,0,0,.12); overflow:hidden}
+.progress .bar i{display:block; height:100%; background:var(--accent)}
+.progress.done{border-color:var(--ok); background:var(--ok-l); color:var(--ok)}
+.progress.done .bar i{background:var(--ok)}
+body.is-final .progress{display:none}
 .pill-final{display:none; align-items:center; gap:8px; background:var(--ok-l); color:var(--ok); font-weight:800;
   border-radius:999px; padding:6px 14px; font-size:.85rem}
 body.is-final .pill-final{display:inline-flex}
@@ -197,7 +268,7 @@ body.is-final #btnFinal{display:none}
 body.is-archview #btnBackup,body.is-archview #btnRestore,body.is-archview #btnNew{display:none}
 
 /* Dialog */
-dialog{border:0; border-radius:18px; padding:0; box-shadow:0 20px 60px rgba(10,38,44,.35); max-width:520px; width:92vw}
+dialog{border:0; border-radius:18px; padding:0; box-shadow:0 20px 60px rgba(10,38,44,.35); max-width:520px; width:92vw; background:var(--card); color:var(--ink)}
 dialog::backdrop{background:rgba(10,38,44,.5)}
 .aufkl-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:0 0 12px}
 .aufkl-row .vitnote{margin:0}
@@ -210,7 +281,7 @@ dialog::backdrop{background:rgba(10,38,44,.5)}
 .aufkl-prev{max-height:46vh;overflow:auto}
 .aufkl-prev table{width:100%;border-collapse:collapse;font-size:.9rem}
 .aufkl-prev td{border-bottom:1px solid var(--line,#e3e8ea);padding:4px 6px;vertical-align:top}
-.aufkl-prev td:first-child{color:#51646f;white-space:nowrap}
+.aufkl-prev td:first-child{color:var(--muted);white-space:nowrap}
 .dlg{padding:20px 22px}
 .dlg h3{font-size:1.1rem}
 .dlg p{color:var(--muted); font-size:.92rem}
@@ -228,6 +299,12 @@ body.hf-locked > *:not(#hf-gate){filter:blur(7px); pointer-events:none; user-sel
 #hf-gate #hf-gate-msg{color:#bcd6d5; font-size:.95rem; margin-top:6px}
 #hf-gate.err .lk{background:rgba(224,138,30,.20)}
 #hf-gate a{color:#ffd79a}
+#hf-gate .tokrow{display:none; margin-top:16px; gap:8px; flex-direction:column}
+#hf-gate.notoken .tokrow{display:flex}
+#hf-gate .tokrow input{width:100%; border-radius:12px; border:1px solid rgba(255,255,255,.25); background:rgba(255,255,255,.08);
+  color:#fff; padding:11px 12px; font:inherit; font-size:.9rem}
+#hf-gate .tokrow input::placeholder{color:#9fbcbb}
+#hf-gate .tokrow .tokhint{font-size:.78rem; color:#9fbcbb}
 
 /* Idle-Lock */
 .idlelock{position:fixed; inset:0; z-index:900; background:rgba(13,48,55,.86); color:#fff; display:none;
@@ -266,43 +343,104 @@ body.hf-locked > *:not(#hf-gate){filter:blur(7px); pointer-events:none; user-sel
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 
 /* -------- Druck / PDF -------- */
+/* Rahmen-Tabelle: im Druck wiederholt sich der Kopf (Praxis + Patient) auf jeder Seite */
+.pframe,.pframe>tbody,.pframe>tbody>tr,.pframe>tbody>tr>td{display:block}
+.pframe>thead{display:none}
 @media print{
-  @page{size:A4; margin:12mm}
-  body{background:#fff; padding:0; font-size:11px; color:#000}
-  .topbar,.footbar,.install,.idlelock,#hf-gate,.tb-actions,.modeswitch,.chev,.no-print,
-  .iconbtn,.paramsel,.stylesel,.addbtnrow,.vittools .stylesel{display:none!important}
+  @page{size:A4; margin:11mm 11mm 13mm;
+    @bottom-right{content:"Seite " counter(page) " / " counter(pages); font-size:8pt; color:#555}}
+  :root{color-scheme:light}
+  body{background:#fff!important; padding:0; font-size:10.5px; line-height:1.3; color:#000}
+  .topbar,.secnav,.footbar,.install,.idlelock,#hf-gate,.tb-actions,.modeswitch,.chev,.no-print,.nowbtn,.draftwarn,
+  .iconbtn,.paramsel,.stylesel,.addbtnrow,.vittools .stylesel,.vitnote,.score .note,.leadcard{display:none!important}
   .wrap{max-width:none; padding:0}
-  .sect,.leadcard{box-shadow:none; border:1px solid #999; break-inside:avoid; margin:6px 0; border-radius:6px}
-  .sect > summary{padding:6px 10px; font-size:12px; border-bottom:1px solid #ccc}
-  .sect > summary .badge{border:1px solid #999; background:#fff; color:#000}
-  .sect .body{padding:8px 10px}
+  main.wrap{padding-top:0}
+  .pframe{display:table; width:100%; border-collapse:collapse}
+  .pframe>thead{display:table-header-group}
+  .pframe>tbody{display:table-row-group}
+  .pframe>tbody>tr,.pframe>thead>tr{display:table-row}
+  .pframe>tbody>tr>td,.pframe>thead>tr>td{display:table-cell; padding:0}
+  .phead{display:flex; justify-content:space-between; gap:12px; align-items:flex-end; border-bottom:1.5px solid #000;
+    padding:0 0 4px; margin-bottom:6px; font-size:9.5px}
+  .phead .pl{font-weight:800; font-size:11px}
+  .phead .pp{text-align:right}
+  .phead .pp b{font-size:11px}
+  .sect,.leadcard{box-shadow:none!important; border:0!important; border-radius:0!important; margin:0 0 6px; background:#fff!important; overflow:visible}
+  .sect{break-inside:auto}
+  .sect > summary{padding:3px 0; font-size:11px; border-bottom:1px solid #000; margin-bottom:4px; break-after:avoid}
+  .sect > summary .badge{border:0; background:none; color:#000; padding:0}
+  .sect .body{padding:2px 0 4px}
   .sect[data-hidden="1"]{display:none!important}
-  input,select,textarea{border:0; border-bottom:1px solid #bbb; border-radius:0; padding:1px 2px; min-height:0;
-    background:#fff; -webkit-appearance:none; appearance:none; color:#000}
-  textarea{border:1px solid #ccc}
-  .inputunit .u{background:#fff; border:0; padding:0 4px}
-  .chip{border:1px solid #999; padding:2px 8px; min-height:0}
-  .chip:has(input:checked){background:#eee}
-  .chip input{position:static; opacity:1; width:auto; height:auto; margin-right:4px}
-  .vitwrap{overflow:visible; border:1px solid #999}
-  .numrows{overflow:visible}
+  .grid,.grid.two{grid-template-columns:repeat(4,minmax(0,1fr)); gap:3px 12px}
+  .grid.two{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .field{gap:0; break-inside:avoid}
+  .field label{font-size:8px; font-weight:600; color:#444; text-transform:none}
+  .field.missing input,.field.missing select,.field.missing textarea,.field.missing .check-row{outline:0!important}
+  input,select,textarea,input[type=text],input[type=date],input[type=time],input[type=number],input[type=datetime-local]{
+    border:0!important; border-bottom:1px solid #999!important; border-radius:0!important; padding:0 1px!important;
+    min-height:0!important; height:auto; background:transparent!important; -webkit-appearance:none; appearance:none;
+    color:#000!important; font-size:10.5px!important; box-shadow:none!important}
+  textarea{border:1px solid #bbb!important; min-height:0!important; field-sizing:content}
+  .inputunit input{border-right:0!important}
+  .inputunit .u{background:none!important; border:0!important; border-bottom:1px solid #999!important; border-radius:0!important; padding:0 2px; color:#000; font-size:9px}
+  .timeunit{gap:0}
+  .chip,.chip.mk{border:0!important; background:none!important; padding:0 8px 0 0; min-height:0; font-size:10px; font-weight:400; color:#000!important; gap:0}
+  .chip input{display:none}
+  .chip::before{content:"\2610\00a0"; font-size:11px}
+  .chip:has(input:checked)::before{content:"\2612\00a0"}
+  .chip:has(input:checked){font-weight:700}
+  .radio-row,.check-row,.mkrow{gap:1px 4px}
+  .mkitem input[type=time]:disabled{display:none}
+  .score{background:#fff!important; border:0; padding:0}
+  .score .comp{border:0; background:none!important; padding:0}
+  .score .comp select{width:auto; min-height:0}
+  .score .sumline{margin-top:2px}
+  .score .sumval{background:none; color:#000; border:1px solid #000; padding:0 8px}
+  .vitwrap{overflow:visible; border:1px solid #999; border-radius:0; background:#fff!important}
+  .legend{margin-top:3px; font-size:9px}
+  .evrow{background:none; border-bottom:1px solid #ccc; border-radius:0; padding:2px 0}
+  .evrow .evn{padding-top:0; color:#000}
+  .evrow textarea{border:0!important}
+  .rowtable{font-size:9.5px}
+  .rowtable th{font-size:8px; padding:2px 4px; color:#444; border-bottom:1px solid #000}
+  .rowtable td{padding:1px 4px; border-bottom:1px solid #ddd}
+  .rowtable td input,.rowtable td select{border:0!important}
+  .dosesum{background:none; border:1px solid #bbb; border-radius:0; padding:4px 8px; margin-top:4px; font-size:9.5px!important}
+  .dosesum *{font-size:inherit!important}
+  .dosesum b{color:#000}
+  .sigpad{border:1px solid #999!important; height:auto; max-height:90px; background:#fff}
+  .sigts{color:#000}
   .print-only{display:block!important}
   .reportfoot{display:block!important}
-  .callout{background:#f3f3f3; color:#000; border-color:#999}
-  .score{background:#fff}
-  .idlelock,.footbar{display:none!important}
+  .callout{background:none!important; color:#000!important; border:1px solid #999; border-radius:0; padding:4px 8px}
+  .aufkl-box{break-inside:avoid}
+  .calcline{margin-top:4px; font-size:9.5px; color:#000}
+  .calcline b{color:#000}
   dialog{display:none!important}
   .tablescroll{overflow:visible; margin:0}
   .tablescroll table{width:100%}
-  .tablescroll input,.tablescroll select{min-width:0!important; width:100%; min-height:0; padding:1px 2px}
+  .tablescroll input,.tablescroll select{min-width:0!important; width:100%}
   input::-webkit-calendar-picker-indicator{display:none}
   .vitwrap .tapgrid{max-width:100%; height:auto}
   .numrows{display:none!important}
   .has-mirror{display:none!important}
-  .printmirror{white-space:pre-wrap; overflow-wrap:anywhere; border-bottom:1px solid #bbb; padding:1px 2px; min-height:1.3em}
-  textarea + .printmirror{border:1px solid #ccc; padding:3px 5px}
-  .printnum table{border-collapse:collapse; margin:4px 0; font-size:9px}
+  .printmirror{white-space:pre-wrap; overflow-wrap:anywhere; border-bottom:1px solid #999; padding:0 1px; min-height:1.2em}
+  textarea + .printmirror{border:1px solid #bbb; padding:2px 4px}
+  .printnum table{border-collapse:collapse; margin:3px 0; font-size:8.5px}
   .printnum th,.printnum td{border:1px solid #999; padding:1px 3px; text-align:center}
+  .sect h3{font-size:10.5px!important; margin:6px 0 2px!important}
+  .score .comp label{font-size:8px; font-weight:600; color:#444}
+  .sigts{font-size:9px}
+  .sigbox > label{font-size:9px!important}
+  .printnum-h{font-size:8px; font-weight:600; color:#444; margin-top:4px}
+  .print-empty{display:none!important}
+  ::placeholder{color:transparent!important}
+  .print-blank{color:transparent!important}
+  .print-blank::-webkit-datetime-edit{color:transparent!important}
+  body.print-final .check-row:has(input:checked) > .chip:not(:has(input:checked)),
+  body.print-final .radio-row:has(input:checked) > .chip:not(:has(input:checked)),
+  body.print-final .mkrow .mkitem:not(:has(input:checked)){display:none!important}
+  a{color:#000; text-decoration:none}
 }
 .print-only,.reportfoot{display:none}
 .reportfoot{margin-top:14px; padding-top:10px; border-top:1px solid #999; font-size:10px; color:#333}
@@ -319,6 +457,11 @@ body.hf-locked > *:not(#hf-gate){filter:blur(7px); pointer-events:none; user-sel
     </div>
     <h2 id="hf-gate-title">Zugang wird geprüft…</h2>
     <p id="hf-gate-msg">Einen Moment bitte.</p>
+    <form class="tokrow" id="hf-tokform" autocomplete="off">
+      <input type="text" id="hf-tokin" placeholder="Freischalt-Link oder Zugangscode einfügen" aria-label="Freischalt-Link oder Zugangscode" spellcheck="false" autocapitalize="off">
+      <button class="btn" type="submit">Freischalten</button>
+      <span class="tokhint">Tipp für iPad/iPhone: Die vom Home-Bildschirm gestartete App hat einen eigenen Speicher. Link aus der Kauf-E-Mail hier einmalig einfügen.</span>
+    </form>
   </div>
 </div>
 
@@ -352,13 +495,17 @@ body.hf-locked > *:not(#hf-gate){filter:blur(7px); pointer-events:none; user-sel
     <div class="tb-actions">
       <button class="btn ghost small" id="btnNew" type="button" title="Neues Protokoll"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg><span class="lbl">Neu</span></button>
       <button class="btn ghost small" id="btnLock" type="button" title="Bildschirm sperren"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><span class="lbl">Sperren</span></button>
+      <button class="themebtn" id="btnTheme" type="button" title="Darstellung: automatisch / hell / dunkel" aria-label="Darstellung umschalten"><span id="themeIco" aria-hidden="true">◐</span><span class="lbl" id="themeLbl">Auto</span></button>
       <button class="btn ghost small" id="btnArchive" type="button" title="Archiv"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="4" rx="1"/><path d="M5 8v11a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8M9 12h6"/></svg><span class="lbl">Archiv</span></button>
     </div>
   </div>
 </header>
 
+<nav class="secnav no-print" id="secnav" aria-label="Abschnitte"><div class="wrap" id="secnavIn"></div></nav>
+
 <!-- ================= INHALT ================= -->
 <main class="wrap" id="app">
+<table class="pframe" role="presentation"><thead><tr><td><div class="phead" id="phead"></div></td></tr></thead><tbody><tr><td>
 
   <div class="install" id="install">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>
@@ -386,12 +533,14 @@ body.hf-locked > *:not(#hf-gate){filter:blur(7px); pointer-events:none; user-sel
   <!-- Nur im Ausdruck sichtbarer Report-Fuß -->
   <div class="reportfoot" id="reportfoot"></div>
 
+</td></tr></tbody></table>
 </main>
 
 <!-- ================= FUSSLEISTE ================= -->
 <div class="footbar no-print">
   <div class="wrap">
     <div class="status" id="status">Entwurf · nicht finalisiert</div>
+    <button class="progress" id="progress" type="button" title="Zu den fehlenden Pflichtangaben springen"><span id="progTxt">Pflichtangaben 0/8</span><span class="bar"><i id="progBar" style="width:0"></i></span></button>
     <span class="pill-final"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg> Finalisiert</span>
     <button class="btn sec small" id="btnBackup" type="button">Sichern (JSON)</button>
     <button class="btn sec small" id="btnRestore" type="button">Einlesen</button>
@@ -439,10 +588,41 @@ window.__HF_PRAXIS = { name:"", sub:"", verantwortlich:"" };
   };
   document.body.classList.add("hf-locked");
   var byId = function(id){ return document.getElementById(id); };
-  function gate(title,msg,isErr){
+  function gate(title,msg,isErr,askToken){
     if(byId("hf-gate-title")) byId("hf-gate-title").textContent = title;
     if(byId("hf-gate-msg")) byId("hf-gate-msg").innerHTML = msg;
     if(isErr && byId("hf-gate")) byId("hf-gate").classList.add("err");
+    if(askToken && byId("hf-gate")) byId("hf-gate").classList.add("notoken");
+  }
+  // Freischalt-Link oder Code manuell einfuegen (v. a. iOS: Home-Bildschirm-App hat eigenen Speicher)
+  function tokenFromInput(v){
+    v = String(v||"").trim(); if(!v) return "";
+    try{ var uu = new URL(v); var t = uu.searchParams.get("k") || uu.searchParams.get("ks"); if(t) return t.trim(); }catch(e){}
+    var m = v.match(/[?&]ks?=([^&#\s]+)/); if(m) return decodeURIComponent(m[1]).trim();
+    return /^[A-Za-z0-9_\-.~]{8,200}$/.test(v) ? v : "";
+  }
+  (function(){
+    var f = byId("hf-tokform"); if(!f) return;
+    f.addEventListener("submit", function(e){
+      e.preventDefault();
+      var t = tokenFromInput(byId("hf-tokin").value);
+      if(!t){ byId("hf-gate-msg").innerHTML = "Das ist kein gültiger Freischalt-Link. Bitte den vollständigen Link aus der E-Mail einfügen."; return; }
+      location.replace(location.pathname + "?k=" + encodeURIComponent(t));
+    });
+  })();
+  // iOS/iPadOS: "Zum Home-Bildschirm" soll den Zugang mitnehmen -> Manifest mit start_url inkl. Token
+  function personalManifest(tok){
+    try{
+      var ios = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform==="MacIntel" && navigator.maxTouchPoints>1);
+      if(!ios || !tok || !window.Blob || !window.URL) return;
+      var o = location.origin;
+      var m = { name:"Anästhesieprotokoll", short_name:"Anästhesie", lang:"de", dir:"ltr", id:o+"/app.html",
+        start_url:o+"/app.html?ks="+encodeURIComponent(tok), scope:o+"/", display:"standalone", orientation:"any",
+        background_color:"#f3f7f9", theme_color:"#0e7c86",
+        icons:[{src:o+"/icons/icon-192.png",sizes:"192x192",type:"image/png"},{src:o+"/icons/icon-512.png",sizes:"512x512",type:"image/png"}] };
+      var l = byId("hf-manifest"); if(!l) return;
+      l.href = URL.createObjectURL(new Blob([JSON.stringify(m)],{type:"application/manifest+json"}));
+    }catch(e){}
   }
   function open(){
     var g = byId("hf-gate"); if(g && g.parentNode) g.parentNode.removeChild(g);
@@ -452,8 +632,12 @@ window.__HF_PRAXIS = { name:"", sub:"", verantwortlich:"" };
   try{
     var u = new URL(window.location.href);
     var k = u.searchParams.get("k");
+    // "ks" = Start vom Home-Bildschirm (dynamisches Manifest): Token uebernehmen, PIN aber NICHT zuruecksetzen
+    var ks = u.searchParams.get("ks");
     if(k){ token = k.trim(); window.__HF_FRESH_TOKEN=true; try{ sessionStorage.setItem("hf_token", token); localStorage.setItem("hf_token", token); }catch(e){}
-           u.searchParams.delete("k"); history.replaceState(null,"",u.pathname+u.search+u.hash); }
+           u.searchParams.delete("k"); u.searchParams.delete("ks"); history.replaceState(null,"",u.pathname+u.search+u.hash); }
+    else if(ks){ token = ks.trim(); try{ sessionStorage.setItem("hf_token", token); localStorage.setItem("hf_token", token); }catch(e){}
+           u.searchParams.delete("ks"); history.replaceState(null,"",u.pathname+u.search+u.hash); }
     else { try{ token = (sessionStorage.getItem("hf_token")||localStorage.getItem("hf_token")||"").trim(); }catch(e){} }
   }catch(e){}
   function newUuid(){
@@ -541,6 +725,7 @@ window.__HF_PRAXIS = { name:"", sub:"", verantwortlich:"" };
       if(box){ box.innerHTML=""; var im=document.createElement("img"); im.src=b.logo; im.alt=""; box.appendChild(im); box.classList.add("has-img"); }
     }
     if(b.header_name){ try{ document.title = b.header_name + " – Anästhesieprotokoll"; }catch(e){} }
+    window.__HF_PIN_PFLICHT = !!b.pin_pflicht;
     try{ if(window.__afterBranding) window.__afterBranding(); }catch(e){}
   }
 
@@ -559,10 +744,10 @@ window.__HF_PRAXIS = { name:"", sub:"", verantwortlich:"" };
 
   function start(){
     flushQueue();
-    if(!token){ gate("Kein Zugang","Bitte über den <b>Freischalt-Link Ihres Zugangs</b> öffnen.", true); return; }
+    if(!token){ gate("Kein Zugang","Bitte über den <b>Freischalt-Link Ihres Zugangs</b> öffnen – oder den Link unten einfügen.", true, true); return; }
     // Offline-Nutzung: letzte erfolgreiche Pruefung merken; bei Netz-/Serverfehler innerhalb der Karenzzeit trotzdem oeffnen
     var OKKEY="aprot_gate_ok", GRACE_MS=7*24*3600*1000;
-    function unlockApp(branding){ applyBranding(branding); open(); try{ if(window.__onUnlock) window.__onUnlock(); }catch(e){} }
+    function unlockApp(branding){ applyBranding(branding); personalManifest(token); open(); try{ if(window.__onUnlock) window.__onUnlock(); }catch(e){} }
     function offlineFallback(){
       var c=null; try{ c=JSON.parse(localStorage.getItem(OKKEY)||"null"); }catch(e){}
       if(c && c.token===token && (Date.now()-c.ts)<GRACE_MS){ unlockApp(c.branding); return; }
@@ -576,7 +761,7 @@ window.__HF_PRAXIS = { name:"", sub:"", verantwortlich:"" };
       else{ try{ sessionStorage.removeItem("hf_token"); localStorage.removeItem(OKKEY); }catch(e){}
             if(d && d.reason==="trial_expired") gate("Testzeitraum abgelaufen","Der kostenlose Testzeitraum Ihres Praxis-Zugangs ist beendet.", true);
             else if(d && d.reason==="locked") gate("Zugang gesperrt","Ihr Praxis-Zugang ist derzeit gesperrt. Bitte wenden Sie sich an den Betreiber.", true);
-            else gate("Zugang ungültig","Der Zugangslink ist nicht (mehr) gültig.", true); }
+            else gate("Zugang ungültig","Der Zugangslink ist nicht (mehr) gültig. Bei neuem Link diesen unten einfügen.", true, true); }
     }).catch(offlineFallback);
   }
   if(document.readyState==="loading") document.addEventListener("DOMContentLoaded", start);
@@ -609,6 +794,35 @@ window.__HF_PRAXIS = { name:"", sub:"", verantwortlich:"" };
   function pad2(n){ return (n<10?"0":"")+n; }
   function nowISO(){ return new Date().toISOString(); }
   function fmtDT(iso){ if(!iso)return"—"; var d=new Date(iso); return pad2(d.getDate())+"."+pad2(d.getMonth()+1)+"."+d.getFullYear()+" "+pad2(d.getHours())+":"+pad2(d.getMinutes()); }
+  function fmtD(ymd){ var m=String(ymd||"").match(/^(\d{4})-(\d{2})-(\d{2})/); return m? m[3]+"."+m[2]+"."+m[1] : String(ymd||""); }
+  function timeNow(){ var d=new Date(); return pad2(d.getHours())+":"+pad2(d.getMinutes()); }
+  function todayYMD(){ var d=new Date(); return d.getFullYear()+"-"+pad2(d.getMonth()+1)+"-"+pad2(d.getDate()); }
+  // Zahl aus Eingabe (Komma oder Punkt als Dezimaltrenner)
+  function numVal(v){ var x=parseFloat(String(v==null?"":v).replace(",",".")); return isNaN(x)?NaN:x; }
+  function fmtNum(x){ return String(x).replace(".",","); }
+  // Zahlenfeld als Textfeld: erlaubt Komma (deutsche Tastatur), filtert Buchstaben
+  function numInput(attrs,onval,allow){
+    var re = allow==="slash" ? /[^0-9.,\-\/]/g : /[^0-9.,\-]/g;
+    attrs.type="text"; attrs.inputmode="decimal"; attrs.autocomplete="off";
+    attrs.oninput=function(e){ var t=e.target, c=t.value.replace(re,""); if(c!==t.value) t.value=c; onval(c,e); };
+    return el("input",attrs);
+  }
+  // Uhrzeit-Feld mit „Jetzt“-Knopf
+  function timeInput(attrs,onval){
+    attrs.type="time";
+    attrs.oninput=function(e){ onval(e.target.value,e); };
+    var inp=el("input",attrs);
+    var b=el("button",{type:"button",class:"nowbtn",title:"Aktuelle Uhrzeit eintragen","aria-label":"Jetzt",onclick:function(){
+      if(inp.disabled) return; inp.value=timeNow(); onval(inp.value,{target:inp}); try{ inp.dispatchEvent(new Event("change",{bubbles:true})); }catch(x){} }},"Jetzt");
+    var w=el("div",{class:"timeunit"},[inp,b]);
+    w._input=inp;
+    return w;
+  }
+  function filled(v){
+    if(Array.isArray(v)) return v.length>0;
+    if(v && typeof v==="object"){ for(var x in v){ if(filled(v[x])) return true; } return false; } // Score-Felder
+    return v!==""&&v!=null&&v!==false;
+  }
 
   /* ---------------- Medikamenten-Katalog (Namen + Einheiten; keine Dosen) ---------------- */
   var DRUGS = {
@@ -647,7 +861,7 @@ window.__HF_PRAXIS = { name:"", sub:"", verantwortlich:"" };
             ambOnly= nur im Ambulant-Modus
   */
   var SECTIONS = [
-    { id:"stamm", title:"Stammdaten", n:"①", fields:[
+    { id:"stamm", nav:"Stammdaten", title:"Stammdaten", n:"①", fields:[
       {id:"name",label:"Name",type:"text",req:true},
       {id:"gebdat",label:"Geburtsdatum",type:"date",req:true},
       {id:"geschlecht",label:"Geschlecht",type:"select",options:["","weiblich","männlich","divers","unbestimmt"]},
@@ -665,13 +879,13 @@ window.__HF_PRAXIS = { name:"", sub:"", verantwortlich:"" };
       {id:"dringlichkeit",label:"Dringlichkeit",type:"select",options:["","elektiv","dringlich","Notfall"]},
       {id:"abloesung",label:"Ablösungen / Personalwechsel (Person, Uhrzeit)",type:"textarea",wide:true,ambHide:true}
     ]},
-    { id:"praemed", title:"Prämedikation & Risiko", n:"②", fields:[
+    { id:"praemed", nav:"Prämedikation", title:"Prämedikation & Risiko", n:"②", fields:[
       {id:"asa",label:"ASA-Klasse",type:"radio",options:["I","II","III","IV","V"]},
       {id:"asaE",label:"Zusatz „E“ (Notfall)",type:"check"},
       {id:"mallampati",label:"Mallampati",type:"radio",options:["I","II","III","IV"],ambHide:true},
       {id:"nuechtern",label:"Nüchternheit",type:"select",options:["","nüchtern","nicht nüchtern","unklar"]},
-      {id:"nuechternZeit",label:"letzte feste Nahrung (Uhrzeit)",type:"text"},
-      {id:"nuechternFl",label:"letzte klare Flüssigkeit (Uhrzeit)",type:"text"},
+      {id:"nuechternZeit",label:"letzte feste Nahrung (Datum, Uhrzeit)",type:"datetime"},
+      {id:"nuechternFl",label:"letzte klare Flüssigkeit (Datum, Uhrzeit)",type:"datetime"},
       {id:"allergien",label:"Allergien / Unverträglichkeiten",type:"textarea",wide:true},
       {id:"dauermedikation",label:"Dauermedikation",type:"textarea",wide:true,ambHide:true},
       {id:"vorerkrankungen",label:"Vorerkrankungen",type:"textarea",wide:true,ambHide:true},
@@ -683,7 +897,7 @@ window.__HF_PRAXIS = { name:"", sub:"", verantwortlich:"" };
       {id:"praemedikation",label:"Prämedikation (Wirkstoff, Dosis, Uhrzeit)",type:"text",wide:true},
       {id:"aufklaerung",label:"Aufklärung erfolgt",type:"check"}
     ]},
-    { id:"art", title:"Anästhesie-Art & Zeiten", n:"③", fields:[
+    { id:"art", nav:"Art & Zeiten", title:"Anästhesie-Art & Zeiten", n:"③", fields:[
       {id:"verfahren",label:"Verfahren",type:"checks",options:["ITN","Larynxmaske (LMA)","Maske","Regional","Analgosedierung","Kombination"],req:true,wide:true},
       {id:"sedierungsgrad",label:"Sedierungsgrad",type:"select",options:["","minimal","moderat","tief"],ambOnly:true},
       {id:"beginn",label:"Anästhesiebeginn",type:"time",req:true},
@@ -693,7 +907,7 @@ window.__HF_PRAXIS = { name:"", sub:"", verantwortlich:"" };
       {id:"opEnde",label:"Naht (OP-Ende)",type:"time"},
       {id:"ende",label:"Anästhesieende",type:"time",req:true}
     ]},
-    { id:"atemweg", title:"Atemwegsmanagement", n:"④", voll:true, fields:[
+    { id:"atemweg", nav:"Atemweg", title:"Atemwegsmanagement", n:"④", voll:true, fields:[
       {id:"tubusArt",label:"Tubusart",type:"select",options:["","Standard (Magill)","Spiral / Woodbridge","RAE oral","RAE nasal","Doppellumen","Mikrolaryngeal","Laser","Trachealkanüle"]},
       {id:"intubWeg",label:"Intubationsweg",type:"select",options:["","oral","nasal","Tracheostoma"]},
       {id:"tubusGroesse",label:"Tubus-Größe (ID)",type:"text"},
@@ -707,8 +921,8 @@ window.__HF_PRAXIS = { name:"", sub:"", verantwortlich:"" };
       {id:"schwierig",label:"schwieriger Atemweg",type:"check"},
       {id:"maskenbeatmung",label:"Maskenbeatmung",type:"select",options:["","möglich","erschwert","nicht möglich"]}
     ]},
-    { id:"medis", title:"Medikamente & Infusionen", n:"⑤", widget:"drugs" },
-    { id:"beatmung", title:"Beatmung & Monitoring", n:"⑥", voll:true, fields:[
+    { id:"medis", nav:"Medikamente", title:"Medikamente & Infusionen", n:"⑤", widget:"drugs" },
+    { id:"beatmung", nav:"Beatmung", title:"Beatmung & Monitoring", n:"⑥", voll:true, fields:[
       {id:"modus",label:"Beatmungsmodus",type:"select",options:["","Spontanatmung","volumenkontrolliert","druckkontrolliert","druckunterstützt (assistiert)","manuell"]},
       {id:"tidalvol",label:"Tidalvolumen",type:"num",unit:"ml"},
       {id:"af",label:"Atemfrequenz",type:"num",unit:"/min"},
@@ -717,8 +931,8 @@ window.__HF_PRAXIS = { name:"", sub:"", verantwortlich:"" };
       {id:"spitzendruck",label:"Spitzendruck",type:"num",unit:"mbar"},
       {id:"monitoring",label:"Monitoring",type:"checks",wide:true,options:["EKG","NIBP","IBP (arteriell)","SpO₂","etCO₂","Temperatur","Relaxometrie","BIS / EEG","ZVK / ZVD","Blasenkatheter","Magensonde"]}
     ]},
-    { id:"verlauf", title:"Intraoperativer Verlauf", n:"⑦", widget:"vitals" },
-    { id:"regional", title:"Regionalanästhesie", n:"⑧", voll:true, fields:[
+    { id:"verlauf", nav:"Verlauf", title:"Intraoperativer Verlauf", n:"⑦", widget:"vitals" },
+    { id:"regional", nav:"Regional", title:"Regionalanästhesie", n:"⑧", voll:true, fields:[
       {id:"regVerfahren",label:"Verfahren",type:"select",options:["","Spinalanästhesie","Periduralanästhesie (PDA)","Kombinierte Spinal-Epidural","Plexus axillaris","Plexus interscalenär","Femoralis","Ischiadicus","TAP-Block","Sonstiges"]},
       {id:"regOrt",label:"Punktionsort / Höhe",type:"text"},
       {id:"regNadel",label:"Nadel",type:"text"},
@@ -729,8 +943,8 @@ window.__HF_PRAXIS = { name:"", sub:"", verantwortlich:"" };
       {id:"regVersuche",label:"Versuche",type:"num"},
       {id:"regAspiration",label:"Aspiration",type:"select",options:["","negativ","positiv"]}
     ]},
-    { id:"ereignis", title:"Ereignisse & Zwischenfälle", n:"⑨", widget:"events" },
-    { id:"lagerung", title:"Lagerung", n:"⑩", voll:true, fields:[
+    { id:"ereignis", nav:"Ereignisse", title:"Ereignisse & Zwischenfälle", n:"⑨", widget:"events" },
+    { id:"lagerung", nav:"Lagerung", title:"Lagerung", n:"⑩", voll:true, fields:[
       {id:"lagerung",label:"Lagerung",type:"select",options:["","Rückenlage","Bauchlage","Seitenlage","Steinschnittlage","Beach-Chair","Sonstige"]},
       {id:"polsterung",label:"Polsterung kontrolliert",type:"check"},
       {id:"waerme",label:"Wärmemanagement",type:"check"},
@@ -741,14 +955,14 @@ window.__HF_PRAXIS = { name:"", sub:"", verantwortlich:"" };
       {id:"blutsperreAuf",label:"Blutsperre geöffnet",type:"time"},
       {id:"zugaenge",label:"Gefäßzugänge",type:"textarea",wide:true}
     ]},
-    { id:"ausleitung", title:"Ausleitung", n:"⑪", voll:true, fields:[
+    { id:"ausleitung", nav:"Ausleitung", title:"Ausleitung", n:"⑪", voll:true, fields:[
       {id:"extubation",label:"Extubation",type:"select",options:["","wach","tief","keine (Nachbeatmung)"]},
       {id:"antagonisierung",label:"Antagonisierung",type:"text"},
       {id:"nachbeatmung",label:"Nachbeatmung",type:"check"},
       {id:"verlegung",label:"Verlegung nach",type:"select",options:["","Aufwachraum","Station","IMC","Intensivstation"]},
       {id:"zustandAus",label:"Zustand bei Verlegung",type:"textarea",wide:true}
     ]},
-    { id:"pacu", title:"Aufwachraum / PACU", n:"⑫", fields:[
+    { id:"pacu", nav:"PACU", title:"Aufwachraum / PACU", n:"⑫", fields:[
       {id:"aldrete",label:"Aldrete-Score",type:"score",comps:[
         {id:"a_akt",label:"Aktivität"},{id:"a_atm",label:"Atmung"},{id:"a_kreis",label:"Kreislauf"},
         {id:"a_bew",label:"Bewusstsein"},{id:"a_spo2",label:"SpO₂"}],wide:true},
@@ -756,7 +970,7 @@ window.__HF_PRAXIS = { name:"", sub:"", verantwortlich:"" };
       {id:"nrs",label:"Schmerz (NRS 0–10)",type:"num"},
       {id:"ponv",label:"PONV aufgetreten",type:"check"},
       {id:"analgesie",label:"Analgesie / Anordnung",type:"textarea",wide:true},
-      {id:"padss",label:"PADSS (ambulant)",type:"score",comps:[
+      {id:"padss",label:"PADSS (ambulant)",type:"score",ambOnly:true,comps:[
         {id:"p_vital",label:"Vitalzeichen"},{id:"p_akt",label:"Aktivität"},{id:"p_ponv",label:"Übelkeit/Erbrechen"},
         {id:"p_schmerz",label:"Schmerz"},{id:"p_blut",label:"Blutung"}],wide:true},
       {id:"begleitperson",label:"Begleitperson / Abholung vorhanden",type:"check"},
@@ -764,7 +978,7 @@ window.__HF_PRAXIS = { name:"", sub:"", verantwortlich:"" };
       {id:"instruktionen",label:"Mitgegebene Instruktionen / Verhaltenshinweise",type:"textarea",wide:true},
       {id:"verlegungszeit",label:"Verlegungs-/Entlasszeit",type:"time"}
     ]},
-    { id:"unterschrift", title:"Übergabe & Unterschriften", n:"⑬", widget:"signatures", fields:[
+    { id:"unterschrift", nav:"Übergabe", title:"Übergabe & Unterschriften", n:"⑬", widget:"signatures", fields:[
       {id:"komplikationen",label:"Komplikationen / Besonderheiten",type:"textarea",wide:true},
       {id:"uebergabeAn",label:"Übergabe an",type:"text"}
     ]}
@@ -776,7 +990,8 @@ window.__HF_PRAXIS = { name:"", sub:"", verantwortlich:"" };
     return {
       v:1, mode:"voll",
       created: nowISO(),
-      f:{},              // Feldwerte  fieldId -> value / array
+      touched: null,     // erste inhaltliche Eingabe (für den Entwurfs-Hinweis)
+      f:{ datum: todayYMD() }, // Feldwerte  fieldId -> value / array; Datum mit heute vorbelegt
       drugs:[],          // {t,name,dose,unit,route}
       infus:[],          // {name,vol,unit}
       blut:"",           // Bemerkung Blutprodukte (Freitext)
@@ -787,6 +1002,7 @@ window.__HF_PRAXIS = { name:"", sub:"", verantwortlich:"" };
       markers:[],        // globale Markerliste
       markerTimes:{},    // Marker -> Uhrzeit
       sigs:{},           // role -> dataURL
+      sigTs:{},          // role -> Zeitpunkt der Unterschrift (ISO)
       final:false, finalAt:null,
       ver:1, addenda:[], audit:[]
     };
@@ -811,16 +1027,12 @@ window.__HF_PRAXIS = { name:"", sub:"", verantwortlich:"" };
   // Während ein archiviertes Protokoll angesehen wird, darf nichts in den Speicher des laufenden Protokolls geschrieben werden
   var archiveBackup=null;
   var saveT=null;
-  function save(){ if(archiveBackup) return; if(saveT) clearTimeout(saveT); saveT=setTimeout(function(){ if(archiveBackup) return; try{ localStorage.setItem(STORE_KEY, JSON.stringify(state)); }catch(e){} },250); }
-  function saveNow(){ if(archiveBackup) return; if(saveT){ clearTimeout(saveT); saveT=null; } try{ localStorage.setItem(STORE_KEY, JSON.stringify(state)); }catch(e){} }
+  function touch(){ if(!state.touched && !state.final && hasContent()) state.touched=nowISO(); }
+  function save(){ updateLive(); if(archiveBackup) return; if(saveT) clearTimeout(saveT); saveT=setTimeout(function(){ if(archiveBackup) return; touch(); try{ localStorage.setItem(STORE_KEY, JSON.stringify(state)); }catch(e){} },250); }
+  function saveNow(){ if(archiveBackup) return; if(saveT){ clearTimeout(saveT); saveT=null; } touch(); try{ localStorage.setItem(STORE_KEY, JSON.stringify(state)); }catch(e){} }
   function hasContent(){
     var f=state.f||{};
-    function filled(v){
-      if(Array.isArray(v)) return v.length>0;
-      if(v && typeof v==="object"){ for(var x in v){ if(filled(v[x])) return true; } return false; } // Score-Felder
-      return v!==""&&v!=null&&v!==false;
-    }
-    for(var k in f){ if(filled(f[k])) return true; }
+    for(var k in f){ if(k==="datum") continue; if(filled(f[k])) return true; } // vorbelegtes Datum zählt nicht als Inhalt
     if(state.drugs.length||state.infus.length||state.blood.length||state.events.length||state.markers.length||state.blut) return true;
     if(Object.keys(state.vitals.data).length||Object.keys(state.sigs||{}).length) return true;
     for(var b in state.balance){ if(state.balance[b]) return true; }
@@ -829,13 +1041,14 @@ window.__HF_PRAXIS = { name:"", sub:"", verantwortlich:"" };
   function audit(action,detail){ state.audit.push({ts:nowISO(),action:action,detail:detail||""}); }
 
   /* ---------------- Feld-Sichtbarkeit ---------------- */
+  // Durch den Modus ausgeblendete Felder/Abschnitte bleiben sichtbar, solange sie Werte enthalten (sonst gingen sie im Ausdruck verloren)
   function fieldVisible(f){
-    if(state.mode==="ambulant" && f.ambHide) return false;
-    if(state.mode!=="ambulant" && f.ambOnly) return false;
+    if(state.mode==="ambulant" && f.ambHide) return filled(state.f[f.id]);
+    if(state.mode!=="ambulant" && f.ambOnly) return filled(state.f[f.id]);
     return true;
   }
   function sectionVisible(s){
-    if(state.mode==="ambulant" && s.voll) return false;
+    if(state.mode==="ambulant" && s.voll) return !!(s.fields && s.fields.some(function(f){ return filled(state.f[f.id]); }));
     return true;
   }
 
@@ -845,9 +1058,10 @@ window.__HF_PRAXIS = { name:"", sub:"", verantwortlich:"" };
   function render(){
     MOUNT.innerHTML="";
     // Hinweis auf liegengebliebenen Entwurf (nur Bildschirm)
-    var age=Date.now()-new Date(state.created||0).getTime();
+    var since=state.touched||state.created;
+    var age=Date.now()-new Date(since||0).getTime();
     if(!state.final && !archiveBackup && hasContent() && age>DRAFT_WARN_MS){
-      MOUNT.appendChild(el("div",{class:"callout draftwarn no-print",html:"<b>Entwurf seit "+esc(fmtDT(state.created))+" nicht finalisiert.</b> Nur finalisierte Protokolle werden ins Archiv übernommen. Bitte finalisieren oder per „Sichern (JSON)“ sichern."}));
+      MOUNT.appendChild(el("div",{class:"callout draftwarn no-print",html:"<b>Entwurf seit "+esc(fmtDT(since))+" nicht finalisiert.</b> Nur finalisierte Protokolle werden ins Archiv übernommen. Bitte finalisieren oder per „Sichern (JSON)“ sichern."}));
     }
     SECTIONS.forEach(function(s){
       var det = el("details",{class:"sect","data-id":s.id});
@@ -870,6 +1084,9 @@ window.__HF_PRAXIS = { name:"", sub:"", verantwortlich:"" };
     paintVitals();
     lockUI();
     updateLead();
+    buildNav();
+    autosizeAll();
+    updateLive();
   }
   var openState={};
 
@@ -887,6 +1104,7 @@ window.__HF_PRAXIS = { name:"", sub:"", verantwortlich:"" };
       grid.appendChild(renderField(f));
     });
     body.appendChild(grid);
+    if(s.id==="stamm") body.appendChild(el("div",{class:"calcline",id:"calcline","aria-live":"polite"}));
     // Ambulant-Sedierungshinweis
     if(s.id==="art"){
       body.appendChild(el("div",{class:"vitnote",text:"• = Pflichtangabe; wird beim Finalisieren auf Vorhandensein geprüft (keine inhaltliche Bewertung)."}));
@@ -903,12 +1121,20 @@ window.__HF_PRAXIS = { name:"", sub:"", verantwortlich:"" };
     var v = state.f[f.id];
     function clearMiss(){ if(missingIds[f.id] && hasVal(state.f[f.id])){ delete missingIds[f.id]; wrap.classList.remove("missing"); } }
 
-    if(f.type==="text"||f.type==="date"||f.type==="time"){
+    if(f.type==="text"||f.type==="date"){
       wrap.appendChild(el("input",{type:f.type,id:"f_"+f.id,value:(v==null?"":v), oninput:function(e){ state.f[f.id]=e.target.value; save(); clearMiss(); }}));
+    }
+    else if(f.type==="time"){
+      wrap.appendChild(timeInput({id:"f_"+f.id,value:(v==null?"":v)},function(val){ state.f[f.id]=val; save(); clearMiss(); }));
+    }
+    else if(f.type==="datetime"){
+      // Datum + Uhrzeit; ältere Freitext-Werte bleiben als Textfeld editierbar
+      var isDT = v==null || v==="" || /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(v);
+      wrap.appendChild(el("input",{type:isDT?"datetime-local":"text",id:"f_"+f.id,value:(v==null?"":v), oninput:function(e){ state.f[f.id]=e.target.value; save(); clearMiss(); }}));
     }
     else if(f.type==="num"){
       var iu = el("div",{class:"inputunit"});
-      iu.appendChild(el("input",{type:"number",inputmode:"decimal",step:"any",id:"f_"+f.id,value:(v==null?"":v), oninput:function(e){ state.f[f.id]=e.target.value; save(); clearMiss(); }}));
+      iu.appendChild(numInput({id:"f_"+f.id,value:(v==null?"":v)},function(val){ state.f[f.id]=val; save(); clearMiss(); }));
       if(f.unit) iu.appendChild(el("span",{class:"u",text:f.unit}));
       wrap.appendChild(iu);
     }
@@ -931,7 +1157,11 @@ window.__HF_PRAXIS = { name:"", sub:"", verantwortlich:"" };
       var rr = el("div",{class:"radio-row"});
       f.options.forEach(function(o){
         var cl2=el("label",{class:"chip"});
-        var rb=el("input",{type:"radio",name:"f_"+f.id,value:o, onchange:function(){ state.f[f.id]=o; save(); }});
+        cl2.title="Erneut antippen zum Abwählen";
+        // click läuft vor change: steht der Wert schon auf o, war die Option bereits gewählt -> abwählen
+        var rb=el("input",{type:"radio",name:"f_"+f.id,value:o,
+          onclick:function(){ if(state.f[f.id]===o){ rb.checked=false; state.f[f.id]=""; save(); } },
+          onchange:function(){ if(rb.checked){ state.f[f.id]=o; save(); clearMiss(); } }});
         if((v||"")===o) rb.checked=true;
         cl2.appendChild(rb); cl2.appendChild(document.createTextNode(o));
         rr.appendChild(cl2);
@@ -1006,11 +1236,11 @@ window.__HF_PRAXIS = { name:"", sub:"", verantwortlich:"" };
     var tb = el("tbody");
     function addRow(row,idx){
       var tr = el("tr");
-      tr.appendChild(el("td",{},el("input",{type:"time",value:row.t||"",style:"min-width:104px",oninput:function(e){ row.t=e.target.value; save(); }})));
+      tr.appendChild(el("td",{},timeInput({value:row.t||"","aria-label":"Uhrzeit"},function(v){ row.t=v; save(); })));
       tr.appendChild(el("td",{},el("input",{type:"text",list:"druglist",value:row.name||"",placeholder:"Wirkstoff",style:"min-width:170px",oninput:function(e){
         row.name=e.target.value; var u=drugUnit(e.target.value); if(u){ row.unit=u; var ui=tr.querySelector(".unitcell input"); if(ui) ui.value=u; } save(); updateDoseSum();
       }})));
-      tr.appendChild(el("td",{},el("input",{type:"number",inputmode:"decimal",step:"any",value:(row.dose==null?"":row.dose),placeholder:"—",style:"min-width:80px",oninput:function(e){ row.dose=e.target.value; save(); updateDoseSum(); }})));
+      tr.appendChild(el("td",{},numInput({value:(row.dose==null?"":row.dose),placeholder:"—","aria-label":"Dosis",style:"min-width:80px"},function(v){ row.dose=v; save(); updateDoseSum(); })));
       tr.appendChild(el("td",{class:"unitcell"},el("input",{type:"text",value:row.unit||"",style:"min-width:64px",oninput:function(e){ row.unit=e.target.value; save(); updateDoseSum(); }})));
       var rsel = el("select",{style:"min-width:104px",onchange:function(e){ row.route=e.target.value; save(); }});
       ["","Bolus","Perfusor","Infusion","inhalativ","p.o.","sonstige"].forEach(function(o){ var op=el("option",{value:o,text:o||"—"}); if((row.route||"")===o) op.selected=true; rsel.appendChild(op); });
@@ -1019,7 +1249,7 @@ window.__HF_PRAXIS = { name:"", sub:"", verantwortlich:"" };
       ["","i.v.","i.m.","s.c.","p.o.","inhalativ","intranasal","rektal","perineural","epidural","intrathekal","lokal"].forEach(function(o){ var op=el("option",{value:o,text:o||"—"}); if((row.weg||"")===o) op.selected=true; wsel.appendChild(op); });
       tr.appendChild(el("td",{},wsel));
       tr.appendChild(el("td",{},el("input",{type:"text",value:row.rate||"",placeholder:"z. B. 5 ml/h","aria-label":"Laufrate",style:"min-width:90px",oninput:function(e){ row.rate=e.target.value; save(); }})));
-      tr.appendChild(el("td",{},el("input",{type:"time",value:row.stop||"","aria-label":"Stopp (Uhrzeit)",style:"min-width:104px",oninput:function(e){ row.stop=e.target.value; save(); }})));
+      tr.appendChild(el("td",{},timeInput({value:row.stop||"","aria-label":"Stopp (Uhrzeit)"},function(v){ row.stop=v; save(); })));
       tr.appendChild(el("td",{class:"tdel"},el("button",{class:"iconbtn",type:"button",title:"Zeile löschen",onclick:function(){ state.drugs.splice(state.drugs.indexOf(row),1); save(); tr.remove(); updateDoseSum(); }},"×")));
       tb.appendChild(tr);
     }
@@ -1028,7 +1258,7 @@ window.__HF_PRAXIS = { name:"", sub:"", verantwortlich:"" };
     scroll.appendChild(t);
     body.appendChild(scroll);
 
-    var addRowBtn = el("div",{class:"addbtnrow",style:"margin:10px 0"},[el("button",{class:"btn sec small",type:"button",onclick:function(){ var r={t:"",name:"",dose:"",unit:"",route:"Bolus",weg:"i.v.",rate:"",stop:""}; state.drugs.push(r); addRow(r); save(); }},"+ Medikament"),
+    var addRowBtn = el("div",{class:"addbtnrow",style:"margin:10px 0"},[el("button",{class:"btn sec small",type:"button",onclick:function(){ var r={t:timeNow(),name:"",dose:"",unit:"",route:"Bolus",weg:"i.v.",rate:"",stop:""}; state.drugs.push(r); addRow(r); save(); var ins=tb.lastChild&&tb.lastChild.querySelector("input[list]"); if(ins) ins.focus(); }},"+ Medikament"),
       el("button",{class:"btn sec small",type:"button",style:"margin-left:8px",onclick:function(){ customDrugDialog(); }},"Eigene Wirkstoffe …")]);
     body.appendChild(addRowBtn);
 
@@ -1041,7 +1271,7 @@ window.__HF_PRAXIS = { name:"", sub:"", verantwortlich:"" };
     function addInf(row){
       var tr=el("tr");
       tr.appendChild(el("td",{},el("input",{type:"text",value:row.name||"",placeholder:"z. B. Ringer-Acetat / EK",style:"min-width:200px",oninput:function(e){ row.name=e.target.value; save(); }})));
-      tr.appendChild(el("td",{},el("input",{type:"number",inputmode:"decimal",step:"any",value:(row.vol==null?"":row.vol),style:"min-width:90px",oninput:function(e){ row.vol=e.target.value; save(); updateDoseSum(); }})));
+      tr.appendChild(el("td",{},numInput({value:(row.vol==null?"":row.vol),"aria-label":"Menge",style:"min-width:90px"},function(v){ row.vol=v; save(); updateDoseSum(); })));
       var us=el("select",{style:"min-width:80px",onchange:function(e){ row.unit=e.target.value; save(); }});
       ["ml","IE","Stk"].forEach(function(o){ var op=el("option",{value:o,text:o}); if((row.unit||"ml")===o) op.selected=true; us.appendChild(op); });
       tr.appendChild(el("td",{},us));
@@ -1058,15 +1288,18 @@ window.__HF_PRAXIS = { name:"", sub:"", verantwortlich:"" };
     var bt = el("table",{class:"rowtable"});
     bt.appendChild(el("thead",{},el("tr",{},[el("th",{text:"Uhrzeit"}),el("th",{text:"Produkt"}),el("th",{text:"Chargen-/Konserven-Nr."}),el("th",{text:"Menge"}),el("th",{text:"Einheit"}),el("th",{text:"Bedside (AB0)"}),el("th",{class:"tdel"})])));
     var btb=el("tbody");
+    // Übliche Mengeneinheit je Produkt (änderbar)
+    var BLOOD_UNIT={"EK":"Einh.","TK":"Einh.","FFP / GFP":"Einh.","Octaplas":"Einh.","Fibrinogen":"g","PPSB":"IE","Albumin":"ml","Cell-Saver":"ml"};
     function addBlood(row){
-      var tr=el("tr");
-      tr.appendChild(el("td",{},el("input",{type:"time",value:row.t||"",style:"min-width:104px","aria-label":"Uhrzeit",oninput:function(e){ row.t=e.target.value; save(); }})));
-      var ps=el("select",{style:"min-width:120px","aria-label":"Produkt",onchange:function(e){ row.prod=e.target.value; save(); }});
+      var tr=el("tr"), bu;
+      tr.appendChild(el("td",{},timeInput({value:row.t||"","aria-label":"Uhrzeit"},function(v){ row.t=v; save(); })));
+      var ps=el("select",{style:"min-width:120px","aria-label":"Produkt",onchange:function(e){
+        row.prod=e.target.value; var u=BLOOD_UNIT[row.prod]; if(u){ row.unit=u; bu.value=u; } save(); }});
       ["","EK","TK","FFP / GFP","Octaplas","Fibrinogen","PPSB","Albumin","Cell-Saver","sonstige"].forEach(function(o){ var op=el("option",{value:o,text:o||"—"}); if((row.prod||"")===o) op.selected=true; ps.appendChild(op); });
       tr.appendChild(el("td",{},ps));
       tr.appendChild(el("td",{},el("input",{type:"text",value:row.charge||"",placeholder:"Chargen-Nr.","aria-label":"Chargen-Nr.",style:"min-width:150px",oninput:function(e){ row.charge=e.target.value; save(); }})));
-      tr.appendChild(el("td",{},el("input",{type:"number",inputmode:"decimal",step:"any",value:(row.menge==null?"":row.menge),"aria-label":"Menge",style:"min-width:80px",oninput:function(e){ row.menge=e.target.value; save(); }})));
-      var bu=el("select",{style:"min-width:80px","aria-label":"Einheit",onchange:function(e){ row.unit=e.target.value; save(); }});
+      tr.appendChild(el("td",{},numInput({value:(row.menge==null?"":row.menge),"aria-label":"Menge",style:"min-width:80px"},function(v){ row.menge=v; save(); })));
+      bu=el("select",{style:"min-width:80px","aria-label":"Einheit",onchange:function(e){ row.unit=e.target.value; save(); }});
       ["ml","Einh.","g","IE"].forEach(function(o){ var op=el("option",{value:o,text:o}); if((row.unit||"ml")===o) op.selected=true; bu.appendChild(op); });
       tr.appendChild(el("td",{},bu));
       var cb=el("input",{type:"checkbox","aria-label":"Bedside-Test durchgeführt",onchange:function(e){ row.bedside=e.target.checked; save(); }}); cb.checked=!!row.bedside;
@@ -1076,7 +1309,7 @@ window.__HF_PRAXIS = { name:"", sub:"", verantwortlich:"" };
     }
     state.blood.forEach(addBlood);
     bt.appendChild(btb); bscroll.appendChild(bt); body.appendChild(bscroll);
-    body.appendChild(el("div",{class:"addbtnrow",style:"margin:10px 0"},el("button",{class:"btn sec small",type:"button",onclick:function(){ var r={t:"",prod:"EK",charge:"",menge:"",unit:"ml",bedside:false}; state.blood.push(r); addBlood(r); save(); }},"+ Blutprodukt")));
+    body.appendChild(el("div",{class:"addbtnrow",style:"margin:10px 0"},el("button",{class:"btn sec small",type:"button",onclick:function(){ var r={t:timeNow(),prod:"EK",charge:"",menge:"",unit:"Einh.",bedside:false}; state.blood.push(r); addBlood(r); save(); }},"+ Blutprodukt")));
     body.appendChild(el("p",{class:"vitnote",text:"Chargendokumentation gemäß § 14 TFG (Produkt, Chargen-/Konservennummer, Menge, Zeitpunkt). Der AB0-Bedside-Test ist vor jeder EK-Gabe durchzuführen; die Checkbox dokumentiert nur, sie prüft nichts."}));
 
     // Ein-/Ausfuhr
@@ -1087,7 +1320,7 @@ window.__HF_PRAXIS = { name:"", sub:"", verantwortlich:"" };
       var w=el("div",{class:"field"});
       w.appendChild(el("label",{text:b[1]}));
       var iu=el("div",{class:"inputunit"});
-      var inp=el("input",{type:"number",inputmode:"decimal",step:"any",value:(state.balance[b[0]]==null?"":state.balance[b[0]]),oninput:function(e){ state.balance[b[0]]=e.target.value; save(); updateDoseSum(); }});
+      var inp=numInput({value:(state.balance[b[0]]==null?"":state.balance[b[0]]),"aria-label":b[1]},function(v){ state.balance[b[0]]=v; save(); updateDoseSum(); });
       balInputs[b[0]]=inp;
       iu.appendChild(inp);
       iu.appendChild(el("span",{class:"u",text:b[2]}));
@@ -1099,14 +1332,14 @@ window.__HF_PRAXIS = { name:"", sub:"", verantwortlich:"" };
     bg.appendChild(bw);
     body.appendChild(bg);
     body.appendChild(el("div",{class:"addbtnrow no-print",style:"margin:10px 0"},el("button",{class:"btn sec small",type:"button",title:"Summe aller Infusionen in ml als Einfuhr eintragen",onclick:function(){
-      var tot=0; state.infus.forEach(function(r){ var v=parseFloat(String(r.vol).replace(",",".")); if(!isNaN(v)&&(r.unit||"ml")==="ml") tot+=v; });
+      var tot=0; state.infus.forEach(function(r){ var v=numVal(r.vol); if(!isNaN(v)&&(r.unit||"ml")==="ml") tot+=v; });
       tot=Math.round(tot*10)/10; state.balance.einfuhr=String(tot); balInputs.einfuhr.value=tot; save(); updateDoseSum();
     }},"Σ Infusionen → Einfuhr übernehmen")));
 
     // Dosis-Summe (reine Addition)
     var ds = el("div",{class:"dosesum",id:"doseSum"});
     body.appendChild(ds);
-    updateDoseSum();
+    updateDoseSum(ds);
   }
 
   function fillDrugList(dl){
@@ -1166,35 +1399,36 @@ window.__HF_PRAXIS = { name:"", sub:"", verantwortlich:"" };
     setTimeout(function(){ inName.focus(); },50);
   }
 
-  function updateDoseSum(){
-    var ds = $("#doseSum"); if(!ds) return;
+  function updateDoseSum(el0){
+    var ds = (el0 && el0.nodeType===1) ? el0 : $("#doseSum"); if(!ds) return;
     var sums={}; // "name||unit" -> total
     state.drugs.forEach(function(r){
-      if(!r.name) return; var d=parseFloat(String(r.dose).replace(",","."));
+      if(!r.name) return; var d=numVal(r.dose);
       if(isNaN(d)) return;
       var key=r.name+" ||"+(r.unit||"");
       sums[key]=(sums[key]||0)+d;
     });
-    var infTot=0; state.infus.forEach(function(r){ var v=parseFloat(String(r.vol).replace(",",".")); if(!isNaN(v)&&(r.unit||"ml")==="ml") infTot+=v; });
+    var infTot=0; state.infus.forEach(function(r){ var v=numVal(r.vol); if(!isNaN(v)&&(r.unit||"ml")==="ml") infTot+=v; });
     ds.innerHTML="";
     ds.appendChild(el("div",{style:"font-weight:800;color:var(--primary-d);margin-bottom:4px",text:"Summen (reine Addition)"}));
     var keys=Object.keys(sums);
+    ds.classList.toggle("is-empty", !keys.length && !infTot);
     if(!keys.length && !infTot){ ds.appendChild(el("div",{class:"vitnote",text:"Noch keine numerischen Dosen erfasst."})); }
     keys.forEach(function(k){
       var parts=k.split(" ||"); var nm=parts[0], un=parts[1];
       var val=sums[k]; var out=(Math.round(val*1000)/1000);
-      ds.appendChild(el("div",{class:"row"},[ el("span",{text:nm}), el("b",{text:out+" "+un}) ]));
+      ds.appendChild(el("div",{class:"row"},[ el("span",{text:nm}), el("b",{text:fmtNum(out)+" "+un}) ]));
     });
-    if(infTot){ ds.appendChild(el("div",{class:"row",style:"border-top:1px solid rgba(0,0,0,.08);margin-top:4px;padding-top:4px"},[ el("span",{text:"Infusionsvolumen (ml)"}), el("b",{text:(Math.round(infTot*10)/10)+" ml"}) ])); }
+    if(infTot){ ds.appendChild(el("div",{class:"row",style:"border-top:1px solid rgba(0,0,0,.08);margin-top:4px;padding-top:4px"},[ el("span",{text:"Infusionsvolumen (ml)"}), el("b",{text:fmtNum(Math.round(infTot*10)/10)+" ml"}) ])); }
     ds.appendChild(el("div",{class:"note",style:"font-size:.72rem;color:var(--muted);margin-top:6px",text:"Nur Zwischensummen. Keine Höchstmengen-Prüfung, keine Warnung, keine Empfehlung."}));
   }
 
   /* ---------------- Vitalkurve ---------------- */
   var VPARAMS=[
-    {id:"rrsys",label:"RR systol.",gly:"∨",color:"#c0392b"},
-    {id:"rrdia",label:"RR diastol.",gly:"∧",color:"#c0392b"},
-    {id:"map",label:"MAP",gly:"–",color:"#8e44ad"},
-    {id:"hf",label:"Herzfrequenz",gly:"•",color:"#0e7c86"}
+    {id:"rrsys",label:"RR systol.",gly:"∨",color:"var(--v-rr)"},
+    {id:"rrdia",label:"RR diastol.",gly:"∧",color:"var(--v-rr)"},
+    {id:"map",label:"MAP",gly:"–",color:"var(--v-map)"},
+    {id:"hf",label:"Herzfrequenz",gly:"•",color:"var(--v-hf)"}
   ];
   var NUMROWS=[
     {id:"hf",label:"HF /min"},{id:"rrsys",label:"RR sys"},{id:"rrdia",label:"RR dia"},{id:"map",label:"MAP"},
@@ -1202,6 +1436,7 @@ window.__HF_PRAXIS = { name:"", sub:"", verantwortlich:"" };
     {id:"bis",label:"BIS"},{id:"tof",label:"TOF %/Count"},{id:"zvd",label:"ZVD mmHg"},{id:"mac",label:"MAC"}
   ];
   var curParam="rrsys";
+  var vitUndo=[]; // {c,p,prev} – per Antippen gesetzte Kurvenwerte (max. 50)
 
   function vitData(col){ if(!state.vitals.data[col]) state.vitals.data[col]={}; return state.vitals.data[col]; }
   function colClock(col){
@@ -1217,25 +1452,30 @@ window.__HF_PRAXIS = { name:"", sub:"", verantwortlich:"" };
     var tools = el("div",{class:"vittools"});
     var startWrap=el("div",{class:"field",style:"max-width:180px"});
     startWrap.appendChild(el("label",{text:"Startzeit Kurve",style:"font-size:.78rem"}));
-    startWrap.appendChild(el("input",{type:"time",value:state.vitals.start||"", oninput:function(e){ state.vitals.start=e.target.value; save(); paintVitals(); }}));
+    startWrap.appendChild(timeInput({value:state.vitals.start||"","aria-label":"Startzeit Kurve"},function(v){ state.vitals.start=v; save(); paintVitals(); refreshNumRows(); }));
     tools.appendChild(startWrap);
 
     var psel=el("div",{class:"paramsel"});
     VPARAMS.forEach(function(p){
       psel.appendChild(el("button",{type:"button","aria-pressed":curParam===p.id?"true":"false",onclick:function(){ curParam=p.id; $$(".paramsel button",tools).forEach(function(b){b.setAttribute("aria-pressed","false");}); this.setAttribute("aria-pressed","true"); }},p.gly+" "+p.label));
     });
-    var pselWrap=el("div",{class:"field"});
+    var pselWrap=el("div",{class:"field no-print"});
     pselWrap.appendChild(el("label",{text:"Antippen setzt:",style:"font-size:.78rem"}));
     pselWrap.appendChild(psel);
     tools.appendChild(pselWrap);
 
-    var stylesel=el("div",{class:"field"});
+    var stylesel=el("div",{class:"field no-print"});
     stylesel.appendChild(el("label",{text:"Darstellung",style:"font-size:.78rem"}));
     var ss=el("div",{class:"stylesel"});
     ss.appendChild(el("button",{type:"button","aria-pressed":state.vitals.style==="classic"?"true":"false",onclick:function(){ state.vitals.style="classic"; save(); render(); }},"klassisch"));
     ss.appendChild(el("button",{type:"button","aria-pressed":state.vitals.style==="modern"?"true":"false",onclick:function(){ state.vitals.style="modern"; save(); render(); }},"modern"));
     stylesel.appendChild(ss);
     tools.appendChild(stylesel);
+
+    var undoWrap=el("div",{class:"field vitundo no-print"});
+    undoWrap.appendChild(el("label",{text:"Korrektur",style:"font-size:.78rem"}));
+    undoWrap.appendChild(el("button",{class:"btn sec small",type:"button",id:"vitUndo",title:"Zuletzt per Antippen gesetzten Kurvenwert zurücknehmen",onclick:undoVital},"↶ Rückgängig"));
+    tools.appendChild(undoWrap);
 
     body.appendChild(tools);
 
@@ -1248,10 +1488,10 @@ window.__HF_PRAXIS = { name:"", sub:"", verantwortlich:"" };
     // Legende (eigene, neutrale)
     var leg = el("div",{class:"legend"});
     if(state.vitals.style==="classic"){
-      leg.appendChild(el("span",{},[el("span",{class:"gly",text:"∨"})," RR systolisch"]));
-      leg.appendChild(el("span",{},[el("span",{class:"gly",text:"∧"})," RR diastolisch"]));
-      leg.appendChild(el("span",{},[el("span",{class:"gly",text:"–"})," MAP"]));
-      leg.appendChild(el("span",{},[el("span",{class:"gly",text:"•"})," Herzfrequenz"]));
+      leg.appendChild(el("span",{},[el("span",{class:"gly",style:"color:var(--v-rr)",text:"∨"})," RR systolisch"]));
+      leg.appendChild(el("span",{},[el("span",{class:"gly",style:"color:var(--v-rr)",text:"∧"})," RR diastolisch"]));
+      leg.appendChild(el("span",{},[el("span",{class:"gly",style:"color:var(--v-map)",text:"–"})," MAP"]));
+      leg.appendChild(el("span",{},[el("span",{class:"gly",style:"color:var(--v-hf)",text:"•"})," Herzfrequenz"]));
     } else {
       VPARAMS.forEach(function(p){ leg.appendChild(el("span",{},[el("span",{class:"swatch",style:"background:"+p.color})," "+p.label])); });
     }
@@ -1272,7 +1512,7 @@ window.__HF_PRAXIS = { name:"", sub:"", verantwortlich:"" };
       }},"Letzte Werte → nächste Spalte")]));
 
     // Numerische Tabelle (Fallback + SpO₂/etCO₂/AF/Temp)
-    renderNumRows(body);
+    body.appendChild(buildNumRows());
     // paintVitals() erst in render(), wenn #vitHost im DOM hängt
   }
 
@@ -1282,11 +1522,11 @@ window.__HF_PRAXIS = { name:"", sub:"", verantwortlich:"" };
     // Auto-Erweiterung: wenn letzte 2 Spalten belegt
     var lastFilled=-1;
     Object.keys(state.vitals.data).forEach(function(c){ var o=state.vitals.data[c]; if(o&&Object.keys(o).some(function(k){return o[k]!==""&&o[k]!=null;})){ if(+c>lastFilled) lastFilled=+c; } });
-    if(lastFilled>=cols-2 && cols<120){ cols=Math.min(cols+6,120); state.vitals.cols=cols; save(); }
+    if(lastFilled>=cols-2 && cols<120 && !state.final && !archiveBackup){ cols=Math.min(cols+6,120); state.vitals.cols=cols; save(); refreshNumRows(); }
 
     var COLW=34, PADL=44, PADR=12, PADT=12, H=300, YMAX=220;
     // Skala dynamisch erweitern, falls Werte > 220 (max. 300)
-    Object.keys(state.vitals.data).forEach(function(c){ var o=state.vitals.data[c]; if(!o) return; VPARAMS.forEach(function(p){ var v=parseFloat(o[p.id]); if(!isNaN(v)&&v+10>YMAX) YMAX=Math.min(300,Math.ceil((v+10)/20)*20); }); });
+    Object.keys(state.vitals.data).forEach(function(c){ var o=state.vitals.data[c]; if(!o) return; VPARAMS.forEach(function(p){ var v=numVal(o[p.id]); if(!isNaN(v)&&v+10>YMAX) YMAX=Math.min(300,Math.ceil((v+10)/20)*20); }); });
     var W=PADL+PADR+cols*COLW;
     function X(c){ return PADL + c*COLW + COLW/2; }
     function Y(val){ return PADT + (1 - val/YMAX)*(H-PADT-24); }
@@ -1299,33 +1539,33 @@ window.__HF_PRAXIS = { name:"", sub:"", verantwortlich:"" };
 
     // Y-Gitter
     for(var yv=0; yv<=YMAX; yv+=20){
-      svg.appendChild(mk("line",{x1:PADL,y1:Y(yv),x2:W-PADR,y2:Y(yv),stroke:"#eef3f5",'stroke-width':1}));
-      svg.appendChild(mk("text",{x:6,y:Y(yv)+4,'font-size':10,fill:"#8aa0ab"})).textContent=yv;
+      svg.appendChild(mk("line",{x1:PADL,y1:Y(yv),x2:W-PADR,y2:Y(yv),style:"stroke:var(--vg-h)",'stroke-width':1}));
+      svg.appendChild(mk("text",{x:6,y:Y(yv)+4,'font-size':10,style:"fill:var(--vg-text)"})).textContent=yv;
     }
     // X-Gitter + Zeitlabel
     for(var c=0;c<cols;c++){
       var major=(c%2===0);
-      svg.appendChild(mk("line",{x1:PADL+c*COLW,y1:PADT,x2:PADL+c*COLW,y2:H-24,stroke:major?"#e2eaee":"#f2f6f8",'stroke-width':1}));
-      if(major){ var tx=mk("text",{x:PADL+c*COLW+2,y:H-8,'font-size':9,fill:"#8aa0ab"}); tx.textContent=colClock(c); svg.appendChild(tx); }
+      svg.appendChild(mk("line",{x1:PADL+c*COLW,y1:PADT,x2:PADL+c*COLW,y2:H-24,style:"stroke:var("+(major?"--vg-major":"--vg-minor")+")",'stroke-width':1}));
+      if(major){ var tx=mk("text",{x:PADL+c*COLW+2,y:H-8,'font-size':9,style:"fill:var(--vg-text)"}); tx.textContent=colClock(c); svg.appendChild(tx); }
     }
-    svg.appendChild(mk("line",{x1:PADL,y1:PADT,x2:PADL,y2:H-24,stroke:"#cdd9df",'stroke-width':1}));
+    svg.appendChild(mk("line",{x1:PADL,y1:PADT,x2:PADL,y2:H-24,style:"stroke:var(--vg-axis)",'stroke-width':1}));
 
     // Datenreihen
-    function series(pid){ var pts=[]; for(var c=0;c<cols;c++){ var o=state.vitals.data[c]; if(o&&o[pid]!==""&&o[pid]!=null){ var val=parseFloat(o[pid]); if(!isNaN(val)) pts.push([c,val]); } } return pts; }
+    function series(pid){ var pts=[]; for(var c=0;c<cols;c++){ var o=state.vitals.data[c]; if(o&&o[pid]!==""&&o[pid]!=null){ var val=numVal(o[pid]); if(!isNaN(val)) pts.push([c,val]); } } return pts; }
 
     if(state.vitals.style==="classic"){
       // HF verbindungslinie
       var hf=series("hf");
-      if(hf.length>1){ var d="M"+hf.map(function(p){return X(p[0])+" "+Y(p[1]);}).join(" L"); svg.appendChild(mk("path",{d:d,fill:"none",stroke:"#0e7c86",'stroke-width':1.4})); }
-      hf.forEach(function(p){ svg.appendChild(mk("circle",{cx:X(p[0]),cy:Y(p[1]),r:3.2,fill:"#0e7c86"})); });
-      series("rrsys").forEach(function(p){ var t=mk("text",{x:X(p[0]),y:Y(p[1])+4,'font-size':13,'text-anchor':"middle",fill:"#c0392b",'font-weight':700}); t.textContent="∨"; svg.appendChild(t); });
-      series("rrdia").forEach(function(p){ var t=mk("text",{x:X(p[0]),y:Y(p[1])+5,'font-size':13,'text-anchor':"middle",fill:"#c0392b",'font-weight':700}); t.textContent="∧"; svg.appendChild(t); });
-      series("map").forEach(function(p){ svg.appendChild(mk("line",{x1:X(p[0])-6,y1:Y(p[1]),x2:X(p[0])+6,y2:Y(p[1]),stroke:"#8e44ad",'stroke-width':2})); });
+      if(hf.length>1){ var d="M"+hf.map(function(p){return X(p[0])+" "+Y(p[1]);}).join(" L"); svg.appendChild(mk("path",{d:d,fill:"none",style:"stroke:var(--v-hf)",'stroke-width':1.4})); }
+      hf.forEach(function(p){ svg.appendChild(mk("circle",{cx:X(p[0]),cy:Y(p[1]),r:3.2,style:"fill:var(--v-hf)"})); });
+      series("rrsys").forEach(function(p){ var t=mk("text",{x:X(p[0]),y:Y(p[1])+4,'font-size':13,'text-anchor':"middle",style:"fill:var(--v-rr)",'font-weight':700}); t.textContent="∨"; svg.appendChild(t); });
+      series("rrdia").forEach(function(p){ var t=mk("text",{x:X(p[0]),y:Y(p[1])+5,'font-size':13,'text-anchor':"middle",style:"fill:var(--v-rr)",'font-weight':700}); t.textContent="∧"; svg.appendChild(t); });
+      series("map").forEach(function(p){ svg.appendChild(mk("line",{x1:X(p[0])-6,y1:Y(p[1]),x2:X(p[0])+6,y2:Y(p[1]),style:"stroke:var(--v-map)",'stroke-width':2})); });
     } else {
       VPARAMS.forEach(function(p){
         var pts=series(p.id);
-        if(pts.length>1){ var d="M"+pts.map(function(q){return X(q[0])+" "+Y(q[1]);}).join(" L"); svg.appendChild(mk("path",{d:d,fill:"none",stroke:p.color,'stroke-width':1.8,'stroke-linejoin':"round"})); }
-        pts.forEach(function(q){ svg.appendChild(mk("circle",{cx:X(q[0]),cy:Y(q[1]),r:2.6,fill:p.color})); });
+        if(pts.length>1){ var d="M"+pts.map(function(q){return X(q[0])+" "+Y(q[1]);}).join(" L"); svg.appendChild(mk("path",{d:d,fill:"none",style:"stroke:"+p.color,'stroke-width':1.8,'stroke-linejoin':"round"})); }
+        pts.forEach(function(q){ svg.appendChild(mk("circle",{cx:X(q[0]),cy:Y(q[1]),r:2.6,style:"fill:"+p.color})); });
       });
     }
 
@@ -1341,16 +1581,40 @@ window.__HF_PRAXIS = { name:"", sub:"", verantwortlich:"" };
       if(c<0) c=0; if(c>=cols) c=cols-1;
       var val=Math.round((1-(py-PADT)/(H-PADT-24))*YMAX);
       if(val<0)val=0; if(val>YMAX)val=YMAX;
-      vitData(c)[curParam]=val; save();
+      var o=vitData(c);
+      vitUndo.push({c:c,p:curParam,prev:(curParam in o)?o[curParam]:undefined}); if(vitUndo.length>50) vitUndo.shift();
+      o[curParam]=val; save();
       var inp=document.querySelector('input[data-vr="'+curParam+'"][data-vc="'+c+'"]'); if(inp) inp.value=val;
       paintVitals();
     }
     svg.addEventListener("click",place); // Touch löst ebenfalls click aus; Scrollen der Kurve bleibt möglich
 
     host.innerHTML=""; host.appendChild(svg);
+    var ub=$("#vitUndo"); if(ub) ub.disabled=!vitUndo.length || !!state.final;
   }
 
-  function renderNumRows(body){
+  function undoVital(){
+    if(state.final || !vitUndo.length) return;
+    var u=vitUndo.pop(), o=vitData(u.c);
+    if(u.prev===undefined) delete o[u.p]; else o[u.p]=u.prev;
+    if(!Object.keys(o).length) delete state.vitals.data[u.c];
+    var inp=document.querySelector('input[data-vr="'+u.p+'"][data-vc="'+u.c+'"]'); if(inp) inp.value=(u.prev==null?"":u.prev);
+    save(); paintVitals();
+  }
+
+  // Zahlentabelle neu aufbauen (z. B. nach automatischer Spaltenerweiterung); Fokus, Cursor und Scrollposition bleiben erhalten
+  function refreshNumRows(){
+    var old=$(".numrows"); if(!old) return;
+    var ae=document.activeElement, vr=null, vc=null, sel=null;
+    if(ae && old.contains(ae) && ae.getAttribute("data-vr")){ vr=ae.getAttribute("data-vr"); vc=ae.getAttribute("data-vc"); try{ sel=[ae.selectionStart,ae.selectionEnd]; }catch(x){} }
+    var os=old.querySelector(".tablescroll"), sl=os?os.scrollLeft:0;
+    var nb=buildNumRows(); old.parentNode.replaceChild(nb,old);
+    var ns=nb.querySelector(".tablescroll"); if(ns) ns.scrollLeft=sl;
+    if(vr!=null){ var ni=nb.querySelector('input[data-vr="'+vr+'"][data-vc="'+vc+'"]'); if(ni){ ni.focus({preventScroll:true}); if(sel) try{ ni.setSelectionRange(sel[0],sel[1]); }catch(x){} } }
+    if(state.final) $$("input",nb).forEach(function(i){ i.disabled=true; });
+  }
+
+  function buildNumRows(){
     var cols=state.vitals.cols||18;
     var box=el("div",{class:"numrows"});
     box.appendChild(el("div",{class:"vitnote",style:"margin-bottom:6px",text:"Numerische Schnelleingabe (Fallback). Werte je 5-Minuten-Spalte:"}));
@@ -1366,17 +1630,17 @@ window.__HF_PRAXIS = { name:"", sub:"", verantwortlich:"" };
         (function(c){
           var o=state.vitals.data[c]||{};
           var td=el("td");
-          td.appendChild(el("input",{type:"number",inputmode:"decimal",step:"any","data-vr":row.id,"data-vc":c,value:(o[row.id]!=null?o[row.id]:""), oninput:function(e){
-            var v=e.target.value; vitData(c)[row.id]= v===""?"":v; save();
+          td.appendChild(numInput({"data-vr":row.id,"data-vc":c,"aria-label":row.label+" "+colClock(c),value:(o[row.id]!=null?o[row.id]:"")},function(v){
+            vitData(c)[row.id]=v; save();
             if(["hf","rrsys","rrdia","map"].indexOf(row.id)>=0) paintVitals();
-          }}));
+          }, row.id==="tof"?"slash":null));
           tr.appendChild(td);
         })(c);
       }
       tb.appendChild(tr);
     });
     t.appendChild(tb); scroll.appendChild(t); box.appendChild(scroll);
-    body.appendChild(box);
+    return box;
   }
 
   /* ---------------- Ereignisse ---------------- */
@@ -1389,16 +1653,29 @@ window.__HF_PRAXIS = { name:"", sub:"", verantwortlich:"" };
       var row=el("div",{class:"evrow"});
       var n=el("div",{class:"evn"});
       row.appendChild(n);
-      row.appendChild(el("input",{type:"time",value:ev.time||"",oninput:function(e){ ev.time=e.target.value; save(); }}));
+      var tu=timeInput({value:ev.time||"","aria-label":"Uhrzeit Ereignis"},function(v){ ev.time=v; save(); });
+      tu._input.addEventListener("change",function(){ resort(ev); });
+      row.appendChild(tu);
       row.appendChild(el("textarea",{placeholder:"Ereignis / Maßnahme",style:"flex:1",oninput:function(e){ ev.text=e.target.value; save(); }},[ev.text||""]));
       row.appendChild(el("button",{class:"iconbtn",type:"button",onclick:function(){ state.events.splice(state.events.indexOf(ev),1); save(); row.remove(); renumber(); }},"×"));
       list.appendChild(row);
       renumber();
     }
     function renumber(){ $$(".evn",list).forEach(function(e,i){ e.textContent="#"+(i+1); }); }
+    // Chronologisch sortieren (stabil; Einträge ohne Uhrzeit ans Ende), dann Liste neu aufbauen
+    function resort(focusEv){
+      var idx=state.events.map(function(e,i){ return [e,i]; });
+      idx.sort(function(a,b){ var ta=a[0].time||"", tb=b[0].time||""; if(!ta!==!tb) return ta?-1:1; return ta<tb?-1:ta>tb?1:a[1]-b[1]; });
+      var sorted=idx.map(function(x){ return x[0]; });
+      if(sorted.every(function(e,i){ return e===state.events[i]; })) return;
+      state.events=sorted; save();
+      list.innerHTML=""; state.events.forEach(addEv);
+      var fi=state.events.indexOf(focusEv); if(fi>=0){ var r=list.children[fi]; if(r) r.classList.add("flash"); }
+      lockUI();
+    }
     state.events.forEach(addEv);
     body.appendChild(list);
-    body.appendChild(el("div",{class:"addbtnrow",style:"margin:10px 0"},el("button",{class:"btn sec small",type:"button",onclick:function(){ var ev={time:"",text:""}; state.events.push(ev); addEv(ev); save(); }},"+ Ereignis")));
+    body.appendChild(el("div",{class:"addbtnrow",style:"margin:10px 0"},el("button",{class:"btn sec small",type:"button",onclick:function(){ var ev={time:timeNow(),text:""}; state.events.push(ev); addEv(ev); save(); var ta=list.lastChild&&list.lastChild.querySelector("textarea"); if(ta) ta.focus(); }},"+ Ereignis")));
 
     body.appendChild(el("h3",{style:"font-size:.95rem;margin-top:12px",text:"Marker"}));
     body.appendChild(el("p",{class:"vitnote",text:"Marker ankreuzen und optional den Zeitpunkt des Auftretens erfassen."}));
@@ -1411,6 +1688,7 @@ window.__HF_PRAXIS = { name:"", sub:"", verantwortlich:"" };
       var cb=el("input",{type:"checkbox",onchange:function(e){
         var arr=Array.isArray(state.markers)?state.markers:[];
         if(e.target.checked){ if(arr.indexOf(m)<0) arr.push(m); } else { arr=arr.filter(function(x){return x!==m;}); }
+        if(e.target.checked && !state.markerTimes[m]){ state.markerTimes[m]=timeNow(); ti.value=state.markerTimes[m]; }
         state.markers=arr; ti.disabled=!e.target.checked || !!state.final; save();
       }});
       var on=(state.markers||[]).indexOf(m)>=0;
@@ -1429,7 +1707,7 @@ window.__HF_PRAXIS = { name:"", sub:"", verantwortlich:"" };
     s.fields.forEach(function(f){ if(fieldVisible(f)) grid.appendChild(renderField(f)); });
     body.appendChild(grid);
 
-    body.appendChild(el("div",{class:"callout",html:"<b>Finalisieren</b> sperrt das Protokoll in dieser App; anschließend kann es als PDF gedruckt werden. Eine spätere Korrektur ist nur als gekennzeichneter <b>Nachtrag (v2)</b> mit Zeitstempel möglich; es findet keine Löschung statt. Eine qualifizierte elektronische Signatur (QES) ist nicht erforderlich."}));
+    body.appendChild(el("div",{class:"callout no-print",html:"<b>Finalisieren</b> sperrt das Protokoll in dieser App; anschließend kann es als PDF gedruckt werden. Eine spätere Korrektur ist nur als gekennzeichneter <b>Nachtrag (v2)</b> mit Zeitstempel möglich; es findet keine Löschung statt. Eine qualifizierte elektronische Signatur (QES) ist nicht erforderlich."}));
 
     var wrap=el("div",{class:"grid two"});
     wrap.appendChild(sigPad("anaesthesist","Anästhesist:in"));
@@ -1454,7 +1732,11 @@ window.__HF_PRAXIS = { name:"", sub:"", verantwortlich:"" };
     box.appendChild(cv);
     var meta=el("div",{class:"sigmeta"});
     meta.appendChild(el("button",{class:"btn sec small no-print",type:"button",onclick:function(){ clearPad(); }},"Löschen"));
-    meta.appendChild(el("span",{class:"vitnote",text:"mit Finger/Stift unterschreiben"}));
+    meta.appendChild(el("span",{class:"vitnote no-print",text:"mit Finger/Stift unterschreiben"}));
+    var ts=el("span",{class:"sigts"});
+    function showTs(){ var t=(state.sigTs||{})[role]; ts.textContent = (t && state.sigs[role]) ? "Unterschrieben: "+fmtDT(t) : ""; }
+    showTs();
+    meta.appendChild(ts);
     box.appendChild(meta);
 
     var ctx=cv.getContext("2d");
@@ -1470,10 +1752,10 @@ window.__HF_PRAXIS = { name:"", sub:"", verantwortlich:"" };
     function pos(e){ var r=cv.getBoundingClientRect(); return [(e.clientX-r.left)*(cv.width/r.width),(e.clientY-r.top)*(cv.height/r.height)]; }
     function down(e){ if(state.final||archiveBackup) return; e.preventDefault(); drawing=true; last=pos(e); try{ cv.setPointerCapture(e.pointerId); }catch(x){} }
     function move(e){ if(!drawing) return; e.preventDefault(); var p=pos(e); ctx.beginPath(); ctx.moveTo(last[0],last[1]); ctx.lineTo(p[0],p[1]); ctx.stroke(); last=p; }
-    function up(){ if(!drawing) return; drawing=false; try{ state.sigs[role]=cv.toDataURL("image/png"); cv.classList.add("signed"); if(missingIds["__sig_"+role]){ delete missingIds["__sig_"+role]; box.classList.remove("missing"); } save(); }catch(e){} }
+    function up(){ if(!drawing) return; drawing=false; try{ state.sigs[role]=cv.toDataURL("image/png"); cv.classList.add("signed"); if(!state.sigTs) state.sigTs={}; state.sigTs[role]=nowISO(); showTs(); if(missingIds["__sig_"+role]){ delete missingIds["__sig_"+role]; box.classList.remove("missing"); } save(); }catch(e){} }
     cv.addEventListener("pointerdown",down); cv.addEventListener("pointermove",move);
     cv.addEventListener("pointerup",up); cv.addEventListener("pointercancel",up);
-    function clearPad(){ if(state.final) return; ctx.clearRect(0,0,cv.width,cv.height); delete state.sigs[role]; cv.classList.remove("signed"); save(); }
+    function clearPad(){ if(state.final) return; ctx.clearRect(0,0,cv.width,cv.height); delete state.sigs[role]; if(state.sigTs) delete state.sigTs[role]; showTs(); cv.classList.remove("signed"); save(); }
     cv._clear=clearPad;
     return box;
   }
@@ -1499,7 +1781,7 @@ window.__HF_PRAXIS = { name:"", sub:"", verantwortlich:"" };
     document.body.classList.toggle("is-final",locked);
     document.body.classList.toggle("is-archview",!!archiveBackup);
     if(locked){
-      $$("#sections input, #sections select, #sections textarea, #sections button.iconbtn, .addbtnrow button, .paramsel button, .stylesel button").forEach(function(e){
+      $$("#sections input, #sections select, #sections textarea, #sections button.iconbtn, #sections .nowbtn, #vitUndo, .addbtnrow button, .paramsel button, .stylesel button").forEach(function(e){
         if(e.closest(".sigmeta")) { e.disabled=true; return; }
         e.disabled=true;
       });
@@ -1507,6 +1789,116 @@ window.__HF_PRAXIS = { name:"", sub:"", verantwortlich:"" };
     $("#btnAddendum").style.display = (locked && !archiveBackup) ? "" : "none";
     $("#btnFinal").disabled = locked;
     $("#modeVoll").disabled=locked; $("#modeAmb").disabled=locked;
+  }
+
+
+  /* ---------------- Live-Anzeigen: Fortschritt, Berechnungen, Navigation ---------------- */
+  function reqSection(fid){ for(var i=0;i<SECTIONS.length;i++){ if((SECTIONS[i].fields||[]).some(function(f){ return f.id===fid; })) return SECTIONS[i].id; } return null; }
+  function openReq(){
+    var o={};
+    FINAL_REQ.forEach(function(r){ if(!hasVal(state.f[r[0]])){ var sid=reqSection(r[0]); if(sid) o[sid]=true; } });
+    if(!state.sigs || !state.sigs.anaesthesist) o.unterschrift=true;
+    return o;
+  }
+  function updateLive(){
+    var total=FINAL_REQ.length+1, done=0;
+    FINAL_REQ.forEach(function(r){ if(hasVal(state.f[r[0]])) done++; });
+    if(state.sigs && state.sigs.anaesthesist) done++;
+    var pb=$("#progress");
+    if(pb){
+      $("#progTxt").textContent="Pflichtangaben "+done+"/"+total;
+      $("#progBar").style.width=Math.round(done/total*100)+"%";
+      pb.classList.toggle("done",done===total);
+      pb.title = done===total ? "Alle Pflichtangaben vorhanden – bereit zum Finalisieren" : "Zu den fehlenden Pflichtangaben springen";
+    }
+    var miss=openReq();
+    $$("#secnavIn a").forEach(function(a){ a.classList.toggle("miss", !state.final && !!miss[a.getAttribute("data-sec")]); });
+    updateCalc();
+  }
+  function progressClick(){
+    if(state.final) return;
+    var miss=validateFinal();
+    if(miss.length){ showMissing(); return; }
+    missingIds={};
+    dialog("Pflichtangaben vollständig ✓", el("p",{text:"Alle Pflichtangaben und die Unterschrift sind vorhanden. Das Protokoll kann finalisiert werden."}),
+      [ {t:"Schließen",cls:"sec",fn:closeDlg}, {t:"Finalisieren …",cls:"primary",fn:function(){ closeDlg(); doFinalize(); }} ]);
+  }
+
+  // Alter / BMI – rein informative Berechnung aus den eingegebenen Werten
+  function parseYMD(v){ var m=String(v||"").match(/^(\d{4})-(\d{2})-(\d{2})$/); return m? new Date(+m[1],+m[2]-1,+m[3]) : null; }
+  function updateCalc(){
+    var cl=$("#calcline"); if(!cl) return;
+    var parts=[];
+    var gb=parseYMD(state.f.gebdat), ref=parseYMD(state.f.datum)||new Date();
+    if(gb && gb<=ref){
+      var months=(ref.getFullYear()-gb.getFullYear())*12+(ref.getMonth()-gb.getMonth()); if(ref.getDate()<gb.getDate()) months--;
+      parts.push(["Alter", months<12 ? months+" Monat"+(months===1?"":"e") : Math.floor(months/12)+" Jahre"]);
+    }
+    var kg=numVal(state.f.gewicht), cm=numVal(state.f.groesse);
+    if(kg>0 && cm>0){ var bmi=kg/Math.pow(cm/100,2); if(isFinite(bmi) && bmi<200) parts.push(["BMI",fmtNum(Math.round(bmi*10)/10)+" kg/m²"]); }
+    cl.innerHTML="";
+    if(!parts.length){ cl.style.display="none"; return; }
+    cl.style.display="";
+    parts.forEach(function(p){ cl.appendChild(el("span",{},[p[0]+": ",el("b",{text:p[1]})])); });
+    cl.appendChild(el("span",{class:"vitnote",style:"margin:0",text:"berechnet, rein informativ"}));
+  }
+
+  // Abschnitts-Navigation (Sprungleiste unter der Kopfzeile)
+  function buildNav(){
+    var nav=$("#secnavIn"); if(!nav) return;
+    nav.innerHTML="";
+    SECTIONS.forEach(function(s){
+      if(!sectionVisible(s)) return;
+      nav.appendChild(el("a",{href:"#sec-"+s.id,"data-sec":s.id,onclick:function(e){
+        e.preventDefault();
+        var d=$('details.sect[data-id="'+s.id+'"]'); if(!d) return;
+        d.open=true; openState[s.id]=true;
+        try{ d.scrollIntoView({block:"start",behavior:"smooth"}); }catch(x){ d.scrollIntoView(); }
+      }},[el("span",{class:"dot","aria-hidden":"true"}), s.nav||s.title]));
+    });
+    $$("details.sect").forEach(function(d){ d.id="sec-"+d.getAttribute("data-id"); });
+    navActive();
+  }
+  var navRaf=0, lastActive=null;
+  function navActive(){
+    navRaf=0;
+    var off=(parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--tbh"))||58)+70, cur=null;
+    $$("details.sect").forEach(function(d){ if(d.style.display==="none") return; if(d.getBoundingClientRect().top<=off) cur=d.getAttribute("data-id"); });
+    if(!cur){ var f=$("details.sect:not([data-hidden])"); cur=f&&f.getAttribute("data-id"); }
+    $$("#secnavIn a").forEach(function(a){
+      var on=a.getAttribute("data-sec")===cur; a.classList.toggle("active",on);
+      if(on){ a.setAttribute("aria-current","true"); if(cur!==lastActive){ var nav=$("#secnavIn"), l=a.offsetLeft-nav.clientWidth/2+a.offsetWidth/2; try{ nav.scrollTo({left:l,behavior:"smooth"}); }catch(x){ nav.scrollLeft=l; } } }
+      else a.removeAttribute("aria-current");
+    });
+    lastActive=cur;
+  }
+  window.addEventListener("scroll",function(){ if(!navRaf) navRaf=requestAnimationFrame(navActive); },{passive:true});
+  (function(){ // Höhe der Kopfzeile für sticky-Navigation und Sprungziele
+    var tb=$(".topbar"); if(!tb) return;
+    function setH(){ document.documentElement.style.setProperty("--tbh",tb.offsetHeight+"px"); }
+    setH();
+    if(window.ResizeObserver) new ResizeObserver(setH).observe(tb); else window.addEventListener("resize",setH);
+  })();
+
+  // Darstellung: automatisch (System) / hell / dunkel
+  var THEMES=[["auto","◐","Auto"],["light","☀","Hell"],["dark","☾","Dunkel"]];
+  function curTheme(){ var t=null; try{ t=localStorage.getItem("aprot_theme"); }catch(e){} return (t==="light"||t==="dark")?t:"auto"; }
+  function applyTheme(t){
+    if(t==="auto") document.documentElement.removeAttribute("data-theme"); else document.documentElement.setAttribute("data-theme",t);
+    try{ if(t==="auto") localStorage.removeItem("aprot_theme"); else localStorage.setItem("aprot_theme",t); }catch(e){}
+    var th=THEMES.filter(function(x){ return x[0]===t; })[0];
+    $("#themeIco").textContent=th[1]; $("#themeLbl").textContent=th[2];
+    $("#btnTheme").setAttribute("aria-label","Darstellung: "+th[2]+" (umschalten)");
+  }
+  function cycleTheme(){ var i=THEMES.map(function(x){ return x[0]; }).indexOf(curTheme()); applyTheme(THEMES[(i+1)%THEMES.length][0]); paintVitals(); }
+
+  // Textfelder wachsen mit dem Inhalt (Fallback für Browser ohne field-sizing)
+  var NEED_AUTOSIZE=!(window.CSS && CSS.supports && CSS.supports("field-sizing","content"));
+  function autosize(t){ if(!NEED_AUTOSIZE || !t.offsetParent) return; t.style.height="auto"; t.style.height=Math.min(t.scrollHeight+2, window.innerHeight*0.6)+"px"; }
+  function autosizeAll(){ if(NEED_AUTOSIZE) $$("#sections textarea").forEach(autosize); }
+  if(NEED_AUTOSIZE){
+    document.addEventListener("input",function(e){ if(e.target.tagName==="TEXTAREA") autosize(e.target); });
+    document.addEventListener("toggle",function(e){ if(e.target.tagName==="DETAILS" && e.target.open) $$("textarea",e.target).forEach(autosize); },true);
   }
 
   /* ---------------- Finalisieren ---------------- */
@@ -1572,8 +1964,22 @@ window.__HF_PRAXIS = { name:"", sub:"", verantwortlich:"" };
     ]);
   }
 
+  /* ---------------- Druckkopf (wiederholt sich auf jeder Seite) ---------------- */
+  function buildPrintHead(){
+    var ph=$("#phead"); if(!ph) return;
+    var p=window.__HF_PRAXIS||{}, f=state.f;
+    ph.innerHTML="";
+    ph.appendChild(el("div",{},[ el("div",{class:"pl",text:p.name||"Anästhesieprotokoll"}), p.sub?el("div",{text:p.sub}):null ]));
+    var info=[];
+    if(f.gebdat) info.push("geb. "+fmtD(f.gebdat));
+    if(f.datum) info.push("Datum "+fmtD(f.datum));
+    info.push("ID "+(state.vid||window.__HF_VISIT||"—")+" · v"+(state.ver||1)+(state.final?"":" · ENTWURF"));
+    ph.appendChild(el("div",{class:"pp"},[ el("b",{text:f.name||"—"}), el("div",{text:info.join(" · ")}) ]));
+  }
+
   /* ---------------- Report-Fuß (nur Druck) ---------------- */
   function buildReportFoot(){
+    buildPrintHead();
     var rf=$("#reportfoot"); if(!rf) return;
     var p=window.__HF_PRAXIS||{};
     var idline = "Protokoll-ID: "+(state.vid||window.__HF_VISIT||"—")+" · Version v"+(state.ver||1);
@@ -1952,7 +2358,7 @@ window.__HF_PRAXIS = { name:"", sub:"", verantwortlich:"" };
     if(!dlg.open) dlg.showModal();
   }
   function closeDlg(){ if(dlg.open) dlg.close(); }
-  dlg.addEventListener("cancel",function(e){ /* ESC erlaubt */ });
+  dlg.addEventListener("cancel",function(e){ if(dlgForced) e.preventDefault(); /* sonst ESC erlaubt */ });
 
   /* ---------------- Idle-Lock ---------------- */
   var IDLE_MS=10*60*1000, idleT=null;
@@ -1992,6 +2398,7 @@ window.__HF_PRAXIS = { name:"", sub:"", verantwortlich:"" };
     setInert(false);
     try{ localStorage.removeItem(LOCKED_KEY); }catch(e){}
     armIdle();
+    setTimeout(ensurePin,0);
   }
   function tryUnlock(){
     var rec=getPin();
@@ -2015,8 +2422,12 @@ window.__HF_PRAXIS = { name:"", sub:"", verantwortlich:"" };
     $("#idlePinErr").textContent="";
     $("#idleMsg").textContent="PIN vergessen: Öffnen Sie den persönlichen Freischalt-Link (aus der Kauf-E-Mail) erneut – dadurch wird die PIN zurückgesetzt. Die Protokolldaten bleiben erhalten.";
   });
-  function pinSetupDialog(){
+  var dlgForced=false; // Pflicht-PIN-Dialog lässt sich nicht per ESC schließen
+  function pinRequired(){ return !!window.__HF_PIN_PFLICHT && canPin; }
+  function ensurePin(){ if(pinRequired() && !getPin() && !isLocked()) pinSetupDialog({forced:true}); }
+  function pinSetupDialog(opt){
     if(!canPin) return;
+    var forced=!!(opt && opt.forced);
     var p1=el("input",{type:"password",inputmode:"numeric",autocomplete:"new-password",maxlength:"12",style:"width:100%"});
     var p2=el("input",{type:"password",inputmode:"numeric",autocomplete:"new-password",maxlength:"12",style:"width:100%"});
     var msg=el("div",{class:"vitnote",role:"status"});
@@ -2026,15 +2437,17 @@ window.__HF_PRAXIS = { name:"", sub:"", verantwortlich:"" };
     var w1=el("div",{class:"field"}); w1.appendChild(el("label",{text:"PIN (4–12 Ziffern)"})); w1.appendChild(p1);
     var w2=el("div",{class:"field"}); w2.appendChild(el("label",{text:"PIN wiederholen"})); w2.appendChild(p2);
     g.appendChild(w1); g.appendChild(w2); b.appendChild(g); b.appendChild(msg);
-    var acts=[{t:"Abbrechen",cls:"sec",fn:closeDlg}];
-    if(getPin()) acts.push({t:"PIN entfernen",cls:"warn",fn:function(){ try{ localStorage.removeItem(PIN_KEY); }catch(e){} closeDlg(); }});
+    if(forced) b.insertBefore(el("div",{class:"callout",style:"margin-top:0",html:"<b>Ihre Praxis verlangt eine PIN</b> für die Bildschirmsperre. Bitte jetzt festlegen."}), b.firstChild);
+    var acts=forced?[]:[{t:"Abbrechen",cls:"sec",fn:closeDlg}];
+    if(getPin() && !pinRequired()) acts.push({t:"PIN entfernen",cls:"warn",fn:function(){ try{ localStorage.removeItem(PIN_KEY); }catch(e){} closeDlg(); }});
     acts.push({t:"Speichern",cls:"ok",fn:function(){
       var a=p1.value, c=p2.value;
       if(!/^\d{4,12}$/.test(a)){ msg.textContent="Bitte 4–12 Ziffern eingeben."; p1.focus(); return; }
       if(a!==c){ msg.textContent="Die PINs stimmen nicht überein."; p2.focus(); return; }
       var salt=Array.prototype.map.call(crypto.getRandomValues(new Uint8Array(16)),function(x){ return (x+256).toString(16).slice(1); }).join("");
-      hashPin(a,salt).then(function(h){ try{ localStorage.setItem(PIN_KEY,JSON.stringify({salt:salt,hash:h})); }catch(e){} closeDlg(); });
+      hashPin(a,salt).then(function(h){ try{ localStorage.setItem(PIN_KEY,JSON.stringify({salt:salt,hash:h})); }catch(e){} dlgForced=false; closeDlg(); });
     }});
+    dlgForced=forced;
     dialog("PIN für Bildschirmsperre", b, acts);
     setTimeout(function(){ p1.focus(); },50);
   }
@@ -2043,11 +2456,52 @@ window.__HF_PRAXIS = { name:"", sub:"", verantwortlich:"" };
   function cleanupPrint(){
     $$(".printmirror,.printnum").forEach(function(n){ n.parentNode.removeChild(n); });
     $$(".has-mirror").forEach(function(n){ n.classList.remove("has-mirror"); });
+    $$(".print-empty").forEach(function(n){ n.classList.remove("print-empty"); });
+    $$(".print-blank").forEach(function(n){ n.classList.remove("print-blank"); });
+    document.body.classList.remove("print-final");
+  }
+  // Finalisierter Ausdruck: leere Felder und Abschnitte weglassen (kompakter Bericht); Entwürfe drucken vollständig als Formular
+  function markEmptyForPrint(){
+    $$("#sections .field").forEach(function(fd){
+      if(fd.closest(".sigbox")) return;
+      var hasVal=$$("input,select,textarea",fd).some(function(n){
+        if(n.type==="checkbox"||n.type==="radio") return n.checked;
+        return n.value!=="" && n.value!=null;
+      });
+      if(fd.querySelector(".score")){ hasVal=$$("select",fd).some(function(n){ return n.value!==""; }); }
+      if(!hasVal) fd.classList.add("print-empty");
+    });
+    $$("#sections details.sect").forEach(function(d){
+      var s=SECBYID[d.getAttribute("data-id")]; if(!s) return;
+      var empty;
+      if(s.widget==="drugs") empty=!state.drugs.length && !state.infus.length && !state.blood.length && !state.blut && !Object.keys(state.balance).some(function(k){ return state.balance[k]; });
+      else if(s.widget==="events") empty=!state.events.length && !(state.markers||[]).length;
+      else if(s.widget==="vitals") empty=!Object.keys(state.vitals.data).some(function(c){ var o=state.vitals.data[c]||{}; return Object.keys(o).some(function(k){ return o[k]!==""&&o[k]!=null; }); });
+      else if(s.widget==="signatures") empty=false;
+      else empty=!$(".field:not(.print-empty)",d);
+      if(empty) d.classList.add("print-empty");
+      else if(s.widget==="drugs"){ // leere Teiltabellen ausblenden
+        $$(".tablescroll",d).forEach(function(ts){
+          if(ts.querySelector("tbody td")) return;
+          ts.classList.add("print-empty");
+          var h=ts.previousElementSibling; if(h&&h.tagName==="H3") h.classList.add("print-empty");
+          // zugehörige Hinweistexte bis zur nächsten Überschrift mit ausblenden
+          for(var n=ts.nextElementSibling; n && n.tagName!=="H3"; n=n.nextElementSibling){ if(n.classList.contains("vitnote")) n.classList.add("print-empty"); }
+        });
+        var balEmpty=!state.blut && !Object.keys(state.balance).some(function(k){ return state.balance[k]; });
+        $$("h3",d).forEach(function(h){ if(balEmpty && /Bilanz/.test(h.textContent)){ h.classList.add("print-empty"); var g=h.nextElementSibling; if(g&&g.classList.contains("grid")) g.classList.add("print-empty"); } });
+        $$(".dosesum.is-empty",d).forEach(function(n){ n.classList.add("print-empty"); });
+      }
+    });
   }
   function prepPrint(){
     cleanupPrint();
     buildReportFoot();
+    document.body.classList.toggle("print-final",!!state.final);
     $$(".sect").forEach(function(d){ if(d.getAttribute("data-hidden")!=="1"){ d.open=true; } });
+    if(state.final) markEmptyForPrint();
+    // leere Datums-/Zeitfelder nicht als „--:--“ drucken
+    $$('#app input[type=time], #app input[type=date], #app input[type=datetime-local]').forEach(function(n){ if(!n.value) n.classList.add("print-blank"); });
     // Vitalkurve sicher gezeichnet
     paintVitals();
     // Freitext vollständig drucken (Textfelder/Eingaben schneiden langen Text sonst ab)
@@ -2063,7 +2517,7 @@ window.__HF_PRAXIS = { name:"", sub:"", verantwortlich:"" };
     }).sort(function(a,b){ return a-b; });
     if(!cols.length) return;
     var box=el("div",{class:"print-only printnum"});
-    box.appendChild(el("div",{class:"vitnote",text:"Vitalwerte (numerisch)"}));
+    box.appendChild(el("div",{class:"printnum-h",text:"Vitalwerte (numerisch)"}));
     for(var i=0;i<cols.length;i+=14){
       var chunk=cols.slice(i,i+14), t=el("table"), hr=el("tr");
       hr.appendChild(el("th",{text:""}));
@@ -2095,6 +2549,9 @@ window.__HF_PRAXIS = { name:"", sub:"", verantwortlich:"" };
     $("#btnNew").addEventListener("click",function(){ if(!archiveBackup) newProtocol(); });
     $("#btnLock").addEventListener("click",function(){ lockNow(); });
     $("#btnArchive").addEventListener("click",openArchive);
+    $("#btnTheme").addEventListener("click",cycleTheme);
+    $("#progress").addEventListener("click",progressClick);
+    applyTheme(curTheme());
     $("#archClose").addEventListener("click",function(){ $("#arch").close(); });
     $("#archExportAll").addEventListener("click",function(){ archiveList(function(list){ if(!list.length){ alert("Archiv ist leer."); return; } exportJSON(list.map(function(r){return r.data;}), "archiv_anaesthesieprotokolle"); }); });
     // Modus initial
@@ -2110,7 +2567,8 @@ window.__HF_PRAXIS = { name:"", sub:"", verantwortlich:"" };
     buildReportFoot();
     if(window.__HF_FRESH_TOKEN){ try{ localStorage.removeItem(PIN_KEY); localStorage.removeItem(LOCKED_KEY); }catch(e){} }
     var wasLocked=false; try{ wasLocked=localStorage.getItem(LOCKED_KEY)==="1"; }catch(e){}
-    if(wasLocked) lockNow(); else armIdle();
+    if(wasLocked) lockNow(); else { armIdle(); ensurePin(); }
+    if(navigator.storage && navigator.storage.persist){ try{ navigator.storage.persist().catch(function(){}); }catch(e){} } // Browser soll lokale Daten nicht automatisch löschen
   }
   window.__onUnlock=boot;
   // Falls der Gate-Block schon entsperrt hat (z. B. kein hf-gate), trotzdem booten
