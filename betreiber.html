@@ -271,6 +271,11 @@
       <label class="fld" for="ed_verantwortlich">DSGVO-Verantwortlicher<button type="button" class="linkbtn" id="ed_autoVer">aus Feldern erzeugen</button></label>
       <textarea id="ed_verantwortlich" rows="2" placeholder="Name, Anschrift und Kontakt der verantwortlichen Stelle"></textarea>
 
+      <div style="display:flex;align-items:flex-start;gap:8px;margin:12px 0 4px">
+        <input id="ed_pin_pflicht" type="checkbox" style="margin-top:3px">
+        <label for="ed_pin_pflicht" style="margin:0;font-weight:500;font-size:.9rem">PIN für die Bildschirmsperre verpflichtend<br><span style="color:var(--muted);font-size:.8rem">Jedes Gerät dieser Praxis muss beim Start eine PIN festlegen; sie kann nicht entfernt werden.</span></label>
+      </div>
+
       <label class="fld">Logo (optional)</label>
       <div class="logo-row">
         <div class="logo-prev" id="ed_logoPrev">kein Logo</div>
@@ -515,6 +520,7 @@
     $("ed_mail").value           = px.mail || "";
     $("ed_web").value            = px.web || "";
     $("ed_verantwortlich").value = b.verantwortlich || "";
+    $("ed_pin_pflicht").checked  = !!b.pin_pflicht;
     $("ed_link").value           = buildLink(p.token);
     showLogoPreview(edLogo);
     $("edTitle").textContent = "Praxis: " + (p.name || "");
@@ -571,6 +577,7 @@
       header_name: hn,
       header_sub: val("ed_header_sub").trim(),
       verantwortlich: val("ed_verantwortlich").trim(),
+      pin_pflicht: !!$("ed_pin_pflicht").checked,
       praxis: {
         name:    hn,
         inhaber: val("ed_inhaber").trim(),
