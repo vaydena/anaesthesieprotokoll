@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" fill="#5b3a1e"/>
+  <circle cx="256" cy="270" r="170" fill="#e3a92b"/>
+  <!-- Bärenkopf -->
+  <circle cx="176" cy="170" r="46" fill="#3a2410"/>
+  <circle cx="336" cy="170" r="46" fill="#3a2410"/>
+  <circle cx="176" cy="170" r="22" fill="#8a5a2b"/>
+  <circle cx="336" cy="170" r="22" fill="#8a5a2b"/>
+  <circle cx="256" cy="270" r="120" fill="#3a2410"/>
+  <ellipse cx="256" cy="318" rx="58" ry="44" fill="#8a5a2b"/>
+  <ellipse cx="256" cy="298" rx="22" ry="15" fill="#1a0f05"/>
+  <circle cx="210" cy="248" r="13" fill="#fff"/>
+  <circle cx="302" cy="248" r="13" fill="#fff"/>
+  <circle cx="212" cy="250" r="6" fill="#1a0f05"/>
+  <circle cx="304" cy="250" r="6" fill="#1a0f05"/>
+  <!-- Rucksackriemen -->
+  <path d="M150 370 Q256 420 362 370" stroke="#e3a92b" stroke-width="14" fill="none" stroke-linecap="round"/>
+</svg>

@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Korbinians Bär</title>
+  <meta name="description" content="Schatzsuche durch Freising: Sammle Korbinians verlorene Reiselast an echten Orten der Stadt.">
+  <meta name="theme-color" content="#5b3a1e">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Korbinians Bär">
+  <link rel="stylesheet" href="vendor/leaflet/leaflet.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="hud">
+    <div class="hud-level" aria-label="Stufe"><span id="hud-level">1</span></div>
+    <div class="hud-main">
+      <div class="hud-title">Korbinians Bär</div>
+      <div class="xp" aria-hidden="true"><div class="xp-fill" id="hud-xp"></div></div>
+    </div>
+    <div class="hud-count" id="hud-count" title="Gefundene Schätze">0/0</div>
+  </header>
+
+  <main id="map" aria-label="Karte von Freising"></main>
+
+  <div class="map-buttons">
+    <button id="btn-center" class="round" title="Auf mich zentrieren" aria-label="Auf mich zentrieren">◎</button>
+  </div>
+
+  <div id="status" class="status" role="status" aria-live="polite"></div>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <nav class="tabs">
+    <button data-panel="" class="active"><span>🗺️</span>Karte</button>
+    <button data-panel="album"><span>🎒</span>Album</button>
+    <button data-panel="kapitel"><span>📖</span>Kapitel</button>
+    <button data-panel="info"><span>ℹ️</span>Info</button>
+  </nav>
+
+  <!-- Bottom-Sheets -->
+  <section id="panel-album" class="sheet" hidden>
+    <h2>Dein Album</h2>
+    <div id="album"></div>
+  </section>
+
+  <section id="panel-kapitel" class="sheet" hidden>
+    <h2>Die Reise des Bären</h2>
+    <div id="kapitel"></div>
+  </section>
+
+  <section id="panel-info" class="sheet" hidden>
+    <h2>So funktioniert's</h2>
+    <ul class="help">
+      <li><b>Geh durch Freising.</b> Die Karte zeigt deinen Standort.</li>
+      <li><b>🟡 Goldene Marker</b> sind Schätze aus Korbinians Gepäck an echten Orten. Wer eine Frage richtig beantwortet, bekommt den Schatz und erfährt etwas über den Ort.</li>
+      <li><b>Kleine Funde</b> wie Brezn oder Bärenspuren tauchen überall in deiner Nähe auf und wechseln alle 15 Minuten.</li>
+      <li>Einsammeln kannst du nur, wenn du nah genug dran bist (gestrichelter Kreis).</li>
+      <li>Ist ein Kapitel komplett, wird das nächste freigeschaltet.</li>
+    </ul>
+    <h3>Sicherheit</h3>
+    <ul class="help">
+      <li>Achte auf den Verkehr, nicht nur aufs Handy.</li>
+      <li>Kein Schatz liegt auf Privatgrund oder in Gebäuden. Kirchen und Museen bitte nur zu den Öffnungszeiten und leise betreten.</li>
+    </ul>
+    <h3>Datenschutz</h3>
+    <p>Dein Standort und dein Spielstand bleiben auf deinem Gerät. Es wird nichts an einen Server geschickt. Nur die Kartenbilder kommen von OpenStreetMap.</p>
+    <h3>Einstellungen</h3>
+    <label class="switch"><input type="checkbox" id="opt-test"> Testmodus: Figur per Tipp auf die Karte bewegen (zum Ausprobieren von zu Hause)</label>
+    <p><button id="btn-reset" class="danger">Spielstand löschen</button></p>
+    <p class="small">Kartendaten © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap-Mitwirkende</a>. Karte: Leaflet.</p>
+  </section>
+
+  <!-- Dialog für Fund / Frage / Story -->
+  <div id="modal" class="modal" hidden>
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+      <div class="modal-icon" id="modal-icon"></div>
+      <h2 id="modal-title"></h2>
+      <div id="modal-body"></div>
+      <div class="modal-actions" id="modal-actions"></div>
+    </div>
+  </div>
+
+  <div id="editor-bar" class="editor-bar" hidden>
+    <b>Ortseditor</b>: Marker ziehen, dann
+    <button id="btn-export">Export</button>
+    <button id="btn-editor-reset">Zurücksetzen</button>
+  </div>
+
+  <script src="vendor/leaflet/leaflet.js"></script>
+  <script src="data.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>
