@@ -1,8 +1,8 @@
 name: Deploy Korbinians Bär zu Hostinger
 
 # Laedt das Spiel "Korbinians Baer" bei Aenderungen auf main per FTPS nach
-# /anaesthesieprotokoll/korbinians-baer/ hoch.
-# Erreichbar unter https://anaesthesieprotokoll.vaydena.de/korbinians-baer/
+# /korbinians-baer/ hoch (Ordner der Subdomain).
+# Erreichbar unter https://korbinians-baer.vaydena.de/
 on:
   push:
     branches: [ main ]
@@ -53,7 +53,7 @@ jobs:
                    --retry 3 --retry-delay 5 --retry-all-errors \
                    --fail --show-error --silent \
                    --user "$FTPUSER:$FTP_PASSWORD" \
-                   -T "$f" "ftp://$FTPHOST/anaesthesieprotokoll/korbinians-baer/$f"; then
+                   -T "$f" "ftp://$FTPHOST/korbinians-baer/$f"; then
                 echo "  OK: $f"; return 0
               fi
               echo "  Fehlversuch $attempt fuer $f"

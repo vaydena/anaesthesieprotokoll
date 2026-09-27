@@ -1,0 +1,35 @@
+# Korbinians Bär – statisches Hosting (Hostinger, Subdomain korbinians-baer.vaydena.de)
+
+AddType application/manifest+json .webmanifest
+
+# Immer HTTPS (Standortbestimmung funktioniert nur verschlüsselt)
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteCond %{HTTPS} off
+  RewriteCond %{HTTP:X-Forwarded-Proto} !https
+  RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+</IfModule>
+
+# Service Worker, Manifest, HTML und Spieldaten nie lange cachen,
+# damit Updates sofort ankommen.
+<FilesMatch "(^sw\.js$|\.webmanifest$|\.html$|^(data|game)\.js$|^style\.css$)">
+  <IfModule mod_headers.c>
+    Header set Cache-Control "no-cache, must-revalidate"
+  </IfModule>
+</FilesMatch>
+
+<FilesMatch "\.(png|svg|ico)$">
+  <IfModule mod_headers.c>
+    Header set Cache-Control "public, max-age=604800"
+  </IfModule>
+</FilesMatch>
+
+<IfModule mod_headers.c>
+  Header set X-Content-Type-Options "nosniff"
+  Header set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
+# README nicht ausliefern
+<Files "README.md">
+  Require all denied
+</Files>

@@ -54,10 +54,11 @@ Die Standortbestimmung funktioniert im Browser nur über **HTTPS** (oder `localh
 
 Das Spiel wird automatisch auf Hostinger veröffentlicht, sobald Änderungen an diesem Ordner auf
 `main` landen (Workflow `.github/workflows/deploy-korbinians-baer.yml`, nutzt dasselbe
-`FTP_PASSWORD`-Secret wie die übrige Seite). Manuell geht es über den Actions-Tab
+`FTP_PASSWORD`-Secret wie die übrige Seite). Ziel ist der FTP-Ordner `/korbinians-baer/`,
+auf den die Subdomain im Hostinger-Panel zeigen muss. Manuell geht es über den Actions-Tab
 („Deploy Korbinians Bär zu Hostinger“ → „Run workflow“).
 
-Adresse: **https://anaesthesieprotokoll.vaydena.de/korbinians-baer/**
+Adresse: **https://korbinians-baer.vaydena.de/**
 
 Alternativ reicht jedes andere Hosting für statische Dateien mit HTTPS: den kompletten Ordner hochladen, fertig.
 
