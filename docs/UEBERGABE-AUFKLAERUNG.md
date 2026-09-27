@@ -35,6 +35,9 @@ das Version 22; gedruckt werden 50 × 50 mm.
 | `j` | mit „ja“ beantwortete Fragen: `{qkey: Freitext \| 1}`; zusätzlich `q33n:1`, wenn q33 = „nein“ | `q*`, `q*_txt` |
 | `b` | Abholung/Betreuung | `q31` |
 | `r` | Bemerkung der Ärztin / des Arztes | `arzt_bemerkung` |
+| `ag` | Datum des Aufklärungsgesprächs, `YYYY-MM-DD` oder `YYYY-MM-DDTHH:MM` (optional) | `ag_datum`, `ag_zeit` |
+| `tf` | Einwilligung Transfusion: `"j"` / `"n"` (optional; bei „n“ zusätzlich `j.q10g`) | `transfusion` |
+| `dm` | Dolmetscher/in, „Name (Sprache)“ (optional) | Dolmetscher-Unterschrift |
 
 ## Zuordnung im Protokoll
 
@@ -43,10 +46,12 @@ das Version 22; gedruckt werden 50 × 50 mm.
 | `p.n`, `p.g`, `p.s`, `p.kg`, `p.cm`, `e` | name, gebdat, geschlecht, gewicht, groesse, eingriff | wird überschrieben (Vorschau zeigt es vorher) |
 | `j.q7` | allergien | Zeile wird angehängt |
 | `j.q6`, `j.q10a` | dauermedikation | Zeile wird angehängt |
-| übrige `j.*` | vorerkrankungen | Zeile wird angehängt, relevante mit „⚠“ |
+| `j.q6b` (GLP-1), `j.q6c` (SGLT-2), `j.q6d` (Kortison) | dauermedikation | Zeile mit „⚠“ wird angehängt, zusätzlich als Hinweis |
+| übrige bekannte `j.*` (u. a. `q1_ponv`, `q1_atemweg`, `q10g`, `q26b`) | vorerkrankungen | Zeile wird angehängt, relevante mit „⚠“ |
+| unbekannte `j.q*` (neuere Bogen-Version) | vorerkrankungen | wird **nie verworfen**: Zeile „⚠ Weitere Angabe aus dem Aufklärungsbogen (Schlüssel): Text“ plus Hinweis |
 | `j.q28` / `j.q28b` | nikotin / alkohol | nur, wenn das Feld leer ist |
 | – | aufklaerung | wird auf „ja“ gesetzt |
-| `v`, `a`, `d`, `p.h`, `b`, `r` | Infobox „Aus dem Aufklärungsbogen übernommen“ (Prämedikation) | nur Anzeige |
+| `v`, `a`, `d`, `ag`, `tf`, `dm`, `p.h`, `b`, `r` | Infobox „Aus dem Aufklärungsbogen übernommen“ (Prämedikation) | nur Anzeige |
 
 Das tatsächliche Anästhesieverfahren wird **nicht** vorbelegt; die eingewilligten Verfahren
 stehen nur als Information in der Infobox. Doppelte Zeilen werden nicht erneut angehängt.
