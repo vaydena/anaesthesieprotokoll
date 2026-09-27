@@ -222,6 +222,8 @@ nav.main a:hover{color:var(--ink);background:var(--primary-l)}
 .feat .ic svg{width:22px;height:22px;stroke:var(--primary-d)}
 .feat h3{font-size:1.02rem;margin-bottom:.35em}
 .feat p{font-size:.92rem;color:var(--muted);margin:0}
+.feat{position:relative}
+.feat .new{position:absolute;top:18px;right:18px;font-size:.68rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#8a5510;background:var(--accent-l);border:1px solid var(--accent);border-radius:999px;padding:2px 9px}
 @media (max-width:900px){ .feats{grid-template-columns:repeat(2,1fr)} }
 @media (max-width:560px){ .feats{grid-template-columns:1fr} }
 
@@ -521,7 +523,7 @@ footer a:hover{color:#fff}
       <div class="feat">
         <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l3-7 4 14 3-7h4"/></svg></div>
         <h3>Vitalkurve zum Antippen</h3>
-        <p>Blutdruck, Herzfrequenz und weitere Werte im 5-Minuten-Raster eintragen. Klassische oder moderne Darstellung – reine Visualisierung Ihrer Eingaben.</p>
+        <p>Blutdruck, Herzfrequenz und weitere Werte im 5-Minuten-Raster eintragen. Klassische oder moderne Darstellung – reine Visualisierung Ihrer Eingaben. Neu: Rückgängig-Taste, mitwachsende Zeilen und Ereignis-Marker mit Uhrzeit.</p>
       </div>
       <div class="feat">
         <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h9l5 5v13H6z"/><path d="M14 3v6h6M9 13h6M9 16h4"/></svg></div>
@@ -536,7 +538,43 @@ footer a:hover{color:#fff}
       <div class="feat">
         <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 9 0 1 0 9 9M12 3v9l6-3"/></svg></div>
         <h3>Datensicherung in Ihrer Hand</h3>
-        <p>Jedes Protokoll als PDF und als JSON-Datensicherung exportierbar – für Ihre Akte und Ihr eigenes Backup, ohne Umweg über eine Cloud.</p>
+        <p>Jedes Protokoll als PDF und als JSON-Datensicherung exportierbar – für Ihre Akte und Ihr eigenes Backup, ohne Umweg über eine Cloud. Finalisierte Fälle liegen zusätzlich im Fall-Archiv auf dem Gerät.</p>
+      </div>
+      <div class="feat">
+        <span class="new">Neu</span>
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 7v5l3 2"/><circle cx="12" cy="12" r="9"/></svg></div>
+        <h3>Schneller eintragen</h3>
+        <p>„Jetzt“-Tasten für Uhrzeiten, vorbelegtes Datum, Dezimalzahlen mit Komma und Auswahlfelder, die sich per erneutem Antippen wieder abwählen lassen. Alter und BMI werden informativ aus Ihren Angaben angezeigt, Blutprodukte mit Einheiten je Produkt.</p>
+      </div>
+      <div class="feat">
+        <span class="new">Neu</span>
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h10M4 18h6"/><circle cx="19" cy="16" r="3"/></svg></div>
+        <h3>Navigation &amp; Fortschritt</h3>
+        <p>Eine Abschnittsleiste springt direkt zu Stammdaten, Medikamenten, Verlauf oder Aufwachraum. Offene Pflichtfelder sind markiert, eine Fortschrittsanzeige zeigt, was vor dem Finalisieren noch fehlt.</p>
+      </div>
+      <div class="feat">
+        <span class="new">Neu</span>
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h3M4 12h3M4 18h3"/><path d="M10 6h10M10 12h10M10 18h6"/></svg></div>
+        <h3>Zeitstempel überall</h3>
+        <p>Ereignisse sortieren sich automatisch nach Uhrzeit, Marker in der Vitalkurve tragen ihre Zeit, Unterschriften werden mit Zeitstempel gespeichert – der Verlauf bleibt lückenlos nachvollziehbar.</p>
+      </div>
+      <div class="feat">
+        <span class="new">Neu</span>
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V3h12v6"/><rect x="3" y="9" width="18" height="8" rx="2"/><path d="M7 14h10v7H7z"/></svg></div>
+        <h3>Kompakter Ausdruck</h3>
+        <p>Im finalen PDF entfallen leere Felder, leere Tabellen und Platzhalter; die Kopfzeile mit Praxis, Patient und Protokoll-ID steht auf jeder Seite. Ein leeres Formular lässt sich weiterhin als Blanko-Vorlage drucken.</p>
+      </div>
+      <div class="feat">
+        <span class="new">Neu</span>
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 13A9 9 0 1 1 11 3a7 7 0 0 0 10 10z"/></svg></div>
+        <h3>Dunkelmodus</h3>
+        <p>Hell, Dunkel oder automatisch nach Geräteeinstellung – angenehm im abgedunkelten OP und im Aufwachraum. Der Ausdruck bleibt immer hell und gut lesbar.</p>
+      </div>
+      <div class="feat">
+        <span class="new">Neu</span>
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3M12 15v2"/></svg></div>
+        <h3>Zugang &amp; Bildschirmsperre</h3>
+        <p>Nach einer erfolgreichen Zugangsprüfung läuft das Protokoll bis zu 7 Tage ohne Internet. Die Bildschirmsperre lässt sich mit PIN schützen – auf Wunsch schreibt der Betreiber die PIN für Ihre Praxis verbindlich vor.</p>
       </div>
     </div>
   </div>
@@ -603,7 +641,8 @@ footer a:hover{color:#fff}
         <span>pro finalisiertem Protokoll</span>
       </div>
       <ul>
-        <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l5 5L20 6"/></svg>Nur finalisierte Protokolle zählen – verworfene oder abgebrochene kosten nichts.</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l5 5L20 6"/></svg>Nur ausgefüllte Protokolle zählen – verworfene, abgebrochene und leere Blanko-Ausdrucke kosten nichts.</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l5 5L20 6"/></svg>Jedes Protokoll zählt genau einmal – egal, wie oft Sie es drucken oder aus dem Archiv erneut ausgeben.</li>
         <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l5 5L20 6"/></svg>Zusammen mit dem Aufklärungsbogen: 1,00&nbsp;€ pro Fall für Aufklärung <i>und</i> Protokoll – per QR-Übergabe automatisch nur einmal gezählt.</li>
         <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l5 5L20 6"/></svg>Keine Einrichtungsgebühr, keine monatliche Grundgebühr.</li>
         <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l5 5L20 6"/></svg>Bequeme Abrechnung per Rechnung – zahlbar per Überweisung mit QR-Code (GiroCode).</li>
@@ -693,12 +732,16 @@ footer a:hover{color:#fff}
         <p>Ausschließlich lokal im Browser des Geräts, auf dem dokumentiert wird. Sie exportieren jedes Protokoll als PDF und als JSON-Datensicherung. An den Server wird nur ein anonymes Zähl-Ereignis übermittelt – ohne Namen und ohne medizinische Inhalte.</p>
       </details>
       <details>
+        <summary>Funktioniert das Protokoll auch ohne Internet? <span class="chev">▶</span></summary>
+        <p>Ja. Nach einer erfolgreichen Zugangsprüfung können Sie bis zu 7 Tage vollständig offline dokumentieren, finalisieren und drucken. Anonyme Zähl-Ereignisse werden auf dem Gerät zwischengespeichert und beim nächsten Öffnen mit Verbindung automatisch nachgesendet.</p>
+      </details>
+      <details>
         <summary>Ist das ein Medizinprodukt? <span class="chev">▶</span></summary>
-        <p>Nein. Es ist ein reines Dokumentationswerkzeug: Es rechnet nicht, warnt nicht und gibt keine Dosis- oder Score-Empfehlungen. Ihr Team dokumentiert den Verlauf; klinische Entscheidungen und die langfristige Archivierung (§&nbsp;630f BGB) bleiben Aufgabe der Praxis.</p>
+        <p>Nein. Es ist ein reines Dokumentationswerkzeug: Es warnt nicht, deutet nichts und gibt keine Dosis- oder Score-Empfehlungen; angezeigte Summen, Alter und BMI sind reine Rechenhilfen aus Ihren Eingaben. Ihr Team dokumentiert den Verlauf; klinische Entscheidungen und die langfristige Archivierung (§&nbsp;630f BGB) bleiben Aufgabe der Praxis.</p>
       </details>
       <details>
         <summary>Was kostet die Nutzung genau? <span class="chev">▶</span></summary>
-        <p>1,00 € pro finalisiertem Protokoll. Abgebrochene oder verworfene Protokolle kosten nichts. Sie erhalten eine übersichtliche Rechnung und zahlen bequem per Überweisung mit QR-Code (GiroCode).</p>
+        <p>1,00 € pro finalisiertem Protokoll. Abgebrochene oder verworfene Protokolle kosten nichts, ebenso leere Blanko-Ausdrucke; erneutes Drucken desselben Protokolls wird nicht noch einmal berechnet. Sie erhalten eine übersichtliche Rechnung und zahlen bequem per Überweisung mit QR-Code (GiroCode).</p>
       </details>
       <details>
         <summary>Wir nutzen bereits den Aufklärungsbogen – was ändert sich? <span class="chev">▶</span></summary>
