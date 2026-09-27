@@ -697,7 +697,10 @@ window.__HF_PRAXIS = { name:"", sub:"", verantwortlich:"" };
   var recorded = false;
   try{ recorded = localStorage.getItem("hf_recorded_visit")===VISIT; }catch(e){}
   function record(){
-    if(recorded) return; recorded=true;
+    if(recorded) return;
+    // Nur ausgefüllte Protokolle werden abgerechnet; ein leerer Ausdruck (Blanko-Formular) zählt nicht
+    try{ if(typeof window.__hasContent==="function" && !window.__hasContent()) return; }catch(e){}
+    recorded=true;
     try{ localStorage.setItem("hf_recorded_visit",VISIT); }catch(e){}
     qAdd(token,VISIT);
     try{ sendUsage(token,VISIT).then(function(res){ if(res===true||res==="drop") qRemove(VISIT); }).catch(function(){}); }catch(e){}
@@ -2533,6 +2536,7 @@ window.__HF_PRAXIS = { name:"", sub:"", verantwortlich:"" };
     nr.parentNode.insertBefore(box, nr.nextSibling);
   }
   window.__prepPrint=prepPrint;
+  window.__hasContent=hasContent;
   window.addEventListener("beforeprint",prepPrint);
   window.addEventListener("afterprint",cleanupPrint);
 
