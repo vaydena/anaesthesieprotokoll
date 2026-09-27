@@ -291,6 +291,18 @@ body.hf-locked > *:not(#hf-gate){filter:blur(7px); pointer-events:none; user-sel
   .callout{background:#f3f3f3; color:#000; border-color:#999}
   .score{background:#fff}
   .idlelock,.footbar{display:none!important}
+  dialog{display:none!important}
+  .tablescroll{overflow:visible; margin:0}
+  .tablescroll table{width:100%}
+  .tablescroll input,.tablescroll select{min-width:0!important; width:100%; min-height:0; padding:1px 2px}
+  input::-webkit-calendar-picker-indicator{display:none}
+  .vitwrap .tapgrid{max-width:100%; height:auto}
+  .numrows{display:none!important}
+  .has-mirror{display:none!important}
+  .printmirror{white-space:pre-wrap; overflow-wrap:anywhere; border-bottom:1px solid #bbb; padding:1px 2px; min-height:1.3em}
+  textarea + .printmirror{border:1px solid #ccc; padding:3px 5px}
+  .printnum table{border-collapse:collapse; margin:4px 0; font-size:9px}
+  .printnum th,.printnum td{border:1px solid #999; padding:1px 3px; text-align:center}
 }
 .print-only,.reportfoot{display:none}
 .reportfoot{margin-top:14px; padding-top:10px; border-top:1px solid #999; font-size:10px; color:#333}
@@ -497,14 +509,20 @@ window.__HF_PRAXIS = { name:"", sub:"", verantwortlich:"" };
       }).catch(function(){});
     });
   }
+  // Gezaehlt-Status ueberlebt Neuladen (sonst koennte eine spaetere QR-Uebernahme die ID eines bereits gezaehlten Falls tauschen)
   var recorded = false;
+  try{ recorded = localStorage.getItem("hf_recorded_visit")===VISIT; }catch(e){}
   function record(){
     if(recorded) return; recorded=true;
+    try{ localStorage.setItem("hf_recorded_visit",VISIT); }catch(e){}
     qAdd(token,VISIT);
     try{ sendUsage(token,VISIT).then(function(res){ if(res===true||res==="drop") qRemove(VISIT); }).catch(function(){}); }catch(e){}
   }
   var _p = (typeof window.print==="function") ? window.print.bind(window) : function(){};
-  window.print = function(){ record(); return _p(); };
+  function prep(){ try{ if(window.__prepPrint) window.__prepPrint(); }catch(e){} }
+  window.print = function(){ record(); prep(); return _p(); };
+  // Druck ohne Zaehlung (nur fuer bereits archivierte Protokolle, die schon gezaehlt wurden)
+  window.__printRaw = function(){ prep(); return _p(); };
   try{ window.addEventListener("online", flushQueue); }catch(e){}
 
   function applyBranding(b){
@@ -542,13 +560,24 @@ window.__HF_PRAXIS = { name:"", sub:"", verantwortlich:"" };
   function start(){
     flushQueue();
     if(!token){ gate("Kein Zugang","Bitte über den <b>Freischalt-Link Ihres Zugangs</b> öffnen.", true); return; }
-    post("aprot-check-token",{token:token}).then(function(r){return r.json();}).then(function(d){
-      if(d && d.valid){ applyBranding(d.branding); open(); try{ if(window.__onUnlock) window.__onUnlock(); }catch(e){} }
-      else{ try{ sessionStorage.removeItem("hf_token"); }catch(e){}
+    // Offline-Nutzung: letzte erfolgreiche Pruefung merken; bei Netz-/Serverfehler innerhalb der Karenzzeit trotzdem oeffnen
+    var OKKEY="aprot_gate_ok", GRACE_MS=7*24*3600*1000;
+    function unlockApp(branding){ applyBranding(branding); open(); try{ if(window.__onUnlock) window.__onUnlock(); }catch(e){} }
+    function offlineFallback(){
+      var c=null; try{ c=JSON.parse(localStorage.getItem(OKKEY)||"null"); }catch(e){}
+      if(c && c.token===token && (Date.now()-c.ts)<GRACE_MS){ unlockApp(c.branding); return; }
+      gate("Verbindungsproblem","Zugang konnte nicht geprüft werden. Bitte Internetverbindung prüfen und erneut versuchen.", true);
+    }
+    post("aprot-check-token",{token:token}).then(function(r){
+      if(!r.ok) throw new Error("http "+r.status);
+      return r.json();
+    }).then(function(d){
+      if(d && d.valid){ try{ localStorage.setItem(OKKEY, JSON.stringify({token:token,ts:Date.now(),branding:d.branding||{}})); }catch(e){} unlockApp(d.branding); }
+      else{ try{ sessionStorage.removeItem("hf_token"); localStorage.removeItem(OKKEY); }catch(e){}
             if(d && d.reason==="trial_expired") gate("Testzeitraum abgelaufen","Der kostenlose Testzeitraum Ihres Praxis-Zugangs ist beendet.", true);
             else if(d && d.reason==="locked") gate("Zugang gesperrt","Ihr Praxis-Zugang ist derzeit gesperrt. Bitte wenden Sie sich an den Betreiber.", true);
             else gate("Zugang ungültig","Der Zugangslink ist nicht (mehr) gültig.", true); }
-    }).catch(function(){ gate("Verbindungsproblem","Zugang konnte nicht geprüft werden. Bitte erneut versuchen.", true); });
+    }).catch(offlineFallback);
   }
   if(document.readyState==="loading") document.addEventListener("DOMContentLoaded", start);
   else start();
@@ -784,7 +813,19 @@ window.__HF_PRAXIS = { name:"", sub:"", verantwortlich:"" };
   var saveT=null;
   function save(){ if(archiveBackup) return; if(saveT) clearTimeout(saveT); saveT=setTimeout(function(){ if(archiveBackup) return; try{ localStorage.setItem(STORE_KEY, JSON.stringify(state)); }catch(e){} },250); }
   function saveNow(){ if(archiveBackup) return; if(saveT){ clearTimeout(saveT); saveT=null; } try{ localStorage.setItem(STORE_KEY, JSON.stringify(state)); }catch(e){} }
-  function hasContent(){ return !!(state.f.name||state.drugs.length||state.events.length||Object.keys(state.vitals.data).length); }
+  function hasContent(){
+    var f=state.f||{};
+    function filled(v){
+      if(Array.isArray(v)) return v.length>0;
+      if(v && typeof v==="object"){ for(var x in v){ if(filled(v[x])) return true; } return false; } // Score-Felder
+      return v!==""&&v!=null&&v!==false;
+    }
+    for(var k in f){ if(filled(f[k])) return true; }
+    if(state.drugs.length||state.infus.length||state.blood.length||state.events.length||state.markers.length||state.blut) return true;
+    if(Object.keys(state.vitals.data).length||Object.keys(state.sigs||{}).length) return true;
+    for(var b in state.balance){ if(state.balance[b]) return true; }
+    return false;
+  }
   function audit(action,detail){ state.audit.push({ts:nowISO(),action:action,detail:detail||""}); }
 
   /* ---------------- Feld-Sichtbarkeit ---------------- */
@@ -1502,6 +1543,7 @@ window.__HF_PRAXIS = { name:"", sub:"", verantwortlich:"" };
   }
   function finalizeNow(){
     state.final=true; state.finalAt=nowISO(); state.ver=1;
+    state.vid=window.__HF_VISIT||state.vid||null; // Protokoll-ID fest im Protokoll speichern (Archiv, Druck, Export)
     audit("finalize","Protokoll finalisiert");
     saveNow();
     archiveSave();
@@ -1534,7 +1576,7 @@ window.__HF_PRAXIS = { name:"", sub:"", verantwortlich:"" };
   function buildReportFoot(){
     var rf=$("#reportfoot"); if(!rf) return;
     var p=window.__HF_PRAXIS||{};
-    var idline = "Protokoll-ID: "+(window.__HF_VISIT||"—")+" · Version v"+(state.ver||1);
+    var idline = "Protokoll-ID: "+(state.vid||window.__HF_VISIT||"—")+" · Version v"+(state.ver||1);
     rf.innerHTML="";
     rf.appendChild(el("div",{style:"font-weight:700",text:(p.name||"Anästhesieprotokoll")+(p.sub?(" · "+p.sub):"")}));
     if(state.final) rf.appendChild(el("div",{text:"Finalisiert: "+fmtDT(state.finalAt)}));
@@ -1556,7 +1598,7 @@ window.__HF_PRAXIS = { name:"", sub:"", verantwortlich:"" };
     }catch(e){ cb(null); }
   }
   function archiveSave(){
-    var id=window.__HF_VISIT||("case-"+Date.now());
+    var id=state.vid||window.__HF_VISIT||("case-"+Date.now());
     var rec={ id:id, at:nowISO(), name:state.f.name||"", datum:state.f.datum||state.f.beginn||"", ver:state.ver||1, data:JSON.parse(JSON.stringify(state)) };
     idb(function(db){ if(!db) return; try{ var tx=db.transaction("cases","readwrite"); tx.objectStore("cases").put(rec); }catch(e){} });
   }
@@ -1589,7 +1631,7 @@ window.__HF_PRAXIS = { name:"", sub:"", verantwortlich:"" };
     $("#arch").close();
     render(); buildReportFoot();
     dialog("Archiviertes Protokoll", el("p",{text:"Schreibgeschützte Ansicht – es wird nichts gespeichert. Sie können drucken. „Zurück“ (oder Esc) kehrt zu Ihrem aktuellen Protokoll zurück."}), [
-      {t:"Drucken / PDF",cls:"sec",fn:function(){ window.print(); }},
+      {t:"Drucken / PDF",cls:"sec",fn:function(){ (window.__printRaw||window.print)(); }},
       {t:"Zurück",cls:"primary",fn:closeDlg}
     ]);
     dlg.addEventListener("close",leaveArchiveView,{once:true});
@@ -1615,12 +1657,20 @@ window.__HF_PRAXIS = { name:"", sub:"", verantwortlich:"" };
         var obj=JSON.parse(rd.result);
         if(Array.isArray(obj)){ // Sammel-Backup -> ins Archiv
           obj=obj.filter(function(d){ return d && typeof d==="object" && d.f; }).map(normalize);
-          idb(function(db){ if(!db) return; var tx=db.transaction("cases","readwrite"); obj.forEach(function(d){ tx.objectStore("cases").put({id:d.created||("case-"+Math.random()),at:nowISO(),name:d.f.name||"",datum:d.f.datum||"",ver:d.ver||1,data:d}); }); });
-          dialog("Eingelesen", el("p",{text:obj.length+" Protokoll(e) ins Archiv übernommen."}), [{t:"OK",cls:"primary",fn:closeDlg}]);
+          var fail=function(){ dialog("Fehler", el("p",{text:"Archiv auf diesem Gerät nicht verfügbar – nichts übernommen."}), [{t:"OK",cls:"primary",fn:closeDlg}]); };
+          idb(function(db){
+            if(!db){ fail(); return; }
+            try{
+              var tx=db.transaction("cases","readwrite");
+              obj.forEach(function(d){ tx.objectStore("cases").put({id:d.vid||d.created||("case-"+Math.random()),at:nowISO(),name:d.f.name||"",datum:d.f.datum||"",ver:d.ver||1,data:d}); });
+              tx.oncomplete=function(){ dialog("Eingelesen", el("p",{text:obj.length+" Protokoll(e) ins Archiv übernommen."}), [{t:"OK",cls:"primary",fn:closeDlg}]); };
+              tx.onerror=fail;
+            }catch(e){ fail(); }
+          });
           return;
         }
         if(obj && obj.f){
-          var doLoad=function(){ state=normalize(obj); missingIds={}; saveNow(); render(); buildReportFoot(); dialog("Eingelesen", el("p",{text:"Protokoll geladen."}), [{t:"OK",cls:"primary",fn:closeDlg}]); };
+          var doLoad=function(){ state=normalize(obj); missingIds={}; if(state.vid && window.__HF_ADOPT_VISIT) window.__HF_ADOPT_VISIT(state.vid); saveNow(); render(); buildReportFoot(); dialog("Eingelesen", el("p",{text:"Protokoll geladen."}), [{t:"OK",cls:"primary",fn:closeDlg}]); };
           if(!state.final && hasContent()){
             dialog("Aktuelles Protokoll ersetzen?", el("p",{html:"Das aktuelle Protokoll ist <b>noch nicht finalisiert</b> und würde durch die Datei ersetzt. Vorher ggf. „Sichern (JSON)“."}), [
               {t:"Abbrechen",cls:"sec",fn:closeDlg},
@@ -1873,7 +1923,7 @@ window.__HF_PRAXIS = { name:"", sub:"", verantwortlich:"" };
   /* ---------------- Neues Protokoll ---------------- */
   function newProtocol(){
     var b=el("div");
-    if(!state.final && (state.f.name||state.drugs.length||Object.keys(state.vitals.data).length)){
+    if(!state.final && hasContent()){
       b.appendChild(el("p",{html:"Das aktuelle Protokoll ist <b>noch nicht finalisiert</b>. Ein neues Protokoll zu starten verwirft die aktuellen, ungesicherten Eingaben (auf diesem Gerät)."}));
       b.appendChild(el("p",{class:"vitnote",text:"Tipp: vorher „Sichern (JSON)“ oder finalisieren."}));
     } else {
@@ -1916,12 +1966,21 @@ window.__HF_PRAXIS = { name:"", sub:"", verantwortlich:"" };
     });
   }
   function isLocked(){ return LOCK.classList.contains("on"); }
+  // Während der Sperre ist die Seite darunter per Tastatur/Screenreader nicht erreichbar
+  function setInert(on){
+    Array.prototype.forEach.call(document.body.children,function(c){
+      if(c===LOCK || c.tagName==="SCRIPT" || c.tagName==="DIALOG") return;
+      if(on){ c.setAttribute("inert",""); c.setAttribute("aria-hidden","true"); } else { c.removeAttribute("inert"); c.removeAttribute("aria-hidden"); }
+    });
+    if(on && document.activeElement && document.activeElement!==document.body && !LOCK.contains(document.activeElement)) document.activeElement.blur();
+  }
   function lockNow(){
     var hp=!!getPin();
     LOCK.classList.toggle("haspin",hp); LOCK.classList.toggle("canpin",canPin);
     $("#idleMsg").textContent = hp ? "Zum Schutz der Patientendaten. PIN eingeben zum Fortsetzen." : "Zum Schutz der Patientendaten. Tippen zum Fortsetzen.";
     $("#idlePin").value=""; $("#idlePinErr").textContent="";
     LOCK.classList.add("on"); LOCK.setAttribute("aria-hidden","false");
+    setInert(true);
     try{ localStorage.setItem(LOCKED_KEY,"1"); }catch(e){}
     // Modale Dialoge liegen im Top-Layer über der Sperre -> schließen
     if(dlg.open) closeDlg();
@@ -1930,6 +1989,7 @@ window.__HF_PRAXIS = { name:"", sub:"", verantwortlich:"" };
   }
   function unlock(){
     LOCK.classList.remove("on"); LOCK.setAttribute("aria-hidden","true");
+    setInert(false);
     try{ localStorage.removeItem(LOCKED_KEY); }catch(e){}
     armIdle();
   }
@@ -1980,12 +2040,47 @@ window.__HF_PRAXIS = { name:"", sub:"", verantwortlich:"" };
   }
 
   /* ---------------- Druck-Vorbereitung ---------------- */
-  window.addEventListener("beforeprint",function(){
+  function cleanupPrint(){
+    $$(".printmirror,.printnum").forEach(function(n){ n.parentNode.removeChild(n); });
+    $$(".has-mirror").forEach(function(n){ n.classList.remove("has-mirror"); });
+  }
+  function prepPrint(){
+    cleanupPrint();
     buildReportFoot();
     $$(".sect").forEach(function(d){ if(d.getAttribute("data-hidden")!=="1"){ d.open=true; } });
     // Vitalkurve sicher gezeichnet
     paintVitals();
-  });
+    // Freitext vollständig drucken (Textfelder/Eingaben schneiden langen Text sonst ab)
+    $$("#app textarea, #app input[type=text]").forEach(function(n){
+      if(!n.value || (n.tagName==="INPUT" && n.value.length<=24)) return;
+      n.classList.add("has-mirror");
+      n.parentNode.insertBefore(el("div",{class:"print-only printmirror",text:n.value}), n.nextSibling);
+    });
+    // Numerische Vitalwerte: nur belegte Spalten, in Blöcken, damit die Tabelle auf A4 passt
+    var nr=$(".numrows"); if(!nr) return;
+    var cols=Object.keys(state.vitals.data).map(Number).filter(function(c){
+      var o=state.vitals.data[c]||{}; return NUMROWS.some(function(r){ return o[r.id]!=null && o[r.id]!==""; });
+    }).sort(function(a,b){ return a-b; });
+    if(!cols.length) return;
+    var box=el("div",{class:"print-only printnum"});
+    box.appendChild(el("div",{class:"vitnote",text:"Vitalwerte (numerisch)"}));
+    for(var i=0;i<cols.length;i+=14){
+      var chunk=cols.slice(i,i+14), t=el("table"), hr=el("tr");
+      hr.appendChild(el("th",{text:""}));
+      chunk.forEach(function(c){ hr.appendChild(el("th",{text:colClock(c)})); });
+      t.appendChild(hr);
+      NUMROWS.forEach(function(r){
+        var tr=el("tr"); tr.appendChild(el("th",{style:"text-align:left",text:r.label}));
+        chunk.forEach(function(c){ var o=state.vitals.data[c]||{}; tr.appendChild(el("td",{text:(o[r.id]!=null?String(o[r.id]):"")})); });
+        t.appendChild(tr);
+      });
+      box.appendChild(t);
+    }
+    nr.parentNode.insertBefore(box, nr.nextSibling);
+  }
+  window.__prepPrint=prepPrint;
+  window.addEventListener("beforeprint",prepPrint);
+  window.addEventListener("afterprint",cleanupPrint);
 
   /* ---------------- Verdrahtung ---------------- */
   function wire(){

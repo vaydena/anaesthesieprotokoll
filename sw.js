@@ -1,9 +1,9 @@
 /* Anästhesieprotokoll – Service Worker
    Offline-first für eine token-gated Doku-PWA.
-   BYTE-DIFF-MARKER (bei jedem Release hochzählen, damit hCDN einen frischen 200 liefert): aprot-sw-5
+   BYTE-DIFF-MARKER (bei jedem Release hochzählen, damit hCDN einen frischen 200 liefert): aprot-sw-6
    Konservativ: fasst NUR eigene GET-Anfragen an. POST/cross-origin (Supabase) laufen
    immer direkt ins Netz – Metering und Token-Prüfung dürfen nie aus dem Cache kommen. */
-const CACHE = "aprot-app-v8";
+const CACHE = "aprot-app-v9";
 const SHELL = [
   "/app.html",
   "/manifest.webmanifest",
