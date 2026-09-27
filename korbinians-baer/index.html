@@ -58,6 +58,7 @@
       <li><b>🟡 Goldene Marker</b> sind Schätze aus Korbinians Gepäck an echten Orten. Wer eine Frage richtig beantwortet, bekommt den Schatz und erfährt etwas über den Ort.</li>
       <li><b>Kleine Funde</b> wie Brezn oder Bärenspuren tauchen überall in deiner Nähe auf und wechseln alle 15 Minuten.</li>
       <li>Einsammeln kannst du nur, wenn du nah genug dran bist (gestrichelter Kreis).</li>
+      <li><b>📷 AR-Modus:</b> Beim Einsammeln öffnet sich die Kamera. Der Fund schwebt dort, wo er wirklich liegt. Halte das Handy aufrecht, dreh dich, bis du ihn siehst, und tipp drauf.</li>
       <li>Ist ein Kapitel komplett, wird das nächste freigeschaltet.</li>
     </ul>
     <h3>Sicherheit</h3>
@@ -66,8 +67,9 @@
       <li>Kein Schatz liegt auf Privatgrund oder in Gebäuden. Kirchen und Museen bitte nur zu den Öffnungszeiten und leise betreten.</li>
     </ul>
     <h3>Datenschutz</h3>
-    <p>Dein Standort und dein Spielstand bleiben auf deinem Gerät. Es wird nichts an einen Server geschickt. Nur die Kartenbilder kommen von OpenStreetMap.</p>
+    <p>Dein Standort und dein Spielstand bleiben auf deinem Gerät. Es wird nichts an einen Server geschickt. Nur die Kartenbilder kommen von OpenStreetMap. Das Kamerabild im AR-Modus wird nur angezeigt, nie gespeichert oder verschickt.</p>
     <h3>Einstellungen</h3>
+    <label class="switch"><input type="checkbox" id="opt-ar"> AR-Modus: Funde und Schätze mit der Kamera fangen</label>
     <label class="switch"><input type="checkbox" id="opt-test"> Testmodus: Figur per Tipp auf die Karte bewegen (zum Ausprobieren von zu Hause)</label>
     <p><button id="btn-reset" class="danger">Spielstand löschen</button></p>
     <p class="small">Kartendaten © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap-Mitwirkende</a>. Karte: Leaflet.</p>
@@ -83,6 +85,18 @@
     </div>
   </div>
 
+  <!-- Kamera-AR -->
+  <div id="ar" class="ar" hidden>
+    <video id="ar-video" autoplay playsinline muted></video>
+    <div class="ar-kopf">
+      <span id="ar-titel"></span>
+      <button id="ar-abbrechen" class="ar-zu" aria-label="AR schließen">✕</button>
+    </div>
+    <button id="ar-objekt" class="ar-objekt" aria-label="Fangen"></button>
+    <div id="ar-pfeil" class="ar-pfeil" hidden></div>
+    <div id="ar-hinweis" class="ar-hinweis"></div>
+  </div>
+
   <div id="editor-bar" class="editor-bar" hidden>
     <b>Ortseditor</b>: Marker ziehen, dann
     <button id="btn-export">Export</button>
@@ -91,6 +105,7 @@
 
   <script src="vendor/leaflet/leaflet.js"></script>
   <script src="data.js"></script>
+  <script src="ar.js"></script>
   <script src="game.js"></script>
 </body>
 </html>

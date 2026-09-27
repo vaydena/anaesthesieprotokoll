@@ -61,9 +61,10 @@ jobs:
             done
             echo "Aufgeben nach $max Versuchen: $f"; return 1
           }
-          # Alle Spieldateien ausser README; sw.js zuletzt, damit der neue
-          # Service Worker erst die fertigen Dateien vorfindet.
-          find . -type f ! -name README.md ! -name sw.js | sed 's|^\./||' | sort > /tmp/dateien.txt
-          echo sw.js >> /tmp/dateien.txt
+          # Alle Spieldateien ausser README. sw.js und index.html zuletzt: Solange
+          # die Seite selbst noch alt ist, fragt niemand nach halb hochgeladenen
+          # Skripten (sonst cachen Browser/CDN 404-Antworten).
+          find . -type f ! -name README.md ! -name sw.js ! -name index.html | sed 's|^\./||' | sort > /tmp/dateien.txt
+          printf '%s\n' sw.js index.html >> /tmp/dateien.txt
           while read -r f; do upload "$f"; done < /tmp/dateien.txt
           echo "Alle Dateien hochgeladen."
